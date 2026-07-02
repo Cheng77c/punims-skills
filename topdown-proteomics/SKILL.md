@@ -111,10 +111,15 @@ python3 scripts/validate_pipeline.py --pipeline pipeline.json
 作业按数据来源选择获取方式:
 
 > **默认路由:谱图一律走 dataset(只读挂载),不论大小、不论来自工作区还是共享盘/个人盘。** 共享盘/个人盘的谱图**直接转 dataset,不要先下载到工作区**;**唯一需要下载的是 FASTA**(因需可写,见下)。**只有当用户主动要求"直接上传/不建数据集"、且谱图 ≤100MB 时,才走 `-p`。**
+>
+> **铁律(数据集来源二选一,不可混):**
+> - **共享盘 / 个人盘(share/… 或 personal/…)的谱图 → 必须用 sandbox 直转**(bohrium-dataset-manager 的「从共享盘/个人盘建数据集」,盘→dataset 服务端直连)。**严禁先下载到工作区再 `make_dataset.py`——那是多余的二次传输,明确禁止。**
+> - **`make_dataset.py` 仅用于「用户上传到当前工作区」的本地谱图**(工作区里实打实的文件)。盘上数据不归它管。
+> - 两条路径**建前都必须查重**:sandbox 直转见 bohrium-dataset-manager 的查重步骤;`make_dataset.py` 已内置查重(建前扫项目,命中同名+同大小文件直接复用、返回 `reused:true`,不重复创建)。
 
 | 数据在哪 | 怎么进作业 | 作业内可写 |
 |---|---|---|
-| **主输入谱图(`.raw`/`.mzML`/`.msalign`/`.pbf`,任意大小)——默认建 dataset** | 工作区本地:`make_dataset.py`;共享盘/个人盘:「转数据集」能力(bohrium-dataset-manager,**直接转、无需下载**)→ `--dataset-path` 挂载。拿 `/bohr/<名>/v1/<文件>` 填 inputs | ❌ 只读 |
+| **主输入谱图(`.raw`/`.mzML`/`.msalign`/`.pbf`,任意大小)——默认建 dataset** | **工作区上传的本地文件**:`make_dataset.py`(已内置查重)。**共享盘/个人盘**:bohrium-dataset-manager 的「从共享盘/个人盘建数据集」sandbox 直转(**服务端直连、严禁先下载**,含查重)→ `--dataset-path` 挂载。拿 `/bohr/<名>/v1/<文件>` 填 inputs | ❌ 只读 |
 | **FASTA / 参数 / 需可写的小文件** | `-p` 上传目录(submit 自动打包)。共享盘/个人盘上的 fasta **只下载它**进任务目录再 -p | ✅ 可写 |
 | **已有 / 网页端上传的 dataset** | `bohr dataset list` 找到,引用 `/bohr/<名>/v1`(不知文件名用「列出数据集内文件」) | ❌ 只读 |
 | 谱图,但用户**主动要求"直接上传"** | `-p`(校验器硬拦 >100MB;仅此情形才用 -p 传谱图) | ✅ 可写 |
@@ -135,12 +140,13 @@ python3 scripts/validate_pipeline.py --pipeline pipeline.json
 >   -H "Authorization: Bearer $ACCESS_KEY" -o /bohr-workspace/td-runs/<任务>/xxx.fasta
 > ```
 
-仅**谱图**需要建 dataset:
+仅**工作区上传的谱图**用 `make_dataset.py` 建 dataset(共享盘/个人盘谱图走 bohrium-dataset-manager sandbox 直转,不用这个):
 ```bash
 source /bohr-workspace/.bohr_env
 python3 scripts/make_dataset.py --file <谱图路径.raw> --name <数据集名>   # 仅谱图;FASTA 勿用
+# 建前自动查重:命中同名+同大小文件则返回 {"reused": true, ...} 复用已有集,不重复创建
 # 返回真实挂载路径(含随机后缀与 upload 层);填入 pipeline.json 的 inputs.spectrum,
-# 第 5 步 submit 时附带 --dataset-path /bohr/<名>-<后缀>/v1
+# 第 5 步 submit 时附带 --dataset-path /bohr/<名>-<后缀>/v1(reused 时用返回的 mount)
 ```
 
 ### 5. 提交 job
