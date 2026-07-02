@@ -1,0 +1,5 @@
+{
+  "steps": [{"step_id": "dia", "tool": "diann", "params": {"library_path": "lib.tsv"}}],
+  "edges": [],
+  "raw_files": ["EXAMPLE.mzML"]
+}
