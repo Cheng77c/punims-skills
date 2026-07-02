@@ -22,11 +22,16 @@ ENVF=/bohr-workspace/.bohr_env
 # 会盖过 image.txt 更新(改了版本号却仍提交旧镜像)。每次以 image.txt 为准;临时换镜像在
 # submit 前命令级 `IMAGE_ADDRESS=… python3 submit_pipeline.py`,不持久化到 .bohr_env。
 IMAGE_ADDRESS="$IMG_DEFAULT"
+# ACCESS_KEY(bohr CLI 读)与 BOHR_ACCESS_KEY(脚本/curl 读)同源同值:一次解析、两名都写。
+# source .bohr_env 后两个名都带 key,agent 不必再手动 export ACCESS_KEY="$BOHR_ACCESS_KEY"
+# (P2 摆弄断 key 的根因就是 .bohr_env 只写了 ACCESS_KEY、没写 BOHR_ACCESS_KEY)。
+AK="${ACCESS_KEY:-${BOHR_ACCESS_KEY:-}}"
 cat > "$ENVF" <<EOF
 export PATH="\$HOME/.bohrium:\$PATH"
 export OPENAPI_HOST=https://openapi.dp.tech
 export TIEFBLUE_HOST=https://tiefblue.dp.tech
-export ACCESS_KEY="${ACCESS_KEY:-${BOHR_ACCESS_KEY:-}}"
+export ACCESS_KEY="${AK}"
+export BOHR_ACCESS_KEY="${AK}"
 export PROJECT_ID="${PROJECT_ID:-}"
 export IMAGE_ADDRESS="${IMAGE_ADDRESS:-$IMG_DEFAULT}"
 export MACHINE_TYPE="${MACHINE_TYPE:-c16_m32_cpu}"
@@ -36,5 +41,5 @@ echo "wrote $ENVF"
 export PATH="$HOME/.bohrium:$PATH"
 bohr version >/dev/null 2>&1 && echo "bohr ready" || echo "WARN: bohr 未就绪"
 command -v python3 >/dev/null 2>&1 || echo "WARN: 需要 python3"
-[ -n "${ACCESS_KEY:-}" ] && echo "ACCESS_KEY 已注入" || echo "WARN: ACCESS_KEY 未注入——先完成授权并重载 skill 再 setup;勿手写 .bohr_env"
+[ -n "${AK:-}" ] && echo "ACCESS_KEY 已注入(ACCESS_KEY+BOHR_ACCESS_KEY 同值)" || echo "WARN: ACCESS_KEY 未注入——先完成授权并重载 skill 再 setup;勿手写 .bohr_env"
 [ -n "${PROJECT_ID:-}" ] && echo "PROJECT_ID=$PROJECT_ID" || echo "WARN: PROJECT_ID 未注入——对话中用户已明确的项目 ID 可直接 export PROJECT_ID=<id> 使用;未知才 AskUserInput 索取;勿凭空编造默认值"
