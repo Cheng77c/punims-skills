@@ -52,7 +52,8 @@ def main():
 
     # 先本地校验 pipeline(错则停,不浪费 job;错误带 step/tool/field/fix 供 agent 自纠),
     # 再查提交所需 env(PROJECT_ID 无默认,须注入)。
-    vres = validate_pipeline.validate_with_fs(pipeline)
+    vres = validate_pipeline.validate_with_fs(
+        pipeline, base=str(Path(a.pipeline).resolve().parent))
     if not vres["ok"]:
         print(json.dumps({"ok": False, "stage": "validate", "errors": vres["errors"]},
                          ensure_ascii=False))

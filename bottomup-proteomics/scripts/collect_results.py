@@ -128,7 +128,8 @@ def collect(job_id: str, dl_dir: str, expected_version: int = EXPECTED_CONTRACT_
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--job-id", required=True)
-    ap.add_argument("--out", default=None, help="下载目录(默认 /bohr-workspace/bu-result/<jobId>)")
+    ap.add_argument("--out", "--outdir", "--output-dir", dest="out", default=None,
+                    help="下载目录(默认 /bohr-workspace/bu-result/<jobId>;--outdir/--output-dir 同义)")
     a = ap.parse_args()
     dl = a.out or f"/bohr-workspace/bu-result/{a.job_id}"
     print(json.dumps(collect(a.job_id, dl), ensure_ascii=False))

@@ -1,0 +1,9 @@
+# 强制所有文本/脚本以 LF 签出——平台把 skill 装到 /data/skills 时若 core.autocrlf=true
+# 会把 LF→CRLF,导致 setup.sh 报 `$'\r': command not found`、python shebang 失效。
+# eol=lf 覆盖平台 autocrlf,保证签出后是干净 LF。
+* text=auto eol=lf
+*.sh text eol=lf
+*.py text eol=lf
+*.md text eol=lf
+*.json text eol=lf
+*.txt text eol=lf
