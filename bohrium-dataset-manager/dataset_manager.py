@@ -16,7 +16,10 @@ import sys
 
 import requests
 
-AK = os.environ.get("BOHR_ACCESS_KEY", "")
+# Accept either var name: BOHR_ACCESS_KEY (platform-injected) or ACCESS_KEY (what the
+# proteomics .bohr_env exports for the bohr CLI). Avoids the "set BOHR_ACCESS_KEY" dead-end
+# when this runs inside the BU/TD flow.
+AK = os.environ.get("BOHR_ACCESS_KEY") or os.environ.get("ACCESS_KEY") or ""
 BASE = "https://open.bohrium.com/openapi/v2/ds"
 HEADERS = {"Authorization": f"Bearer {AK}"}
 HEADERS_JSON = {**HEADERS, "Content-Type": "application/json"}
@@ -264,6 +267,9 @@ def download_file(dataset_id: int, filename: str, out: str = None, version: str 
             print(f"Ambiguous '{filename}': {cands}. Pass the full internal path.")
             return
     out = out or filename.rsplit("/", 1)[-1]
+    # tolerate --out being a directory (or dir/): drop the file inside it
+    if out.endswith("/") or os.path.isdir(out):
+        out = os.path.join(out, filename.rsplit("/", 1)[-1])
     # tiefblue /api/download/<obj> 307-redirects to a presigned OSS URL; requests follows it
     # (and strips our Bearer on the cross-host hop, which is correct — the OSS URL is signed).
     r = requests.get(
@@ -319,7 +325,7 @@ def main():
     args = parser.parse_args()
 
     if not AK:
-        print("ERROR: set BOHR_ACCESS_KEY environment variable")
+        print("ERROR: set BOHR_ACCESS_KEY (or ACCESS_KEY) environment variable")
         sys.exit(1)
 
     if args.cmd == "quota":

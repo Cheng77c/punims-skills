@@ -72,11 +72,11 @@ export ACCESS_KEY="$BOHR_ACCESS_KEY"   # ★ bohr CLI 认这个变量;不设会 
 ## 列出数据集
 
 ```bash
-bohr dataset list                       # 默认最近 50 个
-bohr dataset list -n 10 --json          # JSON 格式，前 10 个
-bohr dataset list -p YOUR_PROJECT_ID                # 按项目 ID 过滤
-bohr dataset list -t "my-dataset"       # 按标题搜索
+export ACCESS_KEY="$BOHR_ACCESS_KEY"    # ★ bohr CLI 认 ACCESS_KEY(见「认证配置」)
+bohr dataset list -p YOUR_PROJECT_ID --json      # 按项目过滤(JSON)
+bohr dataset list -p YOUR_PROJECT_ID -t "my-dataset" --json   # 按标题搜索(title 跨项目重名,-p+-t 合用)
 ```
+> ⚠️ **务必带 `--json`**:不带 `--json` 时 bohr CLI 走交互式分页,在无终端环境会报 `Error: open /dev/tty: no such device or address`。
 
 **JSON 输出字段：**
 
@@ -475,5 +475,7 @@ r = requests.get(f"{BASE}/project", headers=HEADERS)
 | （sandbox 建集）`lbg: error: invalid choice: 'sdbx'` | 装了稳定版 lbg | `pip install --pre --upgrade lbg` |
 | `code:2000` / Unauthorized（**但 key 已设置**） | 网关鉴权偶发抖动，非真失效 | **原样重试 1–2 次**即可；别急着找用户要 key |
 | `bohr dataset ...` 报 `AccessKey Invalid!` 或**空 `Error:`（exit 0）** | 只设了 `BOHR_ACCESS_KEY`;bohr CLI 认 `ACCESS_KEY` | `export ACCESS_KEY="$BOHR_ACCESS_KEY"` 再跑(见「认证配置」) |
+| `bohr dataset list` 报 `open /dev/tty: no such device or address` | 不带 `--json` 走交互式分页,无终端环境报错 | 一律加 `--json` |
+| `dataset_manager.py` 报 `set BOHR_ACCESS_KEY (or ACCESS_KEY)` | 两个变量都没设 | 任一即可;脚本已兼容 `ACCESS_KEY`(BU/TD 的 `.bohr_env` 设的就是它) |
 | `files` 只返回一个 `upload/` 目录项 | 旧版脚本不递归 | 已修:`files`/`download` 会递归下钻,直接用返回的 `mount_path` |
 | `dataset_manager.py` 输出被 `Extra data` JSON 解析错误 | sdbx.py 的 upgrade 提示行混入(仅 sdbx,不是本脚本) | 见上「sdbx.py 输出的两个坑」,解析前滤掉提示行 |
