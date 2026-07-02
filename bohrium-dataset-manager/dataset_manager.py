@@ -46,12 +46,24 @@ def get_detail(dataset_id: int):
     """Get dataset details."""
     r = requests.get(f"{BASE}/{dataset_id}", headers=HEADERS)
     data = r.json().get("data", {})
+    # /v2/ds/{id} 详情端点不含 status,从列表端点(唯一带 status 的)按 id 兜底补上,
+    # 使 detail 成为一站式(path+status),agent 不必再手搓 /v2/ds/?projectId= REST。
+    status = data.get("status")
+    if status is None and data.get("projectId"):
+        try:
+            items = requests.get(f"{BASE}/?projectId={data['projectId']}&page=1&pageSize=100",
+                                 headers=HEADERS).json().get("data", {}).get("items", []) or []
+            hit = next((i for i in items if i.get("id") == data.get("id")), None)
+            if hit:
+                status = hit.get("status")
+        except Exception:
+            pass
     print(f"Dataset: {data.get('title', '?')}")
     print(f"  ID:      {data.get('id')}")
     print(f"  Path:    {data.get('path')}")
     print(f"  Project: {data.get('projectName')}")
     print(f"  Creator: {data.get('creatorName')}")
-    print(f"  Status:  {data.get('status')}")
+    print(f"  Status:  {status}  (2=可用)")
     print(f"  Version: {data.get('versionId')}")
 
 

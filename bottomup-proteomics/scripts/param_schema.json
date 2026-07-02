@@ -694,6 +694,8 @@
   "channel_num": {
    "type": "int",
    "enum": [
+    4,
+    8,
     6,
     10,
     11,

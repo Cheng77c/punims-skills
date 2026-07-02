@@ -126,6 +126,36 @@ def _check_required(cfg: dict, steps: list, errs: list) -> None:
             errs.append(f"步 {s.get('step_id')}({tool}) 缺必填参数 '{name}'")
 
 
+_SPECTRA_PRODUCERS = {"msconvert", "diaumpire", "diatracer"}   # 产 mzML 的步
+# 硬要求 mzML 输入的工具(缺谱图会在运行时 raise InputError)。谱图(raw_files)只送达
+# 无入边的根节点;非根的这些工具必须有一个产 mzML 的父(msconvert 等),否则被饿死。
+_SPECTRA_CONSUMERS = {"msfragger-closed", "crystalc", "ionquant",
+                      "ptmshepherd", "msbooster", "opair", "easypqp"}
+
+
+def _check_spectra_consumers(steps: list, edges: list, errs: list) -> None:
+    """吃 mzML 的工具:谱图来自 raw_files,只喂无入边的根节点。
+    - msfragger 通常作谱图根节点(别画 db→msfragger 边——库经 database_path 自动注入)。
+    - crystalc/ionquant/ptmshepherd/msbooster/opair/easypqp 既要谱图又要上游产物(非根),
+      必须有一个产 mzML 的父(msconvert/diaumpire/diatracer),否则运行时 'requires mzML'。
+    这是手写 DAG 最常见的坑;能用官方 template_id 就别手写。"""
+    tool_by_id = {s.get("step_id"): s.get("tool") for s in steps}
+    for s in steps:
+        tool = s.get("tool") or ""
+        if tool not in _SPECTRA_CONSUMERS:
+            continue
+        sid = s.get("step_id")
+        parents = [e.get("src") for e in (edges or []) if e.get("dst") == sid]
+        if parents and not any(tool_by_id.get(p) in _SPECTRA_PRODUCERS for p in parents):
+            pt = ", ".join(f"{p}({tool_by_id.get(p)})" for p in parents)
+            fix = (f"去掉指向 {sid} 的边让它成为谱图根节点(仅 msfragger 可这样),"
+                   if tool == "msfragger-closed"
+                   else "加一条 msconvert→本步 的边供谱图,")
+            errs.append(
+                f"步 {sid}({tool})有入边但没有谱图来源(父节点:{pt});它硬要求 mzML 输入,"
+                f"而 raw_files 只送达无入边的根节点。修复:{fix}或改用官方 template_id。")
+
+
 def validate_config(cfg: dict) -> list[str]:
     errs: list[str] = []
     # 顶层字段名(raw_file/fastapath 拼错会被静默忽略 → 作业找不到输入才失败)
@@ -160,6 +190,7 @@ def validate_config(cfg: dict) -> list[str]:
         for end in ("src", "dst"):
             if e.get(end) not in ids:
                 errs.append(f"边引用了不存在的步:{e.get(end)}")
+    _check_spectra_consumers(steps, cfg.get("edges") or [], errs)
     _check_overrides(cfg, steps, errs)
     _check_required(cfg, steps, errs)
     return errs

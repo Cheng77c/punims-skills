@@ -165,8 +165,9 @@ bohr dataset create \
    ```
 2. **浏览盘找文件**(可选):用上面「文件盘操作」的 `file/iterate`。
 3. **查重(重要,别只靠名字)**:先看这份数据是否已做过 dataset,命中就**直接返回它的 `path`,零传输**。
-   - **status 从哪看**:只有 `GET /v2/ds/?projectId=<pid>`(**HTTP API 列表**)的每个 item 带 `status`(`2`=可用);`bohr dataset list --json` 和 `GET /v2/ds/{id}` 详情**都不含** `status`——查 status 用 API 列表。
+   - **status 从哪看**:直接 `python dataset_manager.py detail --id <ID>` —— 它一条命令给 `Path`+`Status`(`2`=可用),已自动从列表端点兜底补 status。**别手搓 REST 猜端点**:`/v1/dataset`、`/v2/dataset/list`、`tiefblue/api/datasets` 全是 404;唯一带 status 的原始端点是 `GET /v2/ds/?projectId=<pid>`(带尾斜杠),但优先用 `detail`/`files` 这些封装好的 subcommand,别 curl+python 一行式去凑。
    - **别只信 title**:命名只是启发式(见第 4 步),title 可能撞名或漏配。命中候选后**务必用 `files --id` 核对内部文件名与 `size` 和源文件一致**(源文件大小用 `GET /v1/file/stat/<路径>` 的 `contentLength`),一致才判为同一份、复用;不一致就是撞名,继续新建。
+   - **源文件 stat 拿不到大小时(返回 `exist:false` 或 `contentLength:0`)= 源文件在盘上不存在/不可核对**:此时**绝不能靠 title 猜着复用**——要么路径写错了、要么文件真没了。应向用户如实报告"这份数据在盘上找不到",而不是自作主张挑个同名数据集复用(误复用会把错数据喂进任务)。
    - 多条候选:取 `status=2` 且 `updateTime` 最新;仍不确定就把候选列给用户确认,别盲选。
    - **完全没匹配到**:视为没做过,继续第 4 步新建(别因为一次搜索用词不准就反复重传——不确定时宁可先 `files` 核对几个相近候选)。
 4. **建带盘挂载的 sandbox**:

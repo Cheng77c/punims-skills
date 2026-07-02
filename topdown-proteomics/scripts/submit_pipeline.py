@@ -72,11 +72,17 @@ def main():
                  "勿直接放 /bohr-workspace 根——否则打包会把整个工作空间上传。")
     wd.mkdir(parents=True, exist_ok=True)
 
-    # 本地输入拷进上传包并改为包内相对名;/bohr 挂载路径保留
+    # 本地输入拷进上传包并改为包内相对名;/bohr 挂载路径保留。
+    # 相对路径按 pipeline.json 所在目录解析(不是 CWD)——否则裸文件名会被当成
+    # /root/<名> 而 FileNotFoundError。
+    pdir = Path(a.pipeline).resolve().parent
     inputs = pipeline.get("inputs") or {}
     for k, v in list(inputs.items()):
         if v and not str(v).startswith("/bohr/"):
-            src = Path(v).resolve()
+            src = Path(v)
+            if not src.is_absolute():
+                src = pdir / src
+            src = src.resolve()
             dst = wd / src.name
             if src != dst.resolve():   # 就地打包时输入可能已在 wd,避免 copy 自己到自己
                 shutil.copy(src, dst)

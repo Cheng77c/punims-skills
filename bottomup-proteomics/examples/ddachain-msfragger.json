@@ -6,7 +6,7 @@
     {"step_id": "rp", "tool": "philosopher-report"}
   ],
   "edges": [
-    {"src": "db", "dst": "mf"}, {"src": "mf", "dst": "pp"}, {"src": "pp", "dst": "rp"}
+    {"src": "mf", "dst": "pp"}, {"src": "pp", "dst": "rp"}
   ],
   "raw_files": ["EXAMPLE.mzML"],
   "fasta_path": "EXAMPLE.fasta"

@@ -116,6 +116,7 @@ python3 scripts/validate_pipeline.py --pipeline pipeline.json
 > - **共享盘 / 个人盘(share/… 或 personal/…)的谱图 → 必须用 sandbox 直转**(bohrium-dataset-manager 的「从共享盘/个人盘建数据集」,盘→dataset 服务端直连)。**严禁先下载到工作区再 `make_dataset.py`——那是多余的二次传输,明确禁止。**
 > - **`make_dataset.py` 仅用于「用户上传到当前工作区」的本地谱图**(工作区里实打实的文件)。盘上数据不归它管。
 > - 两条路径**建前都必须查重**:sandbox 直转见 bohrium-dataset-manager 的查重步骤;`make_dataset.py` 已内置查重(建前扫项目,命中同名+同大小文件直接复用、返回 `reused:true`,不重复创建)。
+> - **sandbox 直转受阻时(如 `running sandbox limit reached (20/20)`、`exec` 报错进不去、盘挂载失败):向用户如实报告阻塞并停下,请其清理沙箱或改用工作区上传。绝不退化成"下载谱图到工作区再走 `-p`"——那违反本硬约束。** 浏览盘/查重优先用 HTTP API(不必开 sandbox);只有真正上传才开 sandbox。
 
 | 数据在哪 | 怎么进作业 | 作业内可写 |
 |---|---|---|

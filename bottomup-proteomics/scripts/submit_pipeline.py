@@ -75,9 +75,16 @@ def main():
     # 本地输入拷进上传包并改为包内相对名(/bohr 挂载路径保留)。
     # BU schema:执行器 bu_cli 读 raw_files(list)+ fasta_path(str)+ annotation_path(str),
     # 不是 TD 的 inputs 字典——必须 stage 这几个键,否则作业节点找不到输入。
+    # 相对路径按 pipeline.json 所在目录解析(不是 CWD)——否则裸文件名(如 "erwinia.fasta")
+    # 会被当成 /root/erwinia.fasta 而 FileNotFoundError。
+    pdir = Path(a.pipeline).resolve().parent
+
     def _stage(v):
         if v and not str(v).startswith("/bohr/"):
-            src = Path(v).resolve()
+            src = Path(v)
+            if not src.is_absolute():
+                src = pdir / src
+            src = src.resolve()
             dst = wd / src.name
             if src != dst.resolve():   # 就地打包时输入可能已在 wd,避免 copy 自己到自己
                 shutil.copy(src, dst)
