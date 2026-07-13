@@ -13,10 +13,12 @@ from pathlib import Path
 
 import requests
 
-# API 地址的唯一来源。曾经这里用 open.bohrium.com、查挂载路径那段用 openapi.dp.tech、
-# setup.sh 又导出一个没人读的 OPENAPI_HOST —— 三个地址并存,agent 翻开脚本看到两个域名,
-# 就会以为地址可以"选",进而自己编一个(已发生:编出 /openapi/cli/install,404)。
-OPENAPI = os.environ.get("OPENAPI_HOST", "https://openapi.dp.tech").rstrip("/")
+# API 地址的唯一来源。**只有 open.bohrium.com 能用**:openapi.dp.tech 对本 key 直接
+# 401(AccessKey Invalid),数据集接口还回纯文本 "404 page not found" —— 而这段文本喂给
+# .json() 会炸成 "Extra data: line 1 column 5",看起来像网络抖动,其实是地址错了。
+# (已发生:setup.sh 导出 openapi.dp.tech,查重每次必失败,还劝 agent"重跑一次"。)
+# 别再引入第二个域名,也别自己编路径。
+OPENAPI = os.environ.get("OPENAPI_HOST", "https://open.bohrium.com").rstrip("/")
 DS_API = f"{OPENAPI}/openapi"
 
 

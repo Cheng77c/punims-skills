@@ -1,6 +1,9 @@
 ---
 name: bohrium-dataset-manager
 description: "Manage and inspect Bohrium datasets via bohr CLI or open.bohrium.com API. Use when: creating/listing/deleting datasets, uploading data, managing versions, checking whether a file was ALREADY uploaded before re-uploading it (dedup, `find`), OR listing the files INSIDE a dataset to resolve the exact in-job mount path (/bohr/<name>/v1/<file>) instead of guessing filenames. NOT for: share/personal disk file management (use bohrium-file), job submission, or node management."
+requires:
+  - bohrium-sandbox   # create-from-disk 靠它的 sdbx.py 把盘上文件直转 dataset;
+                       # 不加载 = sdbx.py 不存在 = 建集必失败(且会伪装成「网关故障」)
 ---
 
 # SKILL: Bohrium 数据集 (Dataset) 管理与查看

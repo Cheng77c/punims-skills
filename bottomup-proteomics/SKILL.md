@@ -9,6 +9,7 @@ description: >
 type: sandbox
 requires:
   - bohrium-job
+  - bohrium-sandbox          # 盘→dataset 直转靠它的 sdbx.py;不加载 = 建集必失败
   - bohrium-dataset-manager   # 谱图查重/建集全靠它;不加载 = dataset_manager.py 不存在,
                               # agent 只能手搓 REST 去猜数据集(已翻过车:重传 849MB)
 configFields:
@@ -74,7 +75,7 @@ l1: >
    还漏掉 `ionquant`,结果根本没有 LFQ 强度,「丰度榜单」无从谈起。**
 2. **绝不手写 job.json / 绝不自己拼 `bohr job submit`** —— 一律 `scripts/submit_pipeline.py`。
 3. **绝不直接调工具**(msfragger/diann…)—— 只经 `submit_pipeline.py` 提交。
-4. **谱图默认一律走 dataset(不论大小)**:共享盘/个人盘的谱图**直接转 dataset、无需下载**,工作区本地用 `make_dataset.py`;仅当用户主动要求"直接上传"且谱图 ≤100MB 才 `-p`。**唯一需要下载的是 FASTA**(需可写)。结果用 `collect_results.py` 取。
+4. **谱图默认一律走 dataset(不论大小)**:共享盘/个人盘的谱图**直接转 dataset、无需下载**,工作区本地用 `make_dataset.py`;仅当用户**主动要求**"直接上传"且谱图 ≤100MB 才 `-p`。**建集失败不是启用 `-p` 的理由**——已经翻过车:sandbox 建集报错后,agent 自行把 92MB 谱图下载到工作区再建集,而报错里白纸黑字写着"不要下载到工作区绕过"。建集失败就停下报错,别自己找替代路线。**唯一需要下载的是 FASTA**(需可写)。结果用 `collect_results.py` 取。
 5. **取结果只用 `collect_results.py`**:**绝不手动 `bohr job download` / 解压 zip / 拷贝产物**——手动会导致目录结构混乱。collect 已给出 `result_dir`/`deliverable_paths`/`archive`,按它给的路径用即可。
 6. **标准流程不可跳**:`validate_pipeline.py` →(谱图建 dataset 时)`make_dataset.py` → `submit_pipeline.py` → `poll_job.py` → `collect_results.py`。
 7. **单次轮询,绝不自旋**:提交后查一次状态,若仍在跑向用户报 jobId + 状态后**结束本轮**;jobId 存 Memory,用户稍后回来再查。

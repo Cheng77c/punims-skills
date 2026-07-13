@@ -28,7 +28,7 @@ IMAGE_ADDRESS="$IMG_DEFAULT"
 AK="${ACCESS_KEY:-${BOHR_ACCESS_KEY:-}}"
 cat > "$ENVF" <<EOF
 export PATH="\$HOME/.bohrium:\$PATH"
-export OPENAPI_HOST=https://openapi.dp.tech
+export OPENAPI_HOST=https://open.bohrium.com
 export TIEFBLUE_HOST=https://tiefblue.dp.tech
 export ACCESS_KEY="${AK}"
 export BOHR_ACCESS_KEY="${AK}"

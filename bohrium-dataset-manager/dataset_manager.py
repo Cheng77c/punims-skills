@@ -429,14 +429,37 @@ BOHR_INSTALL = ("https://dp-public.oss-cn-beijing.aliyuncs.com/bohrctl/1.0.0/"
                 "install_bohr_linux_curl.sh")
 
 
+def _sdbx_base():
+    """The sandbox CLI to shell out to: the bohrium-sandbox skill's sdbx.py, or `lbg sdbx`.
+
+    Falling back to `lbg sdbx` silently is how we got burned: when the skill is not loaded,
+    sdbx.py does not exist, and most installed `lbg` builds have no `sdbx` subcommand at all —
+    so every call came back as an argparse usage error, which this script then reported as
+    "the sandbox gateway is failing". It was not. The skill just was not there.
+    """
+    import subprocess
+    if os.path.exists(SDBX_PY):
+        return [sys.executable, SDBX_PY]
+    probe = subprocess.run(["lbg", "sdbx", "--help"], capture_output=True, text=True)
+    if probe.returncode != 0:
+        die("the sandbox CLI is unavailable: neither the bohrium-sandbox skill nor `lbg sdbx`",
+            fix=f"Load the `bohrium-sandbox` skill — this script drives the sandbox through its "
+                f"{SDBX_PY}. Without it there is no supported way to turn a disk file into a "
+                f"dataset. Load it, then re-run this exact command.",
+            never="Do NOT read this as a platform outage, and do NOT work around it by "
+                  "downloading the spectra into the workspace. Fix the missing skill.",
+            code=5)
+    return ["lbg", "sdbx"]
+
+
 def _sdbx(*args, timeout=900):
-    """Invoke the sandbox CLI. Prefers the skill's sdbx.py, falls back to `lbg sdbx`.
+    """Invoke the sandbox CLI.
 
     Also strips the `{"kind":"upgrade_available",...}` banner sdbx.py can prepend, which
     otherwise breaks json.loads on the caller side.
     """
     import subprocess
-    base = [sys.executable, SDBX_PY] if os.path.exists(SDBX_PY) else ["lbg", "sdbx"]
+    base = _sdbx_base()
     r = subprocess.run(base + list(args), capture_output=True, text=True, timeout=timeout)
     out = "\n".join(l for l in (r.stdout or "").splitlines()
                     if "upgrade_available" not in l)
