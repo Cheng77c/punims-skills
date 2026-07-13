@@ -9,6 +9,8 @@ description: >
 type: sandbox
 requires:
   - bohrium-job
+  - bohrium-dataset-manager   # 谱图查重/建集全靠它;不加载 = dataset_manager.py 不存在,
+                              # agent 只能手搓 REST 去猜数据集(已翻过车:重传 849MB)
 configFields:
   - name: IMAGE_ADDRESS
     type: text
@@ -48,6 +50,17 @@ l1: >
 如果 `IMAGE_ADDRESS`/`PROJECT_ID`/`ACCESS_KEY` 未配置,**不要猜或找替代镜像**——用 `AskUserInput` 让用户补配置或提示去启用 `bohrium-job` skill。
 
 ### 🚫 七条铁律(违反=必错)
+
+0. **开工第一件事:加载 `bohrium-dataset-manager` skill。** 谱图的查重与建集全靠它的
+   `dataset_manager.py`;不加载,`/data/skills/bohrium-dataset-manager/` 根本不存在,
+   你会退回去手搓 REST 猜数据集 —— **已经翻过车:靠 dataset 标题判断"没传过",
+   把一份早已在平台上的 849MB 谱图又传了一遍,还卡死在 sandbox 上。**
+   查重/建集**只用**这一条命令,别自己拼:
+   ```bash
+   python3 /data/skills/bohrium-dataset-manager/dataset_manager.py create-from-disk \
+     --project-id <pid> --disk-path share/<盘内路径> --json
+   ```
+   (内含查重:已存在就零传输直接返回 `mount_path`;未命中才自动建集。)
 1. **绝不手写 job.json / 绝不自己拼 `bohr job submit`** —— 一律 `scripts/submit_pipeline.py`。
 2. **绝不直接调工具**(msfragger/diann…)—— 只经 `submit_pipeline.py` 提交。
 3. **谱图默认一律走 dataset(不论大小)**:共享盘/个人盘的谱图**直接转 dataset、无需下载**,工作区本地用 `make_dataset.py`;仅当用户主动要求"直接上传"且谱图 ≤100MB 才 `-p`。**唯一需要下载的是 FASTA**(需可写)。结果用 `collect_results.py` 取。
@@ -77,7 +90,10 @@ source /bohr-workspace/.bohr_env   # 每个新 Bash 调用开头都要,确保 AC
 
 > ⛔ **只许 `bash scripts/setup.sh` 生成 .bohr_env,绝不手写/覆写它**(setup 已兜底读 `BOHR_ACCESS_KEY`)。
 > - `ACCESS_KEY` 未注入:先完成授权 + 重载 skill,再 `setup.sh`。
-> - `PROJECT_ID` 未注入:对话中用户已明确的项目 ID 可直接用(`export PROJECT_ID=<id>`);未知才 `AskUserInput` 索取,**绝不凭空编造默认值**。
+> - `PROJECT_ID` 未注入:**唯一合法来源 = 本轮对话里用户亲口说的项目 ID**(`export PROJECT_ID=<id>`);没说就 `AskUserInput` 索取。
+>   **绝不从记忆文件 / 历史作业记录 / 过往 thread 里翻出一个项目 ID 来用,也绝不凭空编默认值。**
+>   (已经翻过车:从旧记忆 `job-xxxxx.md` 里刨出上一个项目的 ID,差点把作业投到别人的项目里。
+>   记忆里的项目 ID 只能用来*提问*——「上次用的是 24980,这次还是它吗?」——不能直接当参数填。)
 
 ## 工作流(严格按序)
 
