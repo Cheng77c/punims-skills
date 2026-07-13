@@ -599,6 +599,18 @@ def create_from_disk(project_id: int, disk_path: str, name: str = None,
     ident = "".join(c if c.isalnum() else "-" for c in ident).strip("-")[:40] or "dataset"
     print(f"[plan] {p}  ({size/1e6:.1f} MB)  →  dataset '{ident}'")
 
+    # Quota BEFORE the sandbox dance. Registration is the LAST step of the upload, so a full
+    # sandbox + multi-hundred-MB transfer gets burned before the platform says "no slots left".
+    q = (api("GET", f"{BASE}/quota/check", params={"projectId": project_id}).get("data") or {})
+    if q.get("result") is False:
+        die(f"project {project_id} is out of dataset slots ({q.get('used')}/{q.get('limit')} used)",
+            fix="Free a slot (delete a dataset you no longer need) or use a project with room. "
+                "Nothing was uploaded — this was checked before any transfer.",
+            never="Do NOT retry as-is, and do NOT read this as a transient platform error: the "
+                  "upload will fail at the very end every single time, after wasting the "
+                  "whole transfer.",
+            code=9)
+
     sid = _sandbox_ready(project_id, reuse_sandbox)
 
     # 1) bohr CLI inside the sandbox. --user root is mandatory: the default `user` cannot
@@ -622,6 +634,11 @@ def create_from_disk(project_id: int, disk_path: str, name: str = None,
 
     # 2) upload in the background — a foreground exec dies at 60s, which for a multi-GB
     #    spectrum file means a truncated upload reported as success.
+    # Per-upload log. The sandbox is REUSED across calls, so a shared /tmp/upload.log gets
+    # written by two concurrent uploads at once: their output interleaves and the success
+    # check then reads *someone else's* "EXIT_CODE=0 … success" and declares victory for a
+    # file that never finished. Has happened. One log per upload, and only ever read this one.
+    log = f"/tmp/upload-{ident}-{size}.log"
     print("[sandbox] uploading in background (this is the slow part)…")
     script = (
         "export PATH=/root/.bohrium:$PATH\n"
@@ -629,8 +646,8 @@ def create_from_disk(project_id: int, disk_path: str, name: str = None,
         "export TIEFBLUE_HOST=https://tiefblue.dp.tech\n"
         f"export ACCESS_KEY={AK}\n"
         f"echo n | bohr dataset create -n '{ident}' -p '{ident}' -i {project_id} "
-        f"-l '{p}' > /tmp/upload.log 2>&1\n"
-        "echo EXIT_CODE=$? >> /tmp/upload.log\n"
+        f"-l '{p}' > {log} 2>&1\n"
+        f"echo EXIT_CODE=$? >> {log}\n"
     )
     rc, out, err = _sdbx("exec", "--user", "root", "--background", sid, script, timeout=180)
     if rc != 0:
@@ -645,13 +662,16 @@ def create_from_disk(project_id: int, disk_path: str, name: str = None,
     deadline = time.time() + 3600
     while time.time() < deadline:
         time.sleep(20)
-        rc, log, _ = _sdbx("exec", "--user", "root", "--timeout", "30", sid,
-                           "cat /tmp/upload.log 2>/dev/null | tail -3", timeout=90)
-        if "EXIT_CODE=0" in log and "success" in log.lower():
+        rc, tail, _ = _sdbx("exec", "--user", "root", "--timeout", "30", sid,
+                            f"cat {log} 2>/dev/null | tail -3", timeout=90)
+        # `bohr dataset create` exits 0 even when it fails ("Failed to create dataset, err:
+        # …upper limit…" + EXIT_CODE=0), so the exit code alone proves nothing. Demand the
+        # CLI's own success line for THIS dataset name.
+        if f"create dataset {ident} success" in tail.lower():
             print("[sandbox] upload finished.")
             break
-        if "EXIT_CODE=" in log:                      # finished, but non-zero
-            die(f"the upload failed inside sandbox {sid}. Its log says:\n{log}",
+        if "EXIT_CODE=" in tail:                     # finished, but non-zero
+            die(f"the upload failed inside sandbox {sid}. Its log says:\n{tail}",
                 fix="Read the log above — it names the real cause (quota exhausted, bad "
                     "project id, unreadable source path). Fix that and retry. Check quota "
                     f"with: dataset_manager.py quota --project_id {project_id}",
@@ -662,7 +682,7 @@ def create_from_disk(project_id: int, disk_path: str, name: str = None,
     else:
         die(f"upload still unfinished after 60 min (sandbox {sid} left running on purpose)",
             fix=f"The upload may still be running. Check it with:\n"
-                f"       sdbx.py exec --user root {sid} 'tail -5 /tmp/upload.log'\n"
+                f"       sdbx.py exec --user root {sid} 'tail -5 {log}'\n"
                 f"       Then re-run `find --project-id {project_id} --disk-path {disk_path}` "
                 f"— if it HITs, the upload actually completed and you can just use it.",
             never="Do NOT start a second upload of the same file — you will end up with "
