@@ -13,7 +13,11 @@ from pathlib import Path
 
 import requests
 
-DS_API = "https://open.bohrium.com/openapi"
+# API 地址的唯一来源。曾经这里用 open.bohrium.com、查挂载路径那段用 openapi.dp.tech、
+# setup.sh 又导出一个没人读的 OPENAPI_HOST —— 三个地址并存,agent 翻开脚本看到两个域名,
+# 就会以为地址可以"选",进而自己编一个(已发生:编出 /openapi/cli/install,404)。
+OPENAPI = os.environ.get("OPENAPI_HOST", "https://openapi.dp.tech").rstrip("/")
+DS_API = f"{OPENAPI}/openapi"
 
 
 def _iter_leaves(host, token, prefix, depth=0):
@@ -43,20 +47,34 @@ def _iter_leaves(host, token, prefix, depth=0):
     return out
 
 
+class DedupError(Exception):
+    """查重没能跑完 —— 不是"没命中"。
+
+    这两件事必须分开。以前任何一个 API 抖动都被 `except: return None` 吞成"没查到",
+    调用方于是直接新建,把一份几 GB 的数据集重传一遍(还白占配额)。
+    "我不知道"绝不能伪装成"没问题"。
+    """
+
+
 def _find_existing(project, ak, basename, size):
-    """扫项目已有数据集,若某个含 basename 且 size 一致的文件,返回 (mount, 内部挂载路径);否则 None。"""
+    """扫项目已有数据集,找 basename + size 都一致的文件。
+
+    命中 → (mount, 内部挂载路径);确实没有 → None;**查重没跑完 → raise DedupError**。
+    """
     H = {"Authorization": f"Bearer {ak}"}
     try:
         items = requests.get(f"{DS_API}/v2/ds/?projectId={project}&page=1&pageSize=50",
                              headers=H, timeout=20).json().get("data", {}).get("items", [])
-    except Exception:
-        return None
+    except Exception as e:
+        raise DedupError(f"拉取项目 {project} 的数据集列表失败: {e}")
+
+    skipped = []          # 逐个数据集的失败:漏查任何一个,都可能把"已存在"误判成"没有"
     for it in items:
         did, mount = it.get("id"), it.get("path", "")
         try:
             vr = requests.get(f"{DS_API}/v2/ds/{did}/version", headers=H, timeout=20).json().get("data", [])
-        except Exception:
-            continue
+        except Exception as e:
+            skipped.append(f"{did}(version: {e})"); continue
         vers = vr if isinstance(vr, list) else vr.get("items", [])
         if not vers:
             continue
@@ -66,14 +84,18 @@ def _find_existing(project, ak, basename, size):
         try:
             tk = requests.get(f"{DS_API}/v2/ds/input/token", headers=H,
                              params={"projectId": project, "path": tb}, timeout=20).json().get("data", {})
-        except Exception:
-            continue
+        except Exception as e:
+            skipped.append(f"{did}(token: {e})"); continue
         token, host = tk.get("token"), tk.get("host") or "https://tiefblue.dp.tech"
         if not token:
-            continue
+            skipped.append(f"{did}(无 token)"); continue
         for p, sz in _iter_leaves(host, token, tb + "/"):
             if p.rsplit("/", 1)[-1] == basename and sz == size:
                 return mount, f"{mount}/{p[len(tb) + 1:]}"
+
+    if skipped:
+        raise DedupError(f"有 {len(skipped)} 个数据集没查成: {', '.join(skipped[:3])}"
+                         + (" …" if len(skipped) > 3 else ""))
     return None
 
 
@@ -109,7 +131,14 @@ def main():
                          "重传要花几十分钟并白占数据集配额。也不要手写 .bohr_env。"},
             ensure_ascii=False))
     if not a.force:
-        hit = _find_existing(project, _ak, src.name, src.stat().st_size)
+        try:
+            hit = _find_existing(project, _ak, src.name, src.stat().st_size)
+        except DedupError as e:
+            sys.exit(json.dumps({"ok": False, "stage": "dedup", "error": f"查重未能完成: {e}",
+                "next": "多半是网络抖动,原样重跑本命令即可(查重命中就会直接复用,零传输)。",
+                "forbidden": "不要因为查重失败就直接新建 —— 这份数据很可能已经在平台上,"
+                             "重传要花几十分钟、白占数据集配额,还会产生重复数据集。"
+                             "确认必须新建时才显式加 --force。"}, ensure_ascii=False))
         if hit:
             mount, spectrum_mount = hit
             print(json.dumps({
@@ -138,7 +167,7 @@ def main():
     # ★ 关键:Bohrium 给数据集名加随机后缀(如 -hvx3),真实挂载路径必须从 API 查;
     #   不能假设 /bohr/<name>/v1,否则 job 报 "Dataset ... has been deleted"。
     ak = os.environ.get("ACCESS_KEY") or os.environ.get("BOHR_ACCESS_KEY", "")
-    url = f"https://openapi.dp.tech/openapi/v1/ds/?projectId={project}&page=1&pageSize=50"
+    url = f"{DS_API}/v1/ds/?projectId={project}&page=1&pageSize=50"
     req = urllib.request.Request(url, headers={"accessKey": ak})
     items = json.load(urllib.request.urlopen(req, timeout=20)).get("data", {}).get("items", [])
     match = next((i for i in items if i.get("title") == a.name), None)

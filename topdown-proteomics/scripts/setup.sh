@@ -41,5 +41,14 @@ echo "wrote $ENVF"
 export PATH="$HOME/.bohrium:$PATH"
 bohr version >/dev/null 2>&1 && echo "bohr ready" || echo "WARN: bohr 未就绪"
 command -v python3 >/dev/null 2>&1 || echo "WARN: 需要 python3"
-[ -n "${AK:-}" ] && echo "ACCESS_KEY 已注入(ACCESS_KEY+BOHR_ACCESS_KEY 同值)" || echo "WARN: ACCESS_KEY 未注入——先完成授权并重载 skill 再 setup;勿手写 .bohr_env"
+if [ -n "${AK:-}" ]; then
+  echo "ACCESS_KEY 已注入(ACCESS_KEY+BOHR_ACCESS_KEY 同值)"
+else
+  # 以前这里只 echo WARN 就继续(set -e 拦不住 || 分支),setup 报"成功"、退出码 0。
+  # agent 于是一路往下走,直到 submit 才炸,而那时的报错和真因(没授权)已经完全脱钩。
+  echo "ERROR: ACCESS_KEY 未注入,没有它后续每一步都会失败。" >&2
+  echo "FIX:   先在平台上完成授权、重载 skill,再跑 setup.sh。" >&2
+  echo "NEVER: 不要手写 .bohr_env,不要猜一个 key 填进去。" >&2
+  exit 1
+fi
 [ -n "${PROJECT_ID:-}" ] && echo "PROJECT_ID=$PROJECT_ID" || echo "WARN: PROJECT_ID 未注入——对话中用户已明确的项目 ID 可直接 export PROJECT_ID=<id> 使用;未知才 AskUserInput 索取;勿凭空编造默认值"

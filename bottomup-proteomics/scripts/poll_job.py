@@ -50,7 +50,9 @@ def main():
     if not ak:
         sys.exit("missing env: ACCESS_KEY(也没 BOHR_ACCESS_KEY;先 source .bohr_env 或完成授权)")
 
-    url = "https://openapi.dp.tech/openapi/v1/job/list?page=1&pageSize=50"
+    # 地址唯一来源:OPENAPI_HOST(setup.sh 导出)。不要自己拼别的域名。
+    api = os.environ.get("OPENAPI_HOST", "https://openapi.dp.tech").rstrip("/")
+    url = f"{api}/openapi/v1/job/list?page=1&pageSize=50"
     req = urllib.request.Request(url, headers={"accessKey": ak})
     try:
         data = json.load(urllib.request.urlopen(req, timeout=20))

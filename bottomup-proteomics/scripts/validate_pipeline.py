@@ -212,23 +212,65 @@ def _check_params(step: dict, errs: list) -> None:
                       f"步 {step.get('step_id')}({step.get('tool')})")
 
 
-def validate_with_fs(cfg: dict) -> dict:
-    """validate_config(纯规则) + 本地大文件硬拦(>100MB 逼 make_dataset)。
-    submit_pipeline 调用此接口;返回 {"ok": bool, "errors": list[str]}。"""
+def _check_local_input(v, base, field, errs):
+    """本地输入:存在性 + >100MB 硬拦。相对路径按 pipeline.json 所在目录解析。
+
+    base 必须与 submit 的 _stage 用同一个基准目录。以前这里按 CWD 解析、且"文件不存在"
+    是直接跳过(不是报错):相对路径写的 GB 级 raw 在校验端 exists()=False → 静默绕过
+    100MB 硬拦,submit 端却按 pipeline 目录解析成功、把它拷进 -p 上传包。校验器自己放的水。
+    """
+    if not isinstance(v, str) or v.startswith("/bohr/"):
+        return                      # /bohr 是只读挂载路径,不做本地存在性检查
+    path = v if os.path.isabs(v) else os.path.join(base or ".", v)
+    if not os.path.exists(path):
+        errs.append(
+            f"{field} 的本地文件不存在: {v}(按 pipeline.json 所在目录解析为 {path})。"
+            f"修复:ls 确认真实文件名后改 pipeline.json。"
+            f"禁止:不要拿名字相近的另一个文件顶替;不要随手填一个 /bohr/... 路径——"
+            f"/bohr 开头的路径本校验器不做存在性检查,猜的路径必定通过校验、到作业里才炸,"
+            f"/bohr 路径只能来自 make_dataset.py 的返回值。")
+        return
+    mb = os.path.getsize(path) / (1024 * 1024)
+    if field == "raw_files" and mb > _MAX_LOCAL_MB:
+        errs.append(
+            f"本地输入 {v} = {mb:.0f}MB > {_MAX_LOCAL_MB}MB,不能随作业打包上传。"
+            f"修复:python3 make_dataset.py --file {path} --name <稳定的英文名>,"
+            f"然后把它返回的 spectrum_mount 原样填进 raw_files。"
+            f"禁止:不要压缩/切分后硬塞进上传包,不要把它下载到别处再传。")
+
+
+def validate_with_fs(cfg: dict, base: str | None = None) -> dict:
+    """validate_config(纯规则) + 本地输入存在性 + 大文件硬拦(>100MB 逼 make_dataset)。
+
+    base = pipeline.json 所在目录,必须与 submit 的 _stage 同基准,否则相对路径两边解析
+    不一致,硬拦会被静默绕过。submit_pipeline 调用此接口;返回 {"ok","errors"}。
+    """
     errs = validate_config(cfg)
     for p in (cfg.get("raw_files") or []):
-        if isinstance(p, str) and not p.startswith("/bohr/") and os.path.exists(p):
-            mb = os.path.getsize(p) / (1024 * 1024)
-            if mb > _MAX_LOCAL_MB:
-                errs.append(f"本地输入 {p} = {mb:.0f}MB > {_MAX_LOCAL_MB}MB,须 make_dataset 注册")
+        _check_local_input(p, base, "raw_files", errs)
+    for key in ("fasta_path", "annotation_path"):   # 以前完全没检查 → submit 里裸 FileNotFoundError
+        if cfg.get(key):
+            _check_local_input(cfg[key], base, key, errs)
     return {"ok": not errs, "errors": errs}
 
 
 def main(argv=None) -> int:
-    args = argv if argv is not None else sys.argv[1:]
-    if not args:
-        print("usage: validate_pipeline.py pipeline.json", file=sys.stderr)
+    # TD 版用 --pipeline,BU 版历史上只吃位置参数。agent 在两个 skill 间迁移经验时
+    # `validate_pipeline.py --pipeline p.json` 会变成 open("--pipeline") → 一个看不懂的
+    # "文件 --pipeline 不存在"。两种写法都接受。
+    args = list(argv if argv is not None else sys.argv[1:])
+    path = None
+    if "--pipeline" in args:
+        i = args.index("--pipeline")
+        if i + 1 < len(args):
+            path = args[i + 1]
+    elif args and not args[0].startswith("-"):
+        path = args[0]
+    if not path:
+        print("usage: validate_pipeline.py <pipeline.json>   (--pipeline <path> 亦可)",
+              file=sys.stderr)
         return 2
+    args = [path]
     try:
         cfg = json.loads(open(args[0]).read())
     except FileNotFoundError:
@@ -241,7 +283,7 @@ def main(argv=None) -> int:
         print(f"FIX:   Fix the syntax at line {e.lineno}, column {e.colno}, then re-run. "
               "A trailing comma or an unquoted key is the usual cause.", file=sys.stderr)
         return 2
-    vres = validate_with_fs(cfg)
+    vres = validate_with_fs(cfg, base=os.path.dirname(os.path.abspath(args[0])))
     for e in vres["errors"]:
         print(f"ERROR: {e}", file=sys.stderr)
     print(json.dumps(vres, ensure_ascii=False))
