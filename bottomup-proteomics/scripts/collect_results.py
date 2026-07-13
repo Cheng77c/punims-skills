@@ -14,6 +14,66 @@ from pathlib import Path
 
 EXPECTED_CONTRACT_VERSION = 2   # 与 bu_cli.CONTRACT_VERSION 对齐
 
+# ── 交付层白名单 ─────────────────────────────────────────────
+# 只有结果表格是交付物。中间产物(.pin/.pepXML/.prot.xml)、参数文件、各步日志
+# 一律不外发:对用户没用,且带后端实现信息。它们仍留在 out/ 供内部诊断。
+USER_FACING_EXACT = {
+    "psm.tsv", "peptide.tsv", "protein.tsv", "ion.tsv", "modified_peptide.tsv",
+    "report.tsv", "report.pr_matrix.tsv", "report.pg_matrix.tsv", "report.stats.tsv",
+}
+USER_FACING_PREFIX = ("combined_", "abundance_", "ratio_")
+# 文件名里带后端工具名的一律排除(如 modmasses_ionquant.txt、*_stdout.log、fragger.params)
+DENY_SUBSTR = ("fragger", "ionquant", "philosopher", "diann", "dia-nn", "percolator",
+               "peptideprophet", "ptmprophet", "ptmshepherd", "tmtintegrator",
+               "crystalc", "msbooster", "stdout", "stderr")
+
+
+def _is_user_facing(f: Path) -> bool:
+    low = f.name.lower()
+    if any(t in low for t in DENY_SUBSTR):
+        return False
+    if f.suffix.lower() != ".tsv":
+        return False
+    return f.name in USER_FACING_EXACT or low.startswith(USER_FACING_PREFIX)
+
+
+def _n_cols(f: Path) -> int:
+    try:
+        with open(f, errors="replace") as fh:
+            return len(fh.readline().rstrip("\n").split("\t"))
+    except Exception:
+        return 0
+
+
+def _curate(out_dir: Path, dest: Path) -> list:
+    """把面向用户的结果表拷进 dest/,返回其路径。out_dir 原样保留(内部诊断用)。
+
+    同名表可能在多个步目录里各有一份(如 report/psm.tsv 37 列,定量步又补出 42 列的超集)。
+    只交付信息最全的那一份 —— 交两份内容不同的 psm.tsv 给用户,纯属制造困惑。
+    """
+    if dest.exists():
+        shutil.rmtree(dest)
+    dest.mkdir(parents=True, exist_ok=True)
+    best: dict = {}
+    for f in sorted(out_dir.rglob("*")):
+        if not (f.is_file() and _is_user_facing(f)):
+            continue
+        cur = best.get(f.name)
+        if cur is None or _n_cols(f) > _n_cols(cur):
+            best[f.name] = f
+    kept = []
+    for name, f in sorted(best.items()):
+        shutil.copy2(f, dest / name)
+        kept.append(str(dest / name))
+    return kept
+
+
+def _zip_dir(src: Path, zpath: Path) -> None:
+    with zipfile.ZipFile(zpath, "w", zipfile.ZIP_DEFLATED) as z:
+        for f in sorted(src.rglob("*")):
+            if f.is_file():
+                z.write(f, f.relative_to(src))
+
 
 def _count_data_rows(f: Path) -> int:
     try:
@@ -88,17 +148,23 @@ def collect(job_id: str, dl_dir: str, expected_version: int = EXPECTED_CONTRACT_
             shutil.rmtree(final_out)
         shutil.move(str(src_out), str(final_out))
         summ = final_out / "summary.json"
-    archive = None                           # zip 归位 + 清场:无条件执行(不嵌在 if 内)
+    # 清场:down 下来的整包 zip 与中间层目录一律删除。那个 zip 是**整个作业目录**
+    # (各步日志、参数文件、引擎中间格式),交给用户等于把后端实现全抖出去;
+    # 结果表另行裁剪成 results/ 交付,out/ 留本地供失败诊断。
     for z in list(dl.rglob("*.zip")):
-        archive = dl / f"{job_id}.zip"
-        if z.resolve() != archive.resolve():
-            shutil.move(str(z), str(archive))
+        z.unlink()
     for child in dl.iterdir():
         if child.is_dir() and child.name != "out":
             shutil.rmtree(child, ignore_errors=True)
     summary = json.loads(summ.read_text())
     out_dir = summ.parent
-    paths = [str(out_dir / d) for d in summary.get("deliverables", [])]
+    # 交付层裁剪:只有结果表进 results/,再打成 <jobId>-results.zip 供用户下载。
+    results_dir = dl / "results"
+    paths = _curate(out_dir, results_dir)
+    archive = None
+    if paths:
+        archive = dl / f"{job_id}-results.zip"
+        _zip_dir(results_dir, archive)
     warn = ""
     if summary.get("contract_version", 0) < expected_version:
         warn = "镜像执行器版本偏旧(contract_version < 期望),建议重建镜像 v2"
@@ -109,8 +175,13 @@ def collect(job_id: str, dl_dir: str, expected_version: int = EXPECTED_CONTRACT_
         "ok": True, "jobId": job_id, "status": summary.get("status"),
         "steps": summary.get("steps"), "failed_step": summary.get("failed_step"),
         "metrics": metrics, "pipeline": summary.get("pipeline"),
-        "deliverable_paths": paths, "result_dir": str(out_dir),
-        "archive": str(archive) if archive else None,   # 保留的结果 zip,供用户下载
+        "deliverable_paths": paths,                     # 已裁剪:只含结果表,可交付
+        "results_dir": str(results_dir),                # 可交付
+        "archive": str(archive) if archive else None,   # 已裁剪的结果 zip,可交付
+        "result_dir": str(out_dir),                     # ⚠️ 内部诊断用
+        "internal_only": "result_dir 与 pipeline 含中间产物/日志/后端工具名,仅供内部诊断:"
+                         "不要把该目录、其中文件路径或工具名交给用户。交付只用 "
+                         "deliverable_paths / results_dir / archive。",
         "version_warning": warn,
     }
     # 失败时直接surface真错:summary.error(执行器已含日志尾)+ failed_logs 尾部,

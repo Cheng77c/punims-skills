@@ -2,7 +2,7 @@
 name: bottomup-proteomics
 version: 1.0.0
 description: >
-  在 Bohrium 算力上跑 bottom-up 蛋白质组学流水线(MSFragger / DIA-NN / FragPipe 官方模板)。
+  在 Bohrium 算力上跑 bottom-up 蛋白质组学流水线(数据库搜索 / 定量 / DIA,内置行业标准工作流模板)。
   用户提供 .raw/.mzML 谱图 + FASTA 库,确认参数后提交 Bohrium job,回收 PSM/肽段/蛋白报告及定量结果。
   Use when: 用户要对 bottom-up 质谱数据做肽段鉴定 / LFQ / TMT 定量 / DIA 分析。
   NOT for: 完整蛋白(intact protein)搜索、纯文献/数据问答。
@@ -29,7 +29,7 @@ metadata:
 l0: Bottom-up 蛋白质组学流水线(Bohrium)
 l1: >
   用户给 .raw/.mzML + FASTA;确认搜索参数/定量/FDR 后,提交 Bohrium job 跑
-  MSFragger/DIA-NN/FragPipe 模板流水线,产 PSM/肽段/蛋白报告及定量矩阵并回收摘要。重计算在 Bohrium,不在 sandbox。
+  数据库搜索/定量/DIA 模板流水线,产 PSM/肽段/蛋白报告及定量矩阵并回收摘要。重计算在 Bohrium,不在 sandbox。
 ---
 
 # bottomup-proteomics
@@ -50,7 +50,7 @@ l1: >
 
 如果 `IMAGE_ADDRESS`/`PROJECT_ID`/`ACCESS_KEY` 未配置,**不要猜或找替代镜像**——用 `AskUserInput` 让用户补配置或提示去启用 `bohrium-job` skill。
 
-### 🚫 九条铁律(违反=必错)
+### 🚫 十条铁律(违反=必错)
 
 0. **开工第一件事:加载 `bohrium-dataset-manager` skill。** 谱图的查重与建集全靠它的
    `dataset_manager.py`;不加载,`/data/skills/bohrium-dataset-manager/` 根本不存在,
@@ -76,10 +76,27 @@ l1: >
 2. **绝不手写 job.json / 绝不自己拼 `bohr job submit`** —— 一律 `scripts/submit_pipeline.py`。
 3. **绝不直接调工具**(msfragger/diann…)—— 只经 `submit_pipeline.py` 提交。
 4. **谱图默认一律走 dataset(不论大小)**:共享盘/个人盘的谱图**直接转 dataset、无需下载**,工作区本地用 `make_dataset.py`;仅当用户**主动要求**"直接上传"且谱图 ≤100MB 才 `-p`。**建集失败不是启用 `-p` 的理由**——已经翻过车:sandbox 建集报错后,agent 自行把 92MB 谱图下载到工作区再建集,而报错里白纸黑字写着"不要下载到工作区绕过"。建集失败就停下报错,别自己找替代路线。**唯一需要下载的是 FASTA**(需可写)。结果用 `collect_results.py` 取。
-5. **取结果只用 `collect_results.py`**:**绝不手动 `bohr job download` / 解压 zip / 拷贝产物**——手动会导致目录结构混乱。collect 已给出 `result_dir`/`deliverable_paths`/`archive`,按它给的路径用即可。
+5. **取结果只用 `collect_results.py`**:**绝不手动 `bohr job download` / 解压 zip / 拷贝产物**——手动会导致目录结构混乱,**且会绕过交付层裁剪、把日志和参数文件一并抖给用户**。collect 已给出可交付的 `deliverable_paths`/`results_dir`/`archive`(纯结果表)与内部诊断用的 `result_dir`,按它给的路径用即可。
 6. **标准流程不可跳**:`validate_pipeline.py` →(谱图建 dataset 时)`make_dataset.py` → `submit_pipeline.py` → `poll_job.py` → `collect_results.py`。
 7. **单次轮询,绝不自旋**:提交后查一次状态,若仍在跑向用户报 jobId + 状态后**结束本轮**;jobId 存 Memory,用户稍后回来再查。
 8. **HITL 取消 = 中止**:用户拒绝确认/参数确认时,立即停止,不得以默认值继续提交。
+9. **对用户只讲功能,不报后端工具名。** 面向用户的每一句话(参数确认、进度、结果汇报、报错说明)
+   一律用**功能名**,不出现 `msfragger` / `ionquant` / `diann` / `philosopher` / `percolator` 等
+   后端工具名、品牌名、步骤 `tool` 字段值、`fragger.params` 之类的内部文件名。
+   **注意:这是"不主动提",不是"撒谎"。**
+   - 用户直接问用什么引擎 → 如实说明**不便透露具体实现**,可讲能力与算法类别(如"闭合数据库搜索 + 半监督重打分")。
+   - **绝不允许编造一个不存在的引擎名或谎称自研。**结果文件里有真实的打分列,一编造就穿帮。
+   - pipeline.json 内部**照常使用真实 tool 名**(执行器契约,不能改);只是**不要把它打印给用户看**。
+
+   | 内部 tool | 对用户的说法 |
+   |---|---|
+   | `philosopher-database` | 数据库准备(target-decoy) |
+   | `msfragger-closed` | 肽段搜索 |
+   | `percolator` / `peptideprophet` | 结果重打分 / 置信度评估 |
+   | `philosopher-report` | 鉴定报告汇总 |
+   | `ionquant` | 定量 |
+   | `tmtintegrator` | 标记定量汇总 |
+   | `diann` | DIA 分析 |
 
 **数据与接线铁律:**
 - **decoy 必须由 `philosopher-database` 步构建**:把 target-only FASTA 直接喂给 MSFragger 会产生零 decoy 序列,FDR 估计静默崩溃。pipeline.json 的 steps 里必须有 `philosopher-database`,其输出(target+decoy .fas)会**自动注入** `msfragger-closed` 的 `database_path` 参数并自动排序在其后——**不要画 db→msfragger 边**(见形式 A 的警告)。
@@ -118,7 +135,8 @@ source /bohr-workspace/.bohr_env   # 每个新 Bash 调用开头都要,确保 AC
 
 ### 2. 确认参数(HITL,必做)
 提交前**必须**用 `AskUserInput` 让用户确认(完整字段见 `references/parameters.md`):
-搜索引擎(MSFragger 闭合/DDA+ / DIA-NN 等)、FDR、定量方式(LFQ/TMT)、机型(默认 `c16_m32_cpu`)。
+分析模式(DDA 闭合搜索 / 开放搜索 / DIA)、FDR、定量方式(LFQ/TMT/iTRAQ)、机型(默认 `c16_m32_cpu`)。
+**用功能名向用户提问,不要报后端工具名/品牌名**(见铁律 9)。
 - **用户取消 = 中止本次提交**,不得用默认值继续。
 - **一条链满足请求即止**:用户要"完整鉴定",跑一条 DDA chain 即可;追加额外链须先征得同意。
 
@@ -262,7 +280,11 @@ python3 scripts/collect_results.py --job-id <JobId> --out /bohr-workspace/bu-run
 # 回收到任务目录 <任务名>/result/out/(--out 省略则默认 /bohr-workspace/bu-result/<JobId>/out/),
 # 返回 status + metrics(PSM/肽段/蛋白计数)+ 交付物本地路径 + 版本告警
 ```
-- 返回的 `result_dir` 含 `out/`(所有步骤产物,含 summary.json)+ `<JobId>.zip`(完整包供用户下载)。
+- **交付只用 `deliverable_paths` / `results_dir` / `archive`** —— 这三个已裁剪成纯结果表
+  (鉴定报告 + 定量矩阵),可以直接给用户。
+- ⚠️ **`result_dir`(完整 `out/`)与 `pipeline` 字段仅供内部诊断**:含各步日志、参数文件、
+  引擎中间格式和后端工具名。**不要把这个目录、其中的文件路径、或工具名交给用户**(铁律 9)。
+  整包 zip 已由 collect 自动删除,不要试图找回或手动重打包。
 - 返回的 `version_warning` 非空时,应转告用户(镜像需更新)。
 
 然后:`RecordArtifact` 标记 `summary.json` 与关键报告;Chat 只回摘要(PSM/蛋白数、FDR),
