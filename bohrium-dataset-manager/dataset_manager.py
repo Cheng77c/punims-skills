@@ -438,18 +438,30 @@ def _sdbx_base():
     "the sandbox gateway is failing". It was not. The skill just was not there.
     """
     import subprocess
-    if os.path.exists(SDBX_PY):
-        return [sys.executable, SDBX_PY]
-    probe = subprocess.run(["lbg", "sdbx", "--help"], capture_output=True, text=True)
-    if probe.returncode != 0:
-        die("the sandbox CLI is unavailable: neither the bohrium-sandbox skill nor `lbg sdbx`",
-            fix=f"Load the `bohrium-sandbox` skill — this script drives the sandbox through its "
-                f"{SDBX_PY}. Without it there is no supported way to turn a disk file into a "
-                f"dataset. Load it, then re-run this exact command.",
-            never="Do NOT read this as a platform outage, and do NOT work around it by "
-                  "downloading the spectra into the workspace. Fix the missing skill.",
-            code=5)
-    return ["lbg", "sdbx"]
+
+    def has_sdbx():
+        return subprocess.run(["lbg", "sdbx", "--help"],
+                              capture_output=True, text=True).returncode == 0
+
+    # `lbg sdbx` only exists in the PRERELEASE lbg (4.0.0b*). A plain `pip install lbg` lands
+    # 1.2.29, whose subcommands are {node,program,project,image,...} — no sdbx at all. Every
+    # call then dies with an argparse usage error that looks nothing like "wrong lbg version",
+    # which is how this got misread for so long as "the sandbox gateway is down".
+    if not has_sdbx():
+        print("[sandbox] lbg has no `sdbx` subcommand — installing the prerelease lbg…")
+        subprocess.run([sys.executable, "-m", "pip", "install", "-q", "--pre", "--upgrade", "lbg"],
+                       capture_output=True, text=True, timeout=600)
+        if not has_sdbx():
+            die("`lbg sdbx` is unavailable even after installing the prerelease lbg",
+                fix="Run `python3 -m pip install --pre --upgrade lbg` and check "
+                    "`lbg sdbx --help`. The sandbox subcommand ships ONLY in the prerelease "
+                    "(4.0.0b*); the stable 1.2.29 does not have it.",
+                never="Do NOT read this as a platform outage, and do NOT work around it by "
+                      "downloading the spectra into the workspace to build the dataset from "
+                      "there. Fix the CLI.",
+                code=5)
+
+    return [sys.executable, SDBX_PY] if os.path.exists(SDBX_PY) else ["lbg", "sdbx"]
 
 
 def _sdbx(*args, timeout=900):
@@ -460,7 +472,15 @@ def _sdbx(*args, timeout=900):
     """
     import subprocess
     base = _sdbx_base()
-    r = subprocess.run(base + list(args), capture_output=True, text=True, timeout=timeout)
+    # The prerelease lbg reads the key from BOHRIUM_ACCESS_KEY — a third spelling, next to our
+    # ACCESS_KEY and BOHR_ACCESS_KEY. Without it lbg exits with SdbxConfigError, which this
+    # script used to report as "the sandbox gateway is failing". Map it here so the sandbox
+    # works whether or not the bohrium-sandbox skill (whose sdbx.py does only this) is loaded.
+    env = os.environ.copy()
+    ak = env.get("BOHR_ACCESS_KEY") or env.get("ACCESS_KEY")
+    if ak:
+        env.setdefault("BOHRIUM_ACCESS_KEY", ak)
+    r = subprocess.run(base + list(args), capture_output=True, text=True, timeout=timeout, env=env)
     out = "\n".join(l for l in (r.stdout or "").splitlines()
                     if "upgrade_available" not in l)
     return r.returncode, out.strip(), (r.stderr or "").strip()
@@ -512,12 +532,31 @@ def _sandbox_ready(project_id: int, reuse: bool = True):
         if sid:
             print(f"[sandbox] gateway timed out but the sandbox came up: {sid}")
             return sid
-        print(f"[sandbox] attempt {attempt} failed: {(out or err)[:160]}")
+        last = (out or err or "").strip()
+        print(f"[sandbox] attempt {attempt} failed: {last[:160]}")
+
+        # Only a 5xx/timeout is worth retrying. A config or CLI error will fail identically
+        # three times and then get reported as a platform outage — which is exactly how a
+        # missing env var and a wrong lbg version both got misdiagnosed as "the gateway is
+        # down". Anything we can name, we name, and we stop.
+        for marker, what, fix in (
+            ("SdbxConfigError", "the sandbox CLI has no access key",
+             "Export BOHRIUM_ACCESS_KEY (the prerelease lbg reads that spelling, not "
+             "ACCESS_KEY / BOHR_ACCESS_KEY), or re-run `source /bohr-workspace/.bohr_env`."),
+            ("usage: lbg", "the installed lbg is too old to have a `sdbx` subcommand",
+             "Run `python3 -m pip install --pre --upgrade lbg`. sdbx ships only in the "
+             "prerelease (4.0.0b*); the stable 1.2.29 does not have it."),
+        ):
+            if marker in last:
+                die(f"cannot create a sandbox: {what}", fix=fix,
+                    never="This is NOT a platform outage — do not tell the user to retry later, "
+                          "and do not download the spectra into the workspace to work around it.",
+                    code=5)
 
     die("could not get a sandbox after 3 attempts — the Bohrium sandbox gateway is failing",
-        fix="This is platform-side, not a data problem. Tell the user the sandbox service is "
-            "currently unavailable and that the upload cannot proceed right now; suggest "
-            "retrying later. Stop here.",
+        fix="The failure was not a config or CLI problem (those are detected separately), so "
+            "this looks platform-side. Report the message above verbatim to the user and stop; "
+            "suggest retrying later.",
         never="Do NOT download the spectra into the workspace to 'work around' it — a "
               "multi-GB download will blow the workspace and is not the supported path. "
               "Do NOT invent another upload route or hand-craft REST calls.",
