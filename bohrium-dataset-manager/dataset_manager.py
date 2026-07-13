@@ -320,16 +320,50 @@ def _stat_disk_file(disk_path: str, project_id: int):
     return base, int(d["contentLength"])
 
 
+def _iter_datasets(project_id: int, page_size: int = 100):
+    """Yield EVERY dataset in the project, walking pagination to the end.
+
+    The list endpoint silently defaults to pageSize=10. Scanning only that first page
+    makes dedup report "not found" for a file that IS on the platform — which is exactly
+    how a multi-GB re-upload happens. So: never trust one page, and if we cannot account
+    for all `total` datasets, fail loudly rather than return a miss we cannot stand behind.
+    """
+    page, seen, total = 1, 0, None
+    while True:
+        r = api("GET", f"{BASE}/", params={"projectId": project_id,
+                                           "page": page, "pageSize": page_size})
+        data = r.get("data") or {}
+        items = data.get("items") or []
+        if total is None:
+            total = data.get("total")
+        for d in items:
+            seen += 1
+            yield d
+        if not items or (total is not None and seen >= total):
+            break
+        page += 1
+        if page > 200:                # runaway guard: a broken endpoint must not loop forever
+            break
+    if total is not None and seen < total:
+        die(f"dataset scan incomplete: saw {seen} of {total} datasets in project {project_id}",
+            fix="Retry — the listing endpoint truncated. Do NOT treat this as 'file not on "
+                "the platform': an unscanned dataset may already contain it.",
+            never="Do NOT proceed to upload after an incomplete scan. That is how the same "
+                  "multi-GB file gets uploaded twice.")
+
+
 def _find_hit(project_id: int, name: str, size: int):
     """Scan the project's datasets for a file with this exact basename + byte size.
 
-    Content identity, not title. Returns the hit dict, or None. No printing, no exit.
+    Content identity, not title. Returns (hit_dict_or_None, datasets_scanned).
+    The scan count is part of the answer: a MISS is only trustworthy if it looked at all
+    of them. No printing, no exit.
     """
     if not name or not size:
-        return None
-    r = api("GET", f"{BASE}/", params={"projectId": project_id})
-    items = (r.get("data") or {}).get("items") or []
-    for d in items:
+        return None, 0
+    scanned = 0
+    for d in _iter_datasets(project_id):
+        scanned += 1
         if d.get("status") != 2:      # 2 = committed/usable
             continue
         try:
@@ -340,8 +374,8 @@ def _find_hit(project_id: int, name: str, size: int):
             if os.path.basename(f.get("file", "")) == name and int(f.get("size", 0)) == size:
                 return {"found": True, "dataset_id": d["id"], "title": d.get("title"),
                         "file": f["file"], "size": f["size"], "mount_path": f["mount_path"],
-                        "scanned": len(items)}
-    return None
+                        "scanned": scanned}, scanned
+    return None, scanned
 
 
 def find_dataset_for_file(project_id: int, disk_path: str = None,
@@ -368,7 +402,7 @@ def find_dataset_for_file(project_id: int, disk_path: str = None,
         die("nothing to look up",
             fix="Pass --disk-path share/... (preferred), or both --name and --size.", code=2)
 
-    hit = _find_hit(project_id, name, size)
+    hit, scanned = _find_hit(project_id, name, size)
     if hit:
         if as_json:
             print(json.dumps(hit, ensure_ascii=False, indent=2))
@@ -379,11 +413,11 @@ def find_dataset_for_file(project_id: int, disk_path: str = None,
             print(f"   mount   : {hit['mount_path']}")
         return hit
 
-    miss = {"found": False, "name": name, "size": size}
+    miss = {"found": False, "name": name, "size": size, "scanned": scanned}
     if as_json:
         print(json.dumps(miss, ensure_ascii=False, indent=2))
     else:
-        print(f"❌ MISS — no dataset in project {project_id} contains {name} ({size} bytes).")
+        print(f"❌ MISS — scanned all {scanned} datasets in project {project_id}; none contains {name} ({size} bytes).")
         print("   FIX: create it (no download involved):")
         print(f"        dataset_manager.py create-from-disk --project-id {project_id} "
               "--disk-path share/<path>")
@@ -479,7 +513,7 @@ def create_from_disk(project_id: int, disk_path: str, name: str = None,
     import time
 
     # 0) dedup first — the whole sandbox dance is pointless if the file is already up there
-    hit = _find_hit(project_id, *_stat_disk_file(disk_path, project_id))
+    hit, _ = _find_hit(project_id, *_stat_disk_file(disk_path, project_id))
     if hit:
         print("✅ already on the platform — nothing to upload.")
         if as_json:
@@ -577,7 +611,7 @@ def create_from_disk(project_id: int, disk_path: str, name: str = None,
     #    path must be read back, never guessed from the identifier.
     for _ in range(6):
         time.sleep(5)
-        hit = _find_hit(project_id, base, size)
+        hit, _ = _find_hit(project_id, base, size)
         if hit:
             print("\n✅ dataset ready.")
             if as_json:
