@@ -1,6 +1,6 @@
 ---
 name: bohrium-dataset-manager
-description: "Manage and inspect Bohrium datasets via bohr CLI or open.bohrium.com API. Use when: creating/listing/deleting datasets, uploading data, managing versions, OR listing the files INSIDE a dataset to resolve the exact in-job mount path (/bohr/<name>/v1/<file>) instead of guessing filenames. NOT for: share/personal disk file management (use bohrium-file), job submission, or node management."
+description: "Manage and inspect Bohrium datasets via bohr CLI or open.bohrium.com API. Use when: creating/listing/deleting datasets, uploading data, managing versions, checking whether a file was ALREADY uploaded before re-uploading it (dedup, `find`), OR listing the files INSIDE a dataset to resolve the exact in-job mount path (/bohr/<name>/v1/<file>) instead of guessing filenames. NOT for: share/personal disk file management (use bohrium-file), job submission, or node management."
 ---
 
 # SKILL: Bohrium 数据集 (Dataset) 管理与查看
@@ -9,7 +9,7 @@ description: "Manage and inspect Bohrium datasets via bohr CLI or open.bohrium.c
 
 **Bohrium 数据操作的一站式 skill。** 加载本 skill 即掌握全部数据操作,无需再依赖其他 skill:
 
-- **数据集(dataset)**:创建(本地 / **从共享盘·个人盘直接建,免下载** / API)/ 列出 / 看内部文件拿确切挂载路径 / 版本 / 删除 / 在任务中挂载。
+- **数据集(dataset)**:**查重(`find`,建集前必跑)** / 创建(本地 / **从共享盘·个人盘直接建,免下载** / API)/ 列出 / 看内部文件拿确切挂载路径 / 版本 / 删除 / 在任务中挂载。
 - **文件盘(个人盘 personal / 项目共享盘 share)**:列目录 / 下载 / 上传 / stat / mkdir / 移动 / 复制 / 删除 / 解压。
 - **把数据喂进计算任务**:见下方「数据进任务:路由决策」——不同来源(工作区 / 文件盘 / 数据集)+ 不同用途(只读挂载 / 需可写)对应不同操作,别猜、别反问用户。
 
@@ -23,7 +23,7 @@ description: "Manage and inspect Bohrium datasets via bohr CLI or open.bohrium.c
 
 | 数据在哪 | 用途 | 怎么做 |
 |---|---|---|
-| 文件盘(share/personal)的**谱图** | 任务只读输入 | 见「从共享盘/个人盘建数据集(sandbox 法)」→ 任务挂载 `/bohr/<名>/v1/<文件>`(**不下载到本地**) |
+| 文件盘(share/personal)的**谱图** | 任务只读输入 | 一条命令:`dataset_manager.py create-from-disk --project-id <pid> --disk-path share/<路径>`(内含查重,已存在则零传输)→ 用它返回的 `mount_path`。**绝不下载到本地** |
 | 文件盘(share/personal)的 **FASTA / 需可写小文件** | 搜索引擎要在同目录建索引(可写) | **下载**到任务目录(见「下载数据」)→ 随包上传 `-p`,**不要做成只读数据集** |
 | **已有数据集**,但不知里面文件名 | 要引用具体文件 | `dataset_manager.py files --id <ID>` 拿确切 `/bohr/<名>/v1/<文件>`——**别猜、别问用户** |
 | 已有数据集,要在任务里用 | 只读输入 | 直接挂载 `dataset_path`,**不要下载**;真要本地副本才用 `downloadUri`(整包 zip) |
@@ -151,55 +151,32 @@ bohr dataset create \
 
 ---
 
-## 从共享盘 / 个人盘建数据集（sandbox 法，免下载）
+## 从共享盘 / 个人盘建数据集（免下载）
 
-`bohr dataset create -l` 要求文件**本地可读**,但 agent 运行环境**不挂载** `/share`、`/personal`。要把盘里的(GB 级)谱图做成 dataset **又不下载到本地再传**,用一个**临时 Bohrium Sandbox**(带 `--mount-user-storage`)在其中就地 `bohr dataset create`。
+盘上的谱图（GB 级）要做成 dataset，**一条命令，不要自己拼流程**：
 
-> 依赖:`bohrium-sandbox` skill 的 `sdbx.py`(create/exec/files/kill）+ prerelease lbg（`pip install --pre --upgrade lbg`）。**列项目 / 浏览盘 / 查重只用 HTTP API,不开 sandbox;只有真正上传才开。**
+```bash
+python /data/skills/bohrium-dataset-manager/dataset_manager.py create-from-disk \
+  --project-id <projectId> --disk-path share/<盘内路径> --json
+```
+
+它内部按顺序做完：**先查重**（命中就直接返回 `mount_path`，零传输、根本不开 sandbox）→ 起 sandbox（带 `--mount-user-storage`，502 网关超时自动重试且先查有没有已建成的，不留孤儿）→ 沙箱内装 bohr CLI（`--user root`）→ **后台**上传 → 轮询日志 → **读回真实 `/bohr/...` 挂载路径**（Bohrium 会加随机后缀如 `-6f7j`，只能查、不能拼）。
+
+| exit | 含义 | 你该做什么 |
+|---|---|---|
+| `0` | 成功（或本来就已存在） | 用它输出的 `mount_path` |
+| `2` | 源文件在盘上不存在 | 如实告诉用户路径有问题并停下 |
+| `5` | 平台 sandbox 网关故障（重试 3 次仍失败） | **如实报告平台故障并停下。绝不降级去把谱图下载到工作区。** |
+| `6` / `7` | 沙箱内上传失败 / 超时 | 把它打印的日志给用户，别自己另起炉灶 |
+
+> 🚫 **不要手工重做这套流程**。以下每一步都真实翻过车：
+> - 编造 CLI 安装地址（`open.bohrium.com/openapi/cli/install` → 404，下回来一个内容是 "404" 的脚本）；正确地址只有 `dp-public.oss-cn-beijing.aliyuncs.com/bohrctl/1.0.0/install_bohr_linux_curl.sh`。
+> - 漏掉 `--user root`：沙箱默认用户是 `user`，读不了 `/personal`、写不了 `/root`。
+> - `pip install -U lbg` 装到稳定版（1.2.x）——**它没有 `dataset` 子命令**；沙箱内该装的是 `bohr` CLI，不是 lbg。
+> - 前台 `exec` 60 秒就断，几百 MB 的谱图会被截断上传却报成功 → 必须 `--background` + 轮询日志。
+> - 拿 `/bohr/<标识>/v1` 硬拼挂载路径 → 少了随机后缀，任务里必然找不到文件。
 >
-> ⚠️ **sdbx.py 输出的两个坑**:① `--json` 结果**前面可能多一行** `{"kind":"upgrade_available",...}` 升级提示 → 不是纯 JSON,解析前先滤掉(取从第一个 `{` 到匹配的真 JSON,或 `... | grep -v upgrade_available`)。② `exec --background` 返回的是**裸 pid 数字**(如 `89`),不是 `{"pid":...}`。
-
-1. **定 projectId**(决定挂哪个项目 /share、dataset 归属)。不知道就列项目让用户选:
-   ```bash
-   curl -sS "$BASE/v1/project/list?page=1&pageSize=50" -H "Authorization: Bearer $AK"   # → data.items[].{id,name}
-   ```
-2. **浏览盘找文件**(可选):用上面「文件盘操作」的 `file/iterate`。
-3. **查重(重要,别只靠名字)**:先看这份数据是否已做过 dataset,命中就**直接返回它的 `path`,零传输**。
-   - **status 从哪看**:直接 `python dataset_manager.py detail --id <ID>` —— 它一条命令给 `Path`+`Status`(`2`=可用),已自动从列表端点兜底补 status。**别手搓 REST 猜端点**:`/v1/dataset`、`/v2/dataset/list`、`tiefblue/api/datasets` 全是 404;唯一带 status 的原始端点是 `GET /v2/ds/?projectId=<pid>`(带尾斜杠),但优先用 `detail`/`files` 这些封装好的 subcommand,别 curl+python 一行式去凑。
-   - **别只信 title**:命名只是启发式(见第 4 步),title 可能撞名或漏配。命中候选后**务必用 `files --id` 核对内部文件名与 `size` 和源文件一致**(源文件大小用 `GET /v1/file/stat/<路径>` 的 `contentLength`),一致才判为同一份、复用;不一致就是撞名,继续新建。
-   - **源文件 stat 拿不到大小时(返回 `exist:false` 或 `contentLength:0`)= 源文件在盘上不存在/不可核对**:此时**绝不能靠 title 猜着复用**——要么路径写错了、要么文件真没了。应向用户如实报告"这份数据在盘上找不到",而不是自作主张挑个同名数据集复用(误复用会把错数据喂进任务)。
-   - 多条候选:取 `status=2` 且 `updateTime` 最新;仍不确定就把候选列给用户确认,别盲选。
-   - **完全没匹配到**:视为没做过,继续第 4 步新建(别因为一次搜索用词不准就反复重传——不确定时宁可先 `files` 核对几个相近候选)。
-4. **建带盘挂载的 sandbox**:
-   ```bash
-   python /data/skills/bohrium-sandbox/sdbx.py create sdbxagent --mount-user-storage --project-id <projectId> --json   # → sandboxID(SID)
-   ```
-   - 命名约定:从盘内路径推一个**稳定的**英文数字名(如 `astral-tmt18-raw`),同份数据每次同名,查重才生效。
-   - ⚠️ **一沙箱只绑一个项目的 /share**。换项目 → **再建一个沙箱并存,绝不为换项目 kill 旧的**;多项目=多沙箱,各记一个 SID。
-5. **沙箱内装 bohr CLI(必须 `--user root`)**:
-   ```bash
-   python /data/skills/bohrium-sandbox/sdbx.py exec --user root <SID> 'curl -fsSL https://dp-public.oss-cn-beijing.aliyuncs.com/bohrctl/1.0.0/install_bohr_linux_curl.sh | bash'
-   ```
-6. **后台上传**(前台 60s 必超时 → 必须 `--background`;**双引号**让 `$BOHR_ACCESS_KEY` 在调用侧展开成活值,沙箱内才求值的 `\$HOME`/`\$?` 用 `\$` 转义):
-   ```bash
-   python /data/skills/bohrium-sandbox/sdbx.py exec --user root --background <SID> "
-   export PATH=/root/.bohrium:\$PATH
-   export OPENAPI_HOST=https://open.bohrium.com
-   export TIEFBLUE_HOST=https://tiefblue.dp.tech
-   export ACCESS_KEY=$BOHR_ACCESS_KEY
-   echo n | bohr dataset create -n '<名>' -p '<标识>' -i <projectId> -l '<盘内路径>' > /tmp/upload.log 2>&1
-   echo EXIT_CODE=\$? >> /tmp/upload.log
-   "
-   ```
-   `-l` 填 `/share/...` 或 `/personal/...`(可目录可单文件);`echo n`=新建、`echo y`=续传。
-7. **查结果(单次,别自旋)**:`sdbx.py files read <SID> /tmp/upload.log` → 见 `create dataset ... success.` + `EXIT_CODE=0` 即成。没完成就报进度、下轮再查,别原地 sleep 空转。
-8. **拿真实 /bohr 路径**:`GET /v2/ds/?projectId=<pid>` 按 title 匹配取 `.path`(Bohrium 会加随机后缀如 `-3gbh`,**必须查、不能拼** `/bohr/<标识>/v1`)。
-
-**沙箱复用/收尾**:同项目数据复用同一 SID(重复 6~8,不必再装 CLI);**默认不 kill**(12h 自动销毁兜底);仅当用户说"清理"或确定不再上传时 `sdbx.py kill <SID> --force`。
-
-> **沙箱内 bohr CLI 三个 env 缺一不可**:`OPENAPI_HOST=https://open.bohrium.com`(**不带 /openapi**)、`TIEFBLUE_HOST=https://tiefblue.dp.tech`、`ACCESS_KEY=$BOHR_ACCESS_KEY`。缺 TIEFBLUE_HOST 会 `panic: unsupported protocol scheme ""`。
-
----
+> 这些坑 `create-from-disk` 全部封装好了。**沙箱默认复用、不 kill**（12h 自动销毁兜底）；确实要新起一个才加 `--fresh-sandbox`。
 
 ## 使用数据集
 
@@ -480,3 +457,4 @@ r = requests.get(f"{BASE}/project", headers=HEADERS)
 | `dataset_manager.py` 报 `set BOHR_ACCESS_KEY (or ACCESS_KEY)` | 两个变量都没设 | 任一即可;脚本已兼容 `ACCESS_KEY`(BU/TD 的 `.bohr_env` 设的就是它) |
 | `files` 只返回一个 `upload/` 目录项 | 旧版脚本不递归 | 已修:`files`/`download` 会递归下钻,直接用返回的 `mount_path` |
 | `dataset_manager.py` 输出被 `Extra data` JSON 解析错误 | sdbx.py 的 upgrade 提示行混入(仅 sdbx,不是本脚本) | 见上「sdbx.py 输出的两个坑」,解析前滤掉提示行 |
+| 重复上传了已有的大文件 | 靠 dataset `title` 判断有没有传过 → 换个目录/换个人跑名字就对不上,必然漏判 | 建集前一律先跑 `dataset_manager.py find --project-id <pid> --disk-path share/<路径>`;exit 0 = 命中直接用 `mount_path`,exit 4 才新建 |

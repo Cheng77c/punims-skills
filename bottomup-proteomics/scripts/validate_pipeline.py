@@ -29,11 +29,22 @@ _HERE = os.path.dirname(os.path.abspath(__file__))
 
 
 def _load(name):
+    """校验用的 schema。读不到就必须硬失败 —— 绝不能返回 {} 静默放行。
+
+    返回 {} 会让 _check_param_dict / _check_required / template_id 检查全部退化成 no-op,
+    validate 报 ok:true,submit 照常提交一个参数全错的作业,烧完整个 job 才暴露。
+    闸门失效时必须有声音。
+    """
     try:
         with open(os.path.join(_HERE, name), encoding="utf-8") as f:
             return json.load(f)
-    except Exception:
-        return {}
+    except Exception as e:
+        sys.exit(json.dumps({"ok": False, "stage": "validate",
+            "error": f"校验 schema 缺失或损坏: scripts/{name} ({e})",
+            "next": "skill 安装不完整。重新拉取 skill 目录,确认 scripts/param_schema.json "
+                    "与 scripts/template_tools.json 都在。",
+            "forbidden": "不要跳过校验直接 submit_pipeline.py(会花钱跑一个参数没校验过的作业);"
+                         "也不要凭记忆手写一个 schema 文件顶替。"}, ensure_ascii=False))
 
 
 _PARAM_SCHEMA = _load("param_schema.json")     # {tool: {param: {type,required?,enum?,min?,max?,xmin?}}}
@@ -218,7 +229,18 @@ def main(argv=None) -> int:
     if not args:
         print("usage: validate_pipeline.py pipeline.json", file=sys.stderr)
         return 2
-    cfg = json.loads(open(args[0]).read())
+    try:
+        cfg = json.loads(open(args[0]).read())
+    except FileNotFoundError:
+        print(f"ERROR: pipeline file not found: {args[0]}", file=sys.stderr)
+        print("FIX:   Write the pipeline.json first, then validate it. Check the path you "
+              "passed against the file you actually wrote.", file=sys.stderr)
+        return 2
+    except json.JSONDecodeError as e:
+        print(f"ERROR: {args[0]} is not valid JSON: {e}", file=sys.stderr)
+        print(f"FIX:   Fix the syntax at line {e.lineno}, column {e.colno}, then re-run. "
+              "A trailing comma or an unquoted key is the usual cause.", file=sys.stderr)
+        return 2
     vres = validate_with_fs(cfg)
     for e in vres["errors"]:
         print(f"ERROR: {e}", file=sys.stderr)

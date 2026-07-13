@@ -157,7 +157,10 @@ def validate_with_fs(cfg: dict, base: str | None = None) -> dict:
             p = bdir / p
         if not p.exists():
             errors.append(_err("inputs", None, k, f"本地文件不存在: {v}",
-                               fix="确认路径,或用 /bohr 挂载/dataset"))
+                               fix="用 ls 确认真实路径后修正;文件确实不在就向用户索取。"
+                               "禁止:不要随手填一个 /bohr/... 路径顶上——本校验器对 "
+                               "/bohr 开头的路径不做存在性检查,猜的路径必定通过校验、"
+                               "然后在作业里才炸。/bohr 路径只能来自 make_dataset.py 的返回值。"))
             continue
         size_mb = p.stat().st_size / (1024 * 1024)
         if size_mb > MAX_LOCAL_INPUT_MB:

@@ -99,8 +99,16 @@ def main():
                  "dataset 只给大谱图 .raw/.mzML。")
 
     # ★ 查重(硬要求):建前扫项目已有数据集,若已有同名+同大小文件,直接复用,绝不重复创建。
+    # 没有 key 就跳过查重 = 静默退化成重复上传 GB 级数据。查重失败必须硬停,不能"当没查过"继续建。
     _ak = os.environ.get("ACCESS_KEY") or os.environ.get("BOHR_ACCESS_KEY", "")
-    if not a.force and _ak:
+    if not _ak:
+        sys.exit(json.dumps({"ok": False, "error": "缺少 ACCESS_KEY,无法查重",
+            "next": "先 `source /bohr-workspace/.bohr_env`(它同时导出 ACCESS_KEY 和 "
+                    "BOHR_ACCESS_KEY)。为空说明授权没完成,让用户重新授权。",
+            "forbidden": "不要跳过查重直接建集 —— 这份数据很可能已经在平台上,"
+                         "重传要花几十分钟并白占数据集配额。也不要手写 .bohr_env。"},
+            ensure_ascii=False))
+    if not a.force:
         hit = _find_existing(project, _ak, src.name, src.stat().st_size)
         if hit:
             mount, spectrum_mount = hit

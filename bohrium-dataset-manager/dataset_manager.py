@@ -25,6 +25,78 @@ HEADERS = {"Authorization": f"Bearer {AK}"}
 HEADERS_JSON = {**HEADERS, "Content-Type": "application/json"}
 
 
+def die(what: str, *, fix: str, never: str = None, code: int = 1):
+    """Fail loudly, and tell the caller exactly what to do next.
+
+    An LLM agent reads this output and decides its next move. "Error: failed" gives it
+    nothing to act on, so it improvises — inventing API endpoints, guessing a dataset by
+    name, downloading a 900MB spectrum into the workspace. Every failure here therefore
+    states WHAT broke, HOW to fix it, and where relevant WHAT MUST NOT be done instead.
+    """
+    print(f"ERROR: {what}", file=sys.stderr)
+    print(f"FIX:   {fix}", file=sys.stderr)
+    if never:
+        print(f"NEVER: {never}", file=sys.stderr)
+    sys.exit(code)
+
+
+def api(method: str, url: str, **kw):
+    """HTTP against the Bohrium OpenAPI, with actionable failures instead of tracebacks.
+
+    Turns the three ways this bites us — dead network, bad key, API-level error code —
+    into messages an agent can act on, rather than a stack trace it will guess around.
+    """
+    kw.setdefault("timeout", 60)
+    kw.setdefault("headers", HEADERS)
+    try:
+        r = requests.request(method, url, **kw)
+    except requests.exceptions.Timeout:
+        die(f"Bohrium API timed out: {method} {url}",
+            fix="Transient. Retry the same command once or twice. If it keeps timing out, "
+                "report a platform outage and stop.",
+            never="Do not switch to a different endpoint or invent an alternative API path.",
+            code=8)
+    except requests.exceptions.RequestException as e:
+        die(f"cannot reach the Bohrium API: {e}",
+            fix="Check network egress from the sandbox, then retry the same command.",
+            never="Do not fall back to downloading large data into the workspace.", code=8)
+
+    if r.status_code in (401, 403):
+        die(f"Bohrium rejected the access key ({r.status_code}) on {url}",
+            fix="Run the skill's setup.sh, then `source /bohr-workspace/.bohr_env`. It sets "
+                "ACCESS_KEY and BOHR_ACCESS_KEY to the same value. If it still fails, ask the "
+                "user for a valid key — do not guess one.",
+            code=1)
+    if r.status_code == 404:
+        die(f"no such Bohrium endpoint: {url} (404)",
+            fix="This URL does not exist. Use only the subcommands of this script "
+                "(`dataset_manager.py --help`).",
+            never="Do NOT hand-craft REST calls or invent endpoints — /v1/dataset, "
+                  "/v2/dataset/list and /openapi/cli/install are all 404s that have "
+                  "burned us before.",
+            code=8)
+    if r.status_code >= 500:
+        die(f"Bohrium server error {r.status_code} on {url}",
+            fix="Platform-side and usually transient. Retry once or twice, then report the "
+                "outage to the user and stop.",
+            never="Do not work around it by downloading spectra into the workspace.", code=8)
+
+    try:
+        data = r.json()
+    except ValueError:
+        die(f"Bohrium returned non-JSON from {url}: {r.text[:120]!r}",
+            fix="Almost always an auth or URL problem. Verify the key is loaded and that the "
+                "path came from this script, not from memory.", code=8)
+
+    if isinstance(data, dict) and data.get("code") not in (0, None):
+        die(f"Bohrium API error {data.get('code')} on {url}: {data.get('message') or data}",
+            fix="Read the message above — it is the real cause. Fix the inputs it names "
+                "(project id, path, dataset id) and retry.",
+            never="Do not retry blindly with the same inputs, and do not substitute a "
+                  "different dataset to move on.", code=8)
+    return data
+
+
 def check_quota(project_id: int):
     """Check dataset quota for a project."""
     r = requests.get(
@@ -141,7 +213,7 @@ def _iterate_all(host, token, prefix, _depth=0, _max_depth=20):
     return out
 
 
-def list_files(dataset_id: int, version: str = None, as_json: bool = False):
+def list_files(dataset_id: int, version: str = None, as_json: bool = False, quiet: bool = False):
     """List files INSIDE a dataset and resolve each to its exact in-job mount path.
 
     Chain (all verified): detail -> projectId + mount root; version -> tiefbluePath;
@@ -198,12 +270,15 @@ def list_files(dataset_id: int, version: str = None, as_json: bool = False):
             "mount_path": f"{mount_root}/{rel}",
         })
 
+    if quiet:
+        return results
+
     if as_json:
         print(json.dumps(
             {"dataset_id": dataset_id, "title": detail.get("title"),
              "mount_root": mount_root, "files": results},
             ensure_ascii=False, indent=2))
-        return
+        return results
 
     print(f"Dataset {dataset_id} ({detail.get('title', '?')}) — mount root {mount_root}:\n")
     if not results:
@@ -213,6 +288,312 @@ def list_files(dataset_id: int, version: str = None, as_json: bool = False):
         mb = it["size"] / (1024 * 1024) if it["size"] else 0
         print(f"  [{tag}] {it['file']}  ({mb:.1f} MB)")
         print(f"         → 填入 pipeline: {it['mount_path']}")
+    return results
+
+
+def _stat_disk_file(disk_path: str, project_id: int):
+    """Size of a file on the share/personal disk, via the v1 file API.
+
+    The agent sandbox does NOT mount /share or /personal, so os.path.getsize() is not an
+    option here — the size has to come from the platform.
+    Returns (basename, size) or (basename, None) when the file does not exist.
+    """
+    p = disk_path.strip().lstrip("/")
+    if not p.startswith(("share/", "personal/")):
+        die(f"--disk-path must be a disk path, got: {disk_path}",
+            fix="Pass the path as it appears on the disk, starting with share/ or personal/ — "
+                "e.g. share/jubao/run1/sample.mzML. Not a /bohr/... mount path, not a local "
+                "workspace path.", code=2)
+
+    v1 = "https://open.bohrium.com/openapi/v1"
+    uid = (api("GET", f"{v1}/ak/get").get("data") or {}).get("user_id")
+    if not uid:
+        die("could not resolve the Bohrium user id from the access key",
+            fix="The key is loaded but the platform will not identify it. Re-run setup.sh and "
+                "`source /bohr-workspace/.bohr_env`, then retry.", code=1)
+    pid = 0 if p.startswith("personal/") else project_id
+    d = (api("GET", f"{v1}/file/stat/{p}",
+             params={"projectId": pid, "userId": uid}).get("data") or {})
+    base = os.path.basename(p)
+    if not d.get("exist") or not d.get("contentLength"):
+        return base, None
+    return base, int(d["contentLength"])
+
+
+def _find_hit(project_id: int, name: str, size: int):
+    """Scan the project's datasets for a file with this exact basename + byte size.
+
+    Content identity, not title. Returns the hit dict, or None. No printing, no exit.
+    """
+    if not name or not size:
+        return None
+    r = api("GET", f"{BASE}/", params={"projectId": project_id})
+    items = (r.get("data") or {}).get("items") or []
+    for d in items:
+        if d.get("status") != 2:      # 2 = committed/usable
+            continue
+        try:
+            files = list_files(d["id"], quiet=True) or []
+        except Exception:
+            continue                  # unreadable dataset: skip, don't abort the scan
+        for f in files:
+            if os.path.basename(f.get("file", "")) == name and int(f.get("size", 0)) == size:
+                return {"found": True, "dataset_id": d["id"], "title": d.get("title"),
+                        "file": f["file"], "size": f["size"], "mount_path": f["mount_path"],
+                        "scanned": len(items)}
+    return None
+
+
+def find_dataset_for_file(project_id: int, disk_path: str = None,
+                          name: str = None, size: int = None, as_json: bool = False):
+    """Find an existing dataset already containing this exact file — the dedup primitive.
+
+    Matches on CONTENT IDENTITY (basename + byte size), never on dataset title. Titles are
+    a naming convention and break the moment the same file is staged under a new path, which
+    silently causes a multi-GB re-upload of data that is already on the platform.
+
+    Exit codes: 0 = hit (reuse it), 4 = no hit (safe to create), 2 = bad input / missing source.
+    """
+    if disk_path:
+        name, size = _stat_disk_file(disk_path, project_id)
+        if size is None:
+            die(f"source file does not exist on the disk: {disk_path}",
+                fix="List the parent directory and check the exact path/spelling, then retry. "
+                    "If the user gave this path, tell them the file is not there — do not "
+                    "silently pick something else.",
+                never="Do NOT reuse a dataset whose title merely looks similar. That feeds the "
+                      "WRONG DATA into the pipeline and the results will be silently invalid.",
+                code=2)
+    if not name or not size:
+        die("nothing to look up",
+            fix="Pass --disk-path share/... (preferred), or both --name and --size.", code=2)
+
+    hit = _find_hit(project_id, name, size)
+    if hit:
+        if as_json:
+            print(json.dumps(hit, ensure_ascii=False, indent=2))
+        else:
+            print("✅ HIT — this file is already on the platform. Reuse it, upload nothing.\n")
+            print(f"   dataset : {hit['title']}  (id {hit['dataset_id']})")
+            print(f"   size    : {hit['size']} bytes (exact match)")
+            print(f"   mount   : {hit['mount_path']}")
+        return hit
+
+    miss = {"found": False, "name": name, "size": size}
+    if as_json:
+        print(json.dumps(miss, ensure_ascii=False, indent=2))
+    else:
+        print(f"❌ MISS — no dataset in project {project_id} contains {name} ({size} bytes).")
+        print("   FIX: create it (no download involved):")
+        print(f"        dataset_manager.py create-from-disk --project-id {project_id} "
+              "--disk-path share/<path>")
+    sys.exit(4)
+
+
+SDBX_PY = "/data/skills/bohrium-sandbox/sdbx.py"
+BOHR_INSTALL = ("https://dp-public.oss-cn-beijing.aliyuncs.com/bohrctl/1.0.0/"
+                "install_bohr_linux_curl.sh")
+
+
+def _sdbx(*args, timeout=900):
+    """Invoke the sandbox CLI. Prefers the skill's sdbx.py, falls back to `lbg sdbx`.
+
+    Also strips the `{"kind":"upgrade_available",...}` banner sdbx.py can prepend, which
+    otherwise breaks json.loads on the caller side.
+    """
+    import subprocess
+    base = [sys.executable, SDBX_PY] if os.path.exists(SDBX_PY) else ["lbg", "sdbx"]
+    r = subprocess.run(base + list(args), capture_output=True, text=True, timeout=timeout)
+    out = "\n".join(l for l in (r.stdout or "").splitlines()
+                    if "upgrade_available" not in l)
+    return r.returncode, out.strip(), (r.stderr or "").strip()
+
+
+def _sandbox_ready(project_id: int, reuse: bool = True):
+    """Get a sandbox with the project's share disk mounted. Reuses a live one when possible.
+
+    Handles the 502 gateway timeout on create: the sandbox is often built server-side anyway
+    (image cold-pull outlasts the gateway deadline), so we re-list instead of blindly retrying,
+    which would otherwise pile up orphan sandboxes.
+    """
+    import time
+
+    def find_live():
+        rc, out, _ = _sdbx("ls", "--json", timeout=120)
+        if rc != 0 or not out:
+            return None
+        try:
+            for s in json.loads(out):
+                if s.get("template") == "sdbxagent" and s.get("status_name") == "running":
+                    return s.get("sandbox_id")
+        except Exception:
+            pass
+        return None
+
+    if reuse:
+        sid = find_live()
+        if sid:
+            print(f"[sandbox] reusing {sid}")
+            return sid
+
+    for attempt in (1, 2, 3):
+        print(f"[sandbox] creating (attempt {attempt}/3)…")
+        rc, out, err = _sdbx("create", "sdbxagent", "--mount-user-storage",
+                             "--project-id", str(project_id), "--timeout", "3600",
+                             "--json", timeout=900)
+        if rc == 0 and out:
+            try:
+                sid = json.loads(out).get("sandboxID")
+                if sid:
+                    print(f"[sandbox] created {sid}")
+                    return sid
+            except Exception:
+                pass
+        # 502 / gateway timeout: it may exist anyway — look before leaping
+        time.sleep(10)
+        sid = find_live()
+        if sid:
+            print(f"[sandbox] gateway timed out but the sandbox came up: {sid}")
+            return sid
+        print(f"[sandbox] attempt {attempt} failed: {(out or err)[:160]}")
+
+    die("could not get a sandbox after 3 attempts — the Bohrium sandbox gateway is failing",
+        fix="This is platform-side, not a data problem. Tell the user the sandbox service is "
+            "currently unavailable and that the upload cannot proceed right now; suggest "
+            "retrying later. Stop here.",
+        never="Do NOT download the spectra into the workspace to 'work around' it — a "
+              "multi-GB download will blow the workspace and is not the supported path. "
+              "Do NOT invent another upload route or hand-craft REST calls.",
+        code=5)
+
+
+def create_from_disk(project_id: int, disk_path: str, name: str = None,
+                     reuse_sandbox: bool = True, as_json: bool = False):
+    """Turn a file already sitting on the share/personal disk into a dataset — no download.
+
+    One command on purpose. Every step below has bitten us when left to freehand shell:
+    the CLI install URL gets invented, `--user root` gets dropped (then /root is unwritable),
+    plain `pip install -U lbg` lands a stable build with no `dataset` subcommand, and the
+    foreground 60s exec timeout silently truncates a multi-GB upload.
+    """
+    import time
+
+    # 0) dedup first — the whole sandbox dance is pointless if the file is already up there
+    hit = _find_hit(project_id, *_stat_disk_file(disk_path, project_id))
+    if hit:
+        print("✅ already on the platform — nothing to upload.")
+        if as_json:
+            print(json.dumps(hit, ensure_ascii=False, indent=2))
+        else:
+            print(f"   dataset: {hit['title']}  (id {hit['dataset_id']})")
+            print(f"   mount  : {hit['mount_path']}")
+        return hit
+
+    base, size = _stat_disk_file(disk_path, project_id)
+    if size is None:
+        die(f"source file does not exist on the disk: {disk_path}",
+            fix="Check the exact path and spelling (list the parent directory). If the user "
+                "supplied this path, tell them the file is not there and stop.",
+            never="Do NOT reuse a dataset that merely looks similar by name — that feeds the "
+                  "WRONG DATA into the pipeline and the results will be silently invalid.",
+            code=2)
+
+    p = "/" + disk_path.strip().lstrip("/")          # in-sandbox path: /share/... or /personal/...
+    ident = (name or os.path.splitext(base)[0]).lower()
+    ident = "".join(c if c.isalnum() else "-" for c in ident).strip("-")[:40] or "dataset"
+    print(f"[plan] {p}  ({size/1e6:.1f} MB)  →  dataset '{ident}'")
+
+    sid = _sandbox_ready(project_id, reuse_sandbox)
+
+    # 1) bohr CLI inside the sandbox. --user root is mandatory: the default `user` cannot
+    #    read /personal and cannot write /root.
+    print("[sandbox] installing bohr CLI…")
+    rc, out, err = _sdbx("exec", "--user", "root", "--timeout", "300", sid,
+                         f"curl -fsSL {BOHR_INSTALL} | bash", timeout=420)
+    rc2, ver, _ = _sdbx("exec", "--user", "root", "--timeout", "60", sid,
+                        "export PATH=/root/.bohrium:$PATH && bohr -v", timeout=120)
+    if rc2 != 0:
+        die(f"the bohr CLI could not be installed in sandbox {sid}\n"
+            f"       install output: {(out or '')[:200]}\n"
+            f"       verify output : {(err or ver or '')[:200]}",
+            fix=f"Usually transient (network inside the sandbox). Retry the same command. "
+                f"If it persists, inspect the sandbox: "
+                f"`sdbx.py exec --user root {sid} 'curl -sSI {BOHR_INSTALL} | head -1'`.",
+            never="Do NOT try a different install URL — this one is the only correct address. "
+                  "Do NOT `pip install lbg` as a substitute: the stable lbg has no `dataset` "
+                  "subcommand. Do NOT drop --user root.",
+            code=6)
+
+    # 2) upload in the background — a foreground exec dies at 60s, which for a multi-GB
+    #    spectrum file means a truncated upload reported as success.
+    print("[sandbox] uploading in background (this is the slow part)…")
+    script = (
+        "export PATH=/root/.bohrium:$PATH\n"
+        "export OPENAPI_HOST=https://open.bohrium.com\n"
+        "export TIEFBLUE_HOST=https://tiefblue.dp.tech\n"
+        f"export ACCESS_KEY={AK}\n"
+        f"echo n | bohr dataset create -n '{ident}' -p '{ident}' -i {project_id} "
+        f"-l '{p}' > /tmp/upload.log 2>&1\n"
+        "echo EXIT_CODE=$? >> /tmp/upload.log\n"
+    )
+    rc, out, err = _sdbx("exec", "--user", "root", "--background", sid, script, timeout=180)
+    if rc != 0:
+        die(f"could not start the background upload in sandbox {sid}: {(out or err)[:200]}",
+            fix="Retry the same command. If it fails again, the sandbox may be unhealthy — "
+                "rerun with --fresh-sandbox to get a new one.",
+            never="Do NOT run the upload in the foreground instead: exec dies at 60s and a "
+                  "large spectrum file will be silently truncated.",
+            code=6)
+
+    # 3) poll the log — bounded, never spin forever
+    deadline = time.time() + 3600
+    while time.time() < deadline:
+        time.sleep(20)
+        rc, log, _ = _sdbx("exec", "--user", "root", "--timeout", "30", sid,
+                           "cat /tmp/upload.log 2>/dev/null | tail -3", timeout=90)
+        if "EXIT_CODE=0" in log and "success" in log.lower():
+            print("[sandbox] upload finished.")
+            break
+        if "EXIT_CODE=" in log:                      # finished, but non-zero
+            die(f"the upload failed inside sandbox {sid}. Its log says:\n{log}",
+                fix="Read the log above — it names the real cause (quota exhausted, bad "
+                    "project id, unreadable source path). Fix that and retry. Check quota "
+                    f"with: dataset_manager.py quota --project_id {project_id}",
+                never="Do NOT retry blindly with the same inputs, and do NOT switch to "
+                      "downloading the file into the workspace.",
+                code=6)
+        print(f"   … still uploading ({int(deadline - time.time())}s budget left)")
+    else:
+        die(f"upload still unfinished after 60 min (sandbox {sid} left running on purpose)",
+            fix=f"The upload may still be running. Check it with:\n"
+                f"       sdbx.py exec --user root {sid} 'tail -5 /tmp/upload.log'\n"
+                f"       Then re-run `find --project-id {project_id} --disk-path {disk_path}` "
+                f"— if it HITs, the upload actually completed and you can just use it.",
+            never="Do NOT start a second upload of the same file — you will end up with "
+                  "duplicate datasets burning quota.",
+            code=7)
+
+    # 4) resolve the REAL mount path — Bohrium appends a random suffix (-3gbh), so the
+    #    path must be read back, never guessed from the identifier.
+    for _ in range(6):
+        time.sleep(5)
+        hit = _find_hit(project_id, base, size)
+        if hit:
+            print("\n✅ dataset ready.")
+            if as_json:
+                print(json.dumps(hit, ensure_ascii=False, indent=2))
+            else:
+                print(f"   dataset: {hit['title']}  (id {hit['dataset_id']})")
+                print(f"   mount  : {hit['mount_path']}")
+            return hit
+    die("the upload reported success, but the file is not visible in any dataset yet",
+        fix=f"Bohrium is still materialising the dataset version (can take a few minutes for "
+            f"large files). Wait, then run:\n"
+            f"       dataset_manager.py find --project-id {project_id} --disk-path {disk_path}\n"
+            f"       When it HITs, use the mount_path it prints.",
+        never="Do NOT upload again — the data is already there; a second upload just wastes "
+              "quota and creates a duplicate.",
+        code=7)
 
 
 def _resolve_version_token(dataset_id: int, version: str = None):
@@ -327,6 +708,31 @@ def main():
                          help="e.g. 1 or v1 (default: latest)")
     p_files.add_argument("--json", action="store_true")
 
+    p_find = sub.add_parser(
+        "find",
+        help="DEDUP: find an existing dataset already holding this file (match on name+size, "
+             "never on title). Run this BEFORE creating any dataset.",
+    )
+    p_find.add_argument("--project-id", "--project_id", dest="project_id", type=int, required=True)
+    p_find.add_argument("--disk-path", "--disk_path", dest="disk_path",
+                        help="file on the share/personal disk, e.g. share/jubao/x/foo.mzML")
+    p_find.add_argument("--name", help="basename, if the source is not on a disk")
+    p_find.add_argument("--size", type=int, help="byte size, used with --name")
+    p_find.add_argument("--json", action="store_true")
+
+    p_cfd = sub.add_parser(
+        "create-from-disk",
+        help="Make a dataset out of a share/personal disk file WITHOUT downloading it. "
+             "Dedups first, then handles sandbox + CLI install + background upload + polling.",
+    )
+    p_cfd.add_argument("--project-id", "--project_id", dest="project_id", type=int, required=True)
+    p_cfd.add_argument("--disk-path", "--disk_path", dest="disk_path", required=True,
+                       help="share/... or personal/... (file or directory)")
+    p_cfd.add_argument("--name", help="dataset name; defaults to the filename")
+    p_cfd.add_argument("--fresh-sandbox", dest="fresh", action="store_true",
+                       help="do not reuse a running sandbox")
+    p_cfd.add_argument("--json", action="store_true")
+
     p_dl = sub.add_parser(
         "download", help="Download ONE file out of a dataset (writable local copy)")
     p_dl.add_argument("--id", type=int, required=True)
@@ -337,8 +743,10 @@ def main():
     args = parser.parse_args()
 
     if not AK:
-        print("ERROR: set BOHR_ACCESS_KEY (or ACCESS_KEY) environment variable")
-        sys.exit(1)
+        die("no Bohrium access key in the environment",
+            fix="Run the skill's setup.sh, then `source /bohr-workspace/.bohr_env` — it exports "
+                "ACCESS_KEY and BOHR_ACCESS_KEY with the same value. Either name works here.",
+            never="Do not hardcode or guess a key.", code=1)
 
     if args.cmd == "quota":
         check_quota(args.project_id)
@@ -352,6 +760,11 @@ def main():
         check_permission(args.id)
     elif args.cmd == "files":
         list_files(args.id, args.version, args.json)
+    elif args.cmd == "find":
+        find_dataset_for_file(args.project_id, args.disk_path, args.name, args.size, args.json)
+    elif args.cmd == "create-from-disk":
+        create_from_disk(args.project_id, args.disk_path, args.name,
+                         reuse_sandbox=not args.fresh, as_json=args.json)
     elif args.cmd == "download":
         download_file(args.id, args.file, args.out, args.version)
     else:

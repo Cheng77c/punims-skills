@@ -63,6 +63,12 @@ def main():
     if not project:
         sys.exit("missing env: PROJECT_ID(须经 .bohr_env/configField 注入,无默认值)")
     image = os.environ.get("IMAGE_ADDRESS", DEFAULT_IMAGE)
+    if not image:
+        sys.exit("image_address 为空:skill 根目录的 image.txt 找不到,env IMAGE_ADDRESS 也没设。\n"
+                 "下一步:确认 skill 安装完整(image.txt 应与 SKILL.md 同级),"
+                 "或 source /bohr-workspace/.bohr_env 后重试。\n"
+                 "禁止:不要凭记忆编造 registry 地址或镜像 tag —— 空镜像会被照常提交,"
+                 "失败发生在远端,报错和真因完全无关。")
     machine = os.environ.get("MACHINE_TYPE", "c16_m32_cpu")
 
     # 就地打包:默认用 pipeline.json 所在目录(per-task 自包含、并发安全、不散落根目录)。

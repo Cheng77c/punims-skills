@@ -83,7 +83,7 @@ source /bohr-workspace/.bohr_env   # 每个新 Bash 调用开头都要,确保 AC
 
 ### 1. 确认输入文件(先辨识来源)
 - 用户上传到工作区:`ListUploadedFiles` 确认。
-- 数据在**项目共享盘 / 个人盘**:**谱图**用「共享盘/个人盘转数据集」能力(bohrium-dataset-manager 的「从共享盘/个人盘建数据集」)**直接转成 dataset(无需下载)**,拿到 `/bohr/<名>/v1` 填入 raw_files[];**FASTA 不转 dataset,只下载它**进任务目录走 `-p`(见第 4 步)。
+- 数据在**项目共享盘 / 个人盘**:**谱图**一律用 `dataset_manager.py create-from-disk --project-id <pid> --disk-path share/<路径> --json` —— 它**内部先查重**(已传过就零传输直接返回),未命中才自动建集;沙箱、CLI 安装、后台上传、真实挂载路径全部封装好,**不要自己拼这套流程**。拿到 `/bohr/<名>/v1/<文件>` 填入 raw_files[]。**绝不许靠 dataset 标题判断有没有传过**(换个目录/换个人跑名字就对不上,必然重传几百 MB)。**FASTA 不转 dataset,只下载它**进任务目录走 `-p`(见第 4 步)。
 - 已是 **dataset**(自建或网页端上传):`bohr dataset list -p <项目>` 找到,把 `/bohr/<名>/v1/<文件>` 填入 raw_files[];**不知内部文件名/路径时,用 bohrium-dataset-manager 的「列出数据集内文件」(`dataset_manager.py files --id <ID>`)拿确切路径——别猜、也别反问用户**。
 - 一条流水线至少需要 `.raw`/`.mzML` 谱图;MSFragger/Philosopher 步还需 `.fasta`。
 - 缺文件就 `AskUserInput`,**不要假设路径**。
