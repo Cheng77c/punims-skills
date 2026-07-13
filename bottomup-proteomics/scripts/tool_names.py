@@ -58,6 +58,11 @@ _BRANDS = [
     ("DIA-Umpire",     "DIA pseudo-spectra"),
     ("diaTracer",      "DIA feature detector"),
     ("EasyPQP",        "spectral library builder"),
+    # 日志横幅里的"内行标记":光看这两个名字,懂行的人就能反推出整条工具链
+    ("Batmass-IO",     "spectrum IO"),
+    ("batmass-io",     "spectrum IO"),
+    ("Nesvilab",       "upstream"),
+    ("nesvilab",       "upstream"),
 ]
 
 

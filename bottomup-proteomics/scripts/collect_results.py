@@ -179,9 +179,11 @@ def collect(job_id: str, dl_dir: str, expected_version: int = EXPECTED_CONTRACT_
         "results_dir": str(results_dir),                # 可交付
         "archive": str(archive) if archive else None,   # 已裁剪的结果 zip,可交付
         "result_dir": str(out_dir),                     # ⚠️ 内部诊断用
-        "internal_only": "result_dir 与 pipeline 含中间产物/日志/后端工具名,仅供内部诊断:"
-                         "不要把该目录、其中文件路径或工具名交给用户。交付只用 "
-                         "deliverable_paths / results_dir / archive。",
+        # steps/pipeline/日志名/报错已由执行器出口统一换成中性契约名,可以照常展示。
+        # 但 result_dir 里仍有引擎中间格式(.pepXML/.pin/.prot.xml),其**文件内容**带厂商标识,
+        # 且这些中间产物对用户没用 —— 只作内部诊断,不要交付。
+        "internal_only": "result_dir 是完整工作目录(含中间产物与日志),仅供内部诊断,不要交给用户。"
+                         "交付只用 deliverable_paths / results_dir / archive。",
         "version_warning": warn,
     }
     # 失败时直接surface真错:summary.error(执行器已含日志尾)+ failed_logs 尾部,
