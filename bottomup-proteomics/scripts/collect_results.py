@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 """bohr job download 拉回 job 的 out/,解析 summary.json,报指标 + 本地交付物路径。输出 JSON。
 
-job 节点隔离、写不回共享盘,故结果只能 download。小 summary + 终端产物默认下载;
-大中间产物(mzML)须 pipeline.json `collect` 指定后才在 out/ 里、随之下载。
+job 节点隔离、写不回共享盘,故结果只能 download。
+`out/` 由镜像执行器直接产成**交付树**:只有结果表 + summary + DAG 图(失败时另有
+failed_logs),引擎中间格式与日志不写进去,故整个 out/ 都可直接交给用户。
 """
 import argparse
 import json
@@ -12,67 +13,7 @@ import subprocess
 import zipfile
 from pathlib import Path
 
-EXPECTED_CONTRACT_VERSION = 2   # 与 bu_cli.CONTRACT_VERSION 对齐
-
-# ── 交付层白名单 ─────────────────────────────────────────────
-# 只有结果表格是交付物。中间产物(.pin/.pepXML/.prot.xml)、参数文件、各步日志
-# 一律不外发:对用户没用,且带后端实现信息。它们仍留在 out/ 供内部诊断。
-USER_FACING_EXACT = {
-    "psm.tsv", "peptide.tsv", "protein.tsv", "ion.tsv", "modified_peptide.tsv",
-    "report.tsv", "report.pr_matrix.tsv", "report.pg_matrix.tsv", "report.stats.tsv",
-}
-USER_FACING_PREFIX = ("combined_", "abundance_", "ratio_")
-# 文件名里带后端工具名的一律排除(如 modmasses_ionquant.txt、*_stdout.log、fragger.params)
-DENY_SUBSTR = ("fragger", "ionquant", "philosopher", "diann", "dia-nn", "percolator",
-               "peptideprophet", "ptmprophet", "ptmshepherd", "tmtintegrator",
-               "crystalc", "msbooster", "stdout", "stderr")
-
-
-def _is_user_facing(f: Path) -> bool:
-    low = f.name.lower()
-    if any(t in low for t in DENY_SUBSTR):
-        return False
-    if f.suffix.lower() != ".tsv":
-        return False
-    return f.name in USER_FACING_EXACT or low.startswith(USER_FACING_PREFIX)
-
-
-def _n_cols(f: Path) -> int:
-    try:
-        with open(f, errors="replace") as fh:
-            return len(fh.readline().rstrip("\n").split("\t"))
-    except Exception:
-        return 0
-
-
-def _curate(out_dir: Path, dest: Path) -> list:
-    """把面向用户的结果表拷进 dest/,返回其路径。out_dir 原样保留(内部诊断用)。
-
-    同名表可能在多个步目录里各有一份(如 report/psm.tsv 37 列,定量步又补出 42 列的超集)。
-    只交付信息最全的那一份 —— 交两份内容不同的 psm.tsv 给用户,纯属制造困惑。
-    """
-    if dest.exists():
-        shutil.rmtree(dest)
-    dest.mkdir(parents=True, exist_ok=True)
-    best: dict = {}
-    for f in sorted(out_dir.rglob("*")):
-        if not (f.is_file() and _is_user_facing(f)):
-            continue
-        cur = best.get(f.name)
-        if cur is None or _n_cols(f) > _n_cols(cur):
-            best[f.name] = f
-    kept = []
-    for name, f in sorted(best.items()):
-        shutil.copy2(f, dest / name)
-        kept.append(str(dest / name))
-    return kept
-
-
-def _zip_dir(src: Path, zpath: Path) -> None:
-    with zipfile.ZipFile(zpath, "w", zipfile.ZIP_DEFLATED) as z:
-        for f in sorted(src.rglob("*")):
-            if f.is_file():
-                z.write(f, f.relative_to(src))
+EXPECTED_CONTRACT_VERSION = 3   # 与 bu_cli.CONTRACT_VERSION 对齐(v3 = out/ 即交付树)
 
 
 def _count_data_rows(f: Path) -> int:
@@ -148,26 +89,29 @@ def collect(job_id: str, dl_dir: str, expected_version: int = EXPECTED_CONTRACT_
             shutil.rmtree(final_out)
         shutil.move(str(src_out), str(final_out))
         summ = final_out / "summary.json"
-    # 清场:down 下来的整包 zip 与中间层目录一律删除。那个 zip 是**整个作业目录**
-    # (各步日志、参数文件、引擎中间格式),交给用户等于把后端实现全抖出去;
-    # 结果表另行裁剪成 results/ 交付,out/ 留本地供失败诊断。
+    # 清场:只留 out/ 与归位后的 zip。
+    # **不再做交付层裁剪** —— 裁剪已下沉到镜像执行器:out/ 本身就是交付树,
+    # 里面只有结果表(引擎中间格式/日志/参数文件根本不会写进来)。
+    # 放在这里裁是挡不住的:agent 可以自己 `bohr job download`(它真这么干过),
+    # 用户也能直接翻自己项目里的作业目录。
+    archive = None
     for z in list(dl.rglob("*.zip")):
-        z.unlink()
+        archive = dl / f"{job_id}.zip"
+        if z.resolve() != archive.resolve():
+            shutil.move(str(z), str(archive))
     for child in dl.iterdir():
         if child.is_dir() and child.name != "out":
             shutil.rmtree(child, ignore_errors=True)
     summary = json.loads(summ.read_text())
     out_dir = summ.parent
-    # 交付层裁剪:只有结果表进 results/,再打成 <jobId>-results.zip 供用户下载。
-    results_dir = dl / "results"
-    paths = _curate(out_dir, results_dir)
-    archive = None
-    if paths:
-        archive = dl / f"{job_id}-results.zip"
-        _zip_dir(results_dir, archive)
+    paths = [str(out_dir / d) for d in summary.get("deliverables", [])]
     warn = ""
     if summary.get("contract_version", 0) < expected_version:
-        warn = "镜像执行器版本偏旧(contract_version < 期望),建议重建镜像 v2"
+        # 版本错配是**静默泄漏**的路径:旧镜像的 out/ 里还塞着 pepXML(内容写着厂商名)、
+        # 参数文件和各步日志。此时整个 out/ 不可直接交付,必须先升级镜像。
+        warn = ("镜像执行器版本偏旧(contract_version < 3):out/ 还不是交付树,"
+                "内含引擎中间格式与日志。**先重建镜像**,在那之前不要把 out/ 或整包 zip 交给用户,"
+                "只手动挑结果表(psm/peptide/protein/ion/combined_*/abundance_*/ratio_*.tsv)。")
     # 指标:以下载产物实算为准(覆盖镜像 summary 里可能偏薄的 metrics),旧镜像也得富指标
     metrics = dict(summary.get("metrics") or {})
     metrics.update(_metrics_from_out(out_dir))
@@ -175,15 +119,11 @@ def collect(job_id: str, dl_dir: str, expected_version: int = EXPECTED_CONTRACT_
         "ok": True, "jobId": job_id, "status": summary.get("status"),
         "steps": summary.get("steps"), "failed_step": summary.get("failed_step"),
         "metrics": metrics, "pipeline": summary.get("pipeline"),
-        "deliverable_paths": paths,                     # 已裁剪:只含结果表,可交付
-        "results_dir": str(results_dir),                # 可交付
-        "archive": str(archive) if archive else None,   # 已裁剪的结果 zip,可交付
-        "result_dir": str(out_dir),                     # ⚠️ 内部诊断用
-        # steps/pipeline/日志名/报错已由执行器出口统一换成中性契约名,可以照常展示。
-        # 但 result_dir 里仍有引擎中间格式(.pepXML/.pin/.prot.xml),其**文件内容**带厂商标识,
-        # 且这些中间产物对用户没用 —— 只作内部诊断,不要交付。
-        "internal_only": "result_dir 是完整工作目录(含中间产物与日志),仅供内部诊断,不要交给用户。"
-                         "交付只用 deliverable_paths / results_dir / archive。",
+        # out/ 由镜像执行器直接产成交付树:只有结果表 + summary + DAG 图,
+        # 引擎中间格式、日志、参数文件根本不会写进来。故三者皆可直接交给用户。
+        "deliverable_paths": paths,
+        "result_dir": str(out_dir),
+        "archive": str(archive) if archive else None,
         "version_warning": warn,
     }
     # 失败时直接surface真错:summary.error(执行器已含日志尾)+ failed_logs 尾部,

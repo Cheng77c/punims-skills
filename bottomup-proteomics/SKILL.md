@@ -76,7 +76,8 @@ l1: >
 2. **绝不手写 job.json / 绝不自己拼 `bohr job submit`** —— 一律 `scripts/submit_pipeline.py`。
 3. **绝不直接调底层二进制** —— 只经 `submit_pipeline.py` 提交。
 4. **谱图默认一律走 dataset(不论大小)**:共享盘/个人盘的谱图**直接转 dataset、无需下载**,工作区本地用 `make_dataset.py`;仅当用户**主动要求**"直接上传"且谱图 ≤100MB 才 `-p`。**建集失败不是启用 `-p` 的理由**——已经翻过车:sandbox 建集报错后,agent 自行把 92MB 谱图下载到工作区再建集,而报错里白纸黑字写着"不要下载到工作区绕过"。建集失败就停下报错,别自己找替代路线。**唯一需要下载的是 FASTA**(需可写)。结果用 `collect_results.py` 取。
-5. **取结果只用 `collect_results.py`**:**绝不手动 `bohr job download` / 解压 zip / 拷贝产物**——手动会导致目录结构混乱,**且会绕过交付层裁剪、把日志和参数文件一并抖给用户**。collect 已给出可交付的 `deliverable_paths`/`results_dir`/`archive`(纯结果表)与内部诊断用的 `result_dir`,按它给的路径用即可。
+5. **取结果只用 `collect_results.py`**:**绝不手动 `bohr job download` / 解压 zip / 拷贝产物**——手动会搞出 `dl/`、`out/out/` 之类的错乱目录,后续 collect 全部失灵。collect 已给出 `deliverable_paths` / `result_dir` / `archive`,按它给的路径用即可。
+   (`out/` 由执行器直接产成**交付树**:只有结果表 + 摘要 + DAG 图,引擎中间格式与日志根本不写进去,所以这三个字段都能直接给用户。)
 6. **标准流程不可跳**:`validate_pipeline.py` →(谱图建 dataset 时)`make_dataset.py` → `submit_pipeline.py` → `poll_job.py` → `collect_results.py`。
 7. **单次轮询,绝不自旋**:提交后查一次状态,若仍在跑向用户报 jobId + 状态后**结束本轮**;jobId 存 Memory,用户稍后回来再查。
 8. **HITL 取消 = 中止**:用户拒绝确认/参数确认时,立即停止,不得以默认值继续提交。
@@ -282,11 +283,11 @@ python3 scripts/collect_results.py --job-id <JobId> --out /bohr-workspace/bu-run
 # 回收到任务目录 <任务名>/result/out/(--out 省略则默认 /bohr-workspace/bu-result/<JobId>/out/),
 # 返回 status + metrics(PSM/肽段/蛋白计数)+ 交付物本地路径 + 版本告警
 ```
-- **交付只用 `deliverable_paths` / `results_dir` / `archive`** —— 这三个已裁剪成纯结果表
-  (鉴定报告 + 定量矩阵),可以直接给用户。
-- ⚠️ **`result_dir`(完整 `out/`)与 `pipeline` 字段仅供内部诊断**:含各步日志、参数文件、
-  引擎中间格式和后端工具名。**不要把这个目录、其中的文件路径、或工具名交给用户**(铁律 9)。
-  整包 zip 已由 collect 自动删除,不要试图找回或手动重打包。
+- **`out/` 就是交付树**:执行器只往里写结果表(鉴定报告 + 定量矩阵)、`summary.json` 和 DAG 图;
+  引擎中间格式(pepXML/pin)、参数文件、各步日志**根本不会写进来**。所以
+  `deliverable_paths` / `result_dir` / `archive` 都可以直接给用户。
+- 作业失败时,`out/failed_logs/` 里是失败步的日志(**内容已脱敏**),用来定位真因;
+  向用户说明时用功能名(铁律 9),不必把日志原文贴给他。
 - 返回的 `version_warning` 非空时,应转告用户(镜像需更新)。
 
 然后:`RecordArtifact` 标记 `summary.json` 与关键报告;Chat 只回摘要(PSM/蛋白数、FDR),
