@@ -42,7 +42,7 @@ l1: >
   里面**已烤入全套工具 + 流水线执行器**:MSFragger 4.4、IonQuant 1.11.20、DIA-NN 1.8.1.8、FragPipe 24.0、
   Philosopher 5.1.0、Percolator、CrystalC、PTMProphet、PTMShepherd、TMT-Integrator 6.2.1、MSBooster。
   执行器入口 `/opt/topdown/bu_run.sh`(读 pipeline.json 跑链路、接线、校验)。skill 只产 pipeline.json + 取结果,不带执行器代码。
-- ❌ **绝不要去 Bohrium 镜像库搜索 msfragger / diann / 任何"单工具镜像"**——它们不存在,全部工具都在上面这一个镜像里。
+- ❌ **绝不要去 Bohrium 镜像库搜索任何"单工具镜像"**——它们不存在,全部工具都在上面这一个镜像里。
 - ❌ **绝不要自己手写 job.json、自己拼 image_address、自己调 bohr image list 找镜像。**
 - ✅ **一律通过 `scripts/submit_pipeline.py` 提交**——它自动用配置的 `IMAGE_ADDRESS`、装配 pipeline.json 和上传包。
   你只需提供 raw_files / fasta_path / 参数;镜像与作业配置由脚本处理。
@@ -68,39 +68,41 @@ l1: >
    grep -n '^### `' $R                                  # 列出全部 template_id
    grep -n -A2 -i 'lfq\|tmt\|itraq\|dia\|glyco' $R   # 按需求筛
    ```
-   命中就一行调用:`{"template_id":"fp-lfq-mbr","raw_files":[...],"fasta_path":"..."}`(要调参走 `overrides`)。
+   命中就一行调用:`{"template_id":"lfq-mbr","raw_files":[...],"fasta_path":"..."}`(要调参走 `overrides`)。
    **确无对应模板才手写 steps/edges,且必须在回复里说明「查过模板目录、无对应项」。**
    **已经翻过车:用户要「无标记定量 + 高丰度榜单」,agent 没翻目录,手攒了
-   `database → msfragger → peptideprophet → report` —— 等于把 `fp-lfq-mbr` 重造一遍,
-   还漏掉 `ionquant`,结果根本没有 LFQ 强度,「丰度榜单」无从谈起。**
+   `database → search-closed → validate-psm → report` —— 等于把 `lfq-mbr` 重造一遍,
+   还漏掉 `quant`,结果根本没有 LFQ 强度,「丰度榜单」无从谈起。**
 2. **绝不手写 job.json / 绝不自己拼 `bohr job submit`** —— 一律 `scripts/submit_pipeline.py`。
-3. **绝不直接调工具**(msfragger/diann…)—— 只经 `submit_pipeline.py` 提交。
+3. **绝不直接调底层二进制** —— 只经 `submit_pipeline.py` 提交。
 4. **谱图默认一律走 dataset(不论大小)**:共享盘/个人盘的谱图**直接转 dataset、无需下载**,工作区本地用 `make_dataset.py`;仅当用户**主动要求**"直接上传"且谱图 ≤100MB 才 `-p`。**建集失败不是启用 `-p` 的理由**——已经翻过车:sandbox 建集报错后,agent 自行把 92MB 谱图下载到工作区再建集,而报错里白纸黑字写着"不要下载到工作区绕过"。建集失败就停下报错,别自己找替代路线。**唯一需要下载的是 FASTA**(需可写)。结果用 `collect_results.py` 取。
 5. **取结果只用 `collect_results.py`**:**绝不手动 `bohr job download` / 解压 zip / 拷贝产物**——手动会导致目录结构混乱,**且会绕过交付层裁剪、把日志和参数文件一并抖给用户**。collect 已给出可交付的 `deliverable_paths`/`results_dir`/`archive`(纯结果表)与内部诊断用的 `result_dir`,按它给的路径用即可。
 6. **标准流程不可跳**:`validate_pipeline.py` →(谱图建 dataset 时)`make_dataset.py` → `submit_pipeline.py` → `poll_job.py` → `collect_results.py`。
 7. **单次轮询,绝不自旋**:提交后查一次状态,若仍在跑向用户报 jobId + 状态后**结束本轮**;jobId 存 Memory,用户稍后回来再查。
 8. **HITL 取消 = 中止**:用户拒绝确认/参数确认时,立即停止,不得以默认值继续提交。
-9. **对用户只讲功能,不报后端工具名。** 面向用户的每一句话(参数确认、进度、结果汇报、报错说明)
-   一律用**功能名**,不出现 `msfragger` / `ionquant` / `diann` / `philosopher` / `percolator` 等
-   后端工具名、品牌名、步骤 `tool` 字段值、`fragger.params` 之类的内部文件名。
-   **注意:这是"不主动提",不是"撒谎"。**
-   - 用户直接问用什么引擎 → 如实说明**不便透露具体实现**,可讲能力与算法类别(如"闭合数据库搜索 + 半监督重打分")。
-   - **绝不允许编造一个不存在的引擎名或谎称自研。**结果文件里有真实的打分列,一编造就穿帮。
-   - pipeline.json 内部**照常使用真实 tool 名**(执行器契约,不能改);只是**不要把它打印给用户看**。
+9. **对用户只讲功能,不报后端厂商工具名。**
+   **契约名(`search-closed` / `quant` / `dia-search` …)本身是中性的**,pipeline.json、
+   summary.json、日志名里出现的都是它们,**照常写、照常展示,不必遮遮掩掩**。
+   要守的只有两条:
+   - 面向用户的**散文**里用中文功能名(下表),别甩英文契约名当术语——这是产品口径,不是保密。
+   - **绝不报出后端厂商工具名/品牌名**(第三方搜索引擎、定量引擎的商品名)。用户直接问用什么引擎 →
+     如实说明**不便透露具体实现**,可讲能力与算法类别(如"闭合数据库搜索 + 半监督重打分")。
+     **绝不允许编造一个不存在的引擎名或谎称自研**——结果表里有真实的打分列,一编造就穿帮。
+     这是"不主动提",不是"撒谎"。
 
-   | 内部 tool | 对用户的说法 |
+   | 契约名 | 对用户的说法 |
    |---|---|
-   | `philosopher-database` | 数据库准备(target-decoy) |
-   | `msfragger-closed` | 肽段搜索 |
-   | `percolator` / `peptideprophet` | 结果重打分 / 置信度评估 |
-   | `philosopher-report` | 鉴定报告汇总 |
-   | `ionquant` | 定量 |
-   | `tmtintegrator` | 标记定量汇总 |
-   | `diann` | DIA 分析 |
+   | `database` | 数据库准备(target-decoy) |
+   | `search-closed` | 肽段搜索 |
+   | `rescore` / `validate-psm` | 结果重打分 / 置信度评估 |
+   | `report` | 鉴定报告汇总 |
+   | `quant` | 定量 |
+   | `quant-isobaric` | 标记定量汇总 |
+   | `dia-search` | DIA 分析 |
 
 **数据与接线铁律:**
-- **decoy 必须由 `philosopher-database` 步构建**:把 target-only FASTA 直接喂给 MSFragger 会产生零 decoy 序列,FDR 估计静默崩溃。pipeline.json 的 steps 里必须有 `philosopher-database`,其输出(target+decoy .fas)会**自动注入** `msfragger-closed` 的 `database_path` 参数并自动排序在其后——**不要画 db→msfragger 边**(见形式 A 的警告)。
-- **FragPipe 官方模板缺配置时,先查模板迁移脚本,不是执行器问题**:TMT/glyco 模板跑不通的常见根因是 `migrate_fragpipe_workflows.py` 在模板迁移时丢掉了配置字段(TMT `ionquant` 步的 `isotype`/`annotation_file`、glyco 的 `mass_offsets`/`labile_search_mode`),应从镜像内 `/opt/fragpipe-tools/fragpipe-24.0/workflows/` 源文件对照恢复。
+- **decoy 必须由 `database` 步构建**:把 target-only FASTA 直接喂给搜索步会产生零 decoy 序列,FDR 估计静默崩溃。pipeline.json 的 steps 里必须有 `database`,其输出(target+decoy .fas)会**自动注入** `search-closed` 的 `database_path` 参数并自动排序在其后——**不要画 db→search-closed 边**(见形式 A 的警告)。
+- **FragPipe 官方模板缺配置时,先查模板迁移脚本,不是执行器问题**:TMT/glyco 模板跑不通的常见根因是 `migrate_fragpipe_workflows.py` 在模板迁移时丢掉了配置字段(TMT `quant` 步的 `isotype`/`annotation_file`、glyco 的 `mass_offsets`/`labile_search_mode`),应从镜像内 `/opt/fragpipe-tools/fragpipe-24.0/workflows/` 源文件对照恢复。
 
 ## 何时用
 
@@ -152,10 +154,10 @@ source /bohr-workspace/.bohr_env   # 每个新 Bash 调用开头都要,确保 AC
 ```json
 {
   "steps": [
-    {"step_id": "db",  "tool": "philosopher-database"},
-    {"step_id": "mf",  "tool": "msfragger-closed"},
-    {"step_id": "pp",  "tool": "peptideprophet"},
-    {"step_id": "rp",  "tool": "philosopher-report"}
+    {"step_id": "db",  "tool": "database"},
+    {"step_id": "mf",  "tool": "search-closed"},
+    {"step_id": "pp",  "tool": "validate-psm"},
+    {"step_id": "rp",  "tool": "report"}
   ],
   "edges": [
     {"src": "mf", "dst": "pp"}, {"src": "pp", "dst": "rp"}
@@ -164,48 +166,48 @@ source /bohr-workspace/.bohr_env   # 每个新 Bash 调用开头都要,确保 AC
   "fasta_path": "EXAMPLE.fasta"
 }
 ```
-> **⚠️ 千万别画 `philosopher-database → msfragger-closed` 边。** 谱图(raw_files)只送达
-> **无入边的根节点**;`msfragger-closed` 必须是谱图根节点才能拿到 mzML。decoy 库由 `philosopher-database`
+> **⚠️ 千万别画 `database → search-closed` 边。** 谱图(raw_files)只送达
+> **无入边的根节点**;`search-closed` 必须是谱图根节点才能拿到 mzML。decoy 库由 `database`
 > 步经 `database_path` 参数**自动注入**、并自动排在其后,**无需也不能**用边连过去——画了这条边会让
-> msfragger 变成非根,转而把 db 产出的 `.fas` 当谱图输入,运行时报 `input must be mzML/mzXML`。
-> (`db` 步照写在 steps 里即可,不用连边;validate 会拦下 db→msfragger 这个错。)
+> search-closed 变成非根,转而把 db 产出的 `.fas` 当谱图输入,运行时报 `input must be mzML/mzXML`。
+> (`db` 步照写在 steps 里即可,不用连边;validate 会拦下 db→search-closed 这个错。)
 
 **形式 B:模板入口(⭐ 优先用这个)**(`template_id`——执行器展开 81 个官方 FragPipe 模板,不需要 steps/edges):
 ```json
-{"template_id": "fp-open", "raw_files": ["EXAMPLE.mzML"], "fasta_path": "EXAMPLE.fasta"}
+{"template_id": "open", "raw_files": ["EXAMPLE.mzML"], "fasta_path": "EXAMPLE.fasta"}
 ```
 > **有 81 个官方模板,完整目录见 `references/templates.md`(template_id + 链 + 说明 + 可复制的 steps/edges)。**
-> 常见:`fp-basic-search`(全功能基线)、`fp-open`(开放搜索+ptmshepherd)、`fp-lfq-mbr`(LFQ定量)、
-> `fp-tmt10`/`fp-tmt16`(TMT)、`fp-itraq4`(iTRAQ)、`fp-glyco-n-hcd`(N-糖)、`fp-dia-speclib-quant`(DIA)等。
+> 常见:`basic-search`(全功能基线)、`open`(开放搜索+ptm-profile)、`lfq-mbr`(LFQ定量)、
+> `tmt10`/`tmt16`(TMT)、`itraq4`(iTRAQ)、`glyco-n-hcd`(N-糖)、`dia-speclib-quant`(DIA)等。
 
 > **⚠️ 铁律:能用模板就别手写 DAG。** 官方模板的接线已验证正确;手写显式 DAG 极易漏掉
-> 隐性接线 —— 例如 **ptmshepherd 需要 mzML(要 msconvert→ptmshepherd 边)**、open 搜索需 crystalc、
-> ionquant 需谱图+psm.tsv 双父边。漏了 validate 也不一定拦(它查参数不查接线完整性),只在运行时崩。
+> 隐性接线 —— 例如 **ptm-profile 需要 mzML(要 msconvert→ptm-profile 边)**、open 搜索需 precursor-refine、
+> quant 需谱图+psm.tsv 双父边。漏了 validate 也不一定拦(它查参数不查接线完整性),只在运行时崩。
 > 想要某条链先在 `references/templates.md` 找对应 template_id;**确无对应才手写**,并对照官方同类模板的 edges 补全接线。
 
-**单工具**:一步 + 零边即可(`"steps":[{"step_id":"x","tool":"diann","params":{...}}], "edges":[]`)。
+**单工具**:一步 + 零边即可(`"steps":[{"step_id":"x","tool":"dia-search","params":{...}}], "edges":[]`)。
 
 **支持的工具:**
-`philosopher-database` · `msfragger-closed` · `crystalc` · `percolator` · `percolator-to-pepxml` ·
-`peptideprophet` · `ptmprophet` · `philosopher-report` · `ionquant` · `ptmshepherd` ·
-`tmtintegrator` · `diann` · `diaumpire` · `diatracer` · `easypqp` · `opair` · `msbooster` · `iprophet` · `proteinprophet`
+`database` · `search-closed` · `precursor-refine` · `rescore` · `rescore-export` ·
+`validate-psm` · `ptm-localize` · `report` · `quant` · `ptm-profile` ·
+`quant-isobaric` · `dia-search` · `dia-pseudo` · `dia-features` · `speclib-build` · `glyco-localize` · `predict-rescore` · `psm-integrate` · `protein-infer`
 
 **典型链组合:**
 
 | 场景 | steps | 说明 |
 |---|---|---|
-| 标准 DDA LFQ | `philosopher-database → msfragger-closed → peptideprophet → philosopher-report` | ionquant 可加在 report 后做 LFQ 矩阵 |
-| DDA + Percolator | `philosopher-database → msfragger-closed → crystalc → percolator → percolator-to-pepxml → philosopher-report` | 用 Percolator 替代 PeptideProphet 做 PSM 验证 |
-| TMT 定量 | 上述 DDA 链 + `ionquant`(perform_isoquant=true)→ `tmtintegrator` | annotation_file 和 channel_num 必填 |
-| iTRAQ 定量 | **优先用模板 `fp-itraq4` / `fp-itraq4-phospho`** | `channel_num`=4(iTRAQ-4)或 8(iTRAQ-8)、`ionquant.isotype`=`iTRAQ-4`/`iTRAQ-8`;**务必让 msfragger 按 iTRAQ 加标(模板自动配),否则 PSM 不带 `n[144]`、通道定量全 0** |
-| DIA | `diann`(library_path 或上游 easypqp) | 现成谱图库可直接填 library_path |
-| PTM 定量 | DDA 链 + `ptmshepherd` | 修饰位点富集分析 |
+| 标准 DDA LFQ | `database → search-closed → validate-psm → report` | quant 可加在 report 后做 LFQ 矩阵 |
+| DDA + Percolator | `database → search-closed → precursor-refine → rescore → rescore-export → report` | 用 Percolator 替代 PeptideProphet 做 PSM 验证 |
+| TMT 定量 | 上述 DDA 链 + `quant`(perform_isoquant=true)→ `quant-isobaric` | annotation_file 和 channel_num 必填 |
+| iTRAQ 定量 | **优先用模板 `itraq4` / `itraq4-phospho`** | `channel_num`=4(iTRAQ-4)或 8(iTRAQ-8)、`quant.isotype`=`iTRAQ-4`/`iTRAQ-8`;**务必让搜索步按 iTRAQ 加标(模板自动配),否则 PSM 不带 `n[144]`、通道定量全 0** |
+| DIA | `dia-search`(library_path 或上游 speclib-build) | 现成谱图库可直接填 library_path |
+| PTM 定量 | DDA 链 + `ptm-profile` | 修饰位点富集分析 |
 
-> 表中的 `→` 是**逻辑顺序,不是字面 edge**。手写 DAG 时:`msfragger-closed` 作谱图根节点(**不连 db 边**),
-> `philosopher-database` 只放进 steps(库自动注入);edges 从 `msfragger-closed → peptideprophet` 开始画。
+> 表中的 `→` 是**逻辑顺序,不是字面 edge**。手写 DAG 时:`search-closed` 作谱图根节点(**不连 db 边**),
+> `database` 只放进 steps(库自动注入);edges 从 `search-closed → validate-psm` 开始画。
 >
-> **⚠️ 多个吃谱图的步(`crystalc`/`ionquant`/`ptmshepherd`/`msbooster`/`opair`/`easypqp`)时**:它们既要上游产物、又硬要 mzML,
-> 但 raw_files 只喂根节点——所以**必须加一个 `msconvert` 作共享谱图根**,连边 `msconvert → 每个吃谱图的步`(含 msfragger)。
+> **⚠️ 多个吃谱图的步(`precursor-refine`/`quant`/`ptm-profile`/`predict-rescore`/`glyco-localize`/`speclib-build`)时**:它们既要上游产物、又硬要 mzML,
+> 但 raw_files 只喂根节点——所以**必须加一个 `msconvert` 作共享谱图根**,连边 `msconvert → 每个吃谱图的步`(含 search-closed)。
 > 少了这条谱图边,运行时会报 `requires mzML`(validate 已能提前拦下)。**这正是"能用模板就别手写"的原因——强烈建议直接用 `template_id`。**
 
 ### 3.5 提交前本地校验(必做,零成本)
@@ -294,15 +296,15 @@ python3 scripts/collect_results.py --job-id <JobId> --out /bohr-workspace/bu-run
 
 ### 🚫 失败排查铁律(防臆断/幻觉)
 1. **先定位真实原因,不得臆测**:运行 `collect_results.py`,读取返回的 `error` / `failed_log_tail` / `missing_inputs`——工具的真实报错即在其中。未读到真实报错前,不得编造原因。
-2. **失败几乎都源于数据/配置,而非"管线不支持"**:常见真因为 `philosopher-database` 步漏掉(零 decoy FDR 崩)、dataset 路径漏 `upload/` 层、FASTA 置于只读 dataset、TMT 模板缺 `annotation_file`/`isotype`。
+2. **失败几乎都源于数据/配置,而非"管线不支持"**:常见真因为 `database` 步漏掉(零 decoy FDR 崩)、dataset 路径漏 `upload/` 层、FASTA 置于只读 dataset、TMT 模板缺 `annotation_file`/`isotype`。
 3. **绝不下"X 不支持 / 架构限制"结论**:执行器支持单工具、任意起点、显式 DAG、模板入口。怀疑不支持时,先查看真实报错并核对 `references/`,不得凭印象断言。
 4. **绝不绕过执行器**手写 wrapper 直调工具二进制——违反铁律,且丢失自动接线、输入校验,降低健壮性。
 5. **官方模板缺配置**:先对照镜像内模板源文件(`/opt/fragpipe-tools/fragpipe-24.0/workflows/`)恢复缺失字段,不是执行器的问题。
-6. **TMT/iTRAQ 通道定量全为 0**:**绝不归因为"工具低 PSM 局限/归一化数据不足"**——真因几乎必是配置:① **搜索没加标**——查 PSM 修饰,应带标签质量(iTRAQ-4/8 = `n[144]`/`K[144]`,TMT = `n[229]`);若显示 `n[43]` 等其它修饰,说明 msfragger 未按标记搜索(用官方 `fp-tmt*`/`fp-itraq*` 模板可自动加标,别手写漏掉);② **少了汇总步**——isobaric 通道定量由 `tmtintegrator` 产;仅 `ionquant perform_isoquant` 不一定落通道列。优先整条用模板,别手改。
+6. **TMT/iTRAQ 通道定量全为 0**:**绝不归因为"工具低 PSM 局限/归一化数据不足"**——真因几乎必是配置:① **搜索没加标**——查 PSM 修饰,应带标签质量(iTRAQ-4/8 = `n[144]`/`K[144]`,TMT = `n[229]`);若显示 `n[43]` 等其它修饰,说明搜索步未按标记搜索(用官方 `tmt*`/`itraq*` 模板可自动加标,别手写漏掉);② **少了汇总步**——isobaric 通道定量由 `quant-isobaric` 产;仅 `quant perform_isoquant` 不一定落通道列。优先整条用模板,别手改。
 
 **判断要点:**
 - **dataset 阈值(已硬拦)**:本地输入 > 100MB 时 `validate_pipeline.py` 直接报错并要求改走 make_dataset。(注:≤100MB 的谱图**默认也走 dataset**,见 §4 默认路由;-p 传谱图仅限用户主动要求。)
-- **philosopher-database 必须是首步**:没有 target+decoy .fas,MSFragger 无法估 FDR。
+- **database 必须是首步**:没有 target+decoy .fas,MSFragger 无法估 FDR。
 - **运行时长**:c16_m32 上 DDA LFQ 链典型 20–60 分钟(数据量决定);DIA-NN 单样本 5–20 分钟。
 
 **submit_pipeline.py 成功返回示例:**
@@ -316,10 +318,10 @@ python3 scripts/collect_results.py --job-id <JobId> --out /bohr-workspace/bu-run
 | `AccessKey Invalid` | 确认 `ACCESS_KEY` 已 export;REST API 用 `accessKey:` 头,不是 `Authorization: Bearer` |
 | job `status=-1`(失败) | `collect_results.py` 直接返回 `failed_step` + `error` + `failed_log_tail`;依据真实报错修正 |
 | `no files found matching X` | 输入路径问题;确认文件真存在,或 dataset 路径带 `upload/` 层 |
-| 零 PSM / FDR 崩溃 | `philosopher-database` 步漏掉,MSFragger 直接拿 target-only FASTA 导致零 decoy |
+| 零 PSM / FDR 崩溃 | `database` 步漏掉,MSFragger 直接拿 target-only FASTA 导致零 decoy |
 | `Dataset ... has been deleted` | Bohrium 给数据集名加随机后缀;**make_dataset.py 已自动从 API 返回真实路径**,用它给的 `spectrum_mount` 即可 |
-| TMT 模板无定量结果 | 检查 ionquant 的 `isotype`/`annotation_file`、tmtintegrator 的 `channel_num`;对照官方模板源文件补齐缺失字段 |
-| `Cannot read file .meta/db.bin` | philosopher-report 步的 workspace 未 annotate;确认流水线包含 philosopher-database 步 |
+| TMT 模板无定量结果 | 检查 quant 的 `isotype`/`annotation_file`、quant-isobaric 的 `channel_num`;对照官方模板源文件补齐缺失字段 |
+| `Cannot read file .meta/db.bin` | report 步的 workspace 未 annotate;确认流水线包含 database 步 |
 
 ## HARD STOP(成本确认)
 机型为大核数(如 `c32_*`)或预计长时运行,提交前**必须** `AskUserInput` 用 checkbox 让用户确认费用。不静默提交高成本 job。

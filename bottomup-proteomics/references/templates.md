@@ -18,28 +18,28 @@
 ```json
 {"steps":[
   {"step_id": "convert", "tool": "msconvert"},
-  {"step_id": "search", "tool": "msfragger-closed"},
-  {"step_id": "rescore", "tool": "percolator"}
+  {"step_id": "search", "tool": "search-closed"},
+  {"step_id": "rescore", "tool": "rescore"}
 ],"edges":[
   {"src": "convert", "dst": "search"},
   {"src": "search", "dst": "rescore"}
 ]}
 ```
 
-### `fp-basic-search`
-- **用途**:Migrated from FragPipe 'Basic-Search.workflow'. Original workflow also enabled: ['msbooster', 'skyline'] (dropped — non-critical layers; downstream FDR still valid). Requires user-supplied target FASTA (the `database` step builds the decoy variant).
+### `basic-search`
+- **用途**:迁移自官方模板 'Basic-Search.workflow'. Original workflow also enabled: ['msbooster', 'skyline'] (dropped — non-critical layers; downstream FDR still valid). Requires user-supplied target FASTA (the `database` step builds the decoy variant).
 - **输入**:谱图 `raw_files`(mzML/raw);`fasta_path`=**target 蛋白库**(database 步自动建 decoy)
-- **调用(推荐)**:`{"template_id":"fp-basic-search","raw_files":["谱图"],"fasta_path":"蛋白库"}`
+- **调用(推荐)**:`{"template_id":"basic-search","raw_files":["谱图"],"fasta_path":"蛋白库"}`
 - **DAG**(同 pipeline.json 格式,可复制改造):
 ```json
 {"steps":[
   {"step_id": "convert", "tool": "msconvert"},
-  {"step_id": "database", "tool": "philosopher-database"},
-  {"step_id": "search", "tool": "msfragger-closed"},
-  {"step_id": "rescore", "tool": "percolator"},
-  {"step_id": "to_pepxml", "tool": "percolator-to-pepxml"},
-  {"step_id": "report", "tool": "philosopher-report"},
-  {"step_id": "quant", "tool": "ionquant"}
+  {"step_id": "database", "tool": "database"},
+  {"step_id": "search", "tool": "search-closed"},
+  {"step_id": "rescore", "tool": "rescore"},
+  {"step_id": "to_pepxml", "tool": "rescore-export"},
+  {"step_id": "report", "tool": "report"},
+  {"step_id": "quant", "tool": "quant"}
 ],"edges":[
   {"src": "convert", "dst": "search"},
   {"src": "search", "dst": "rescore"},
@@ -64,9 +64,9 @@
 ```json
 {"steps":[
   {"step_id": "convert", "tool": "msconvert"},
-  {"step_id": "search", "tool": "msfragger-closed"},
-  {"step_id": "report", "tool": "philosopher-report"},
-  {"step_id": "quant", "tool": "ionquant"}
+  {"step_id": "search", "tool": "search-closed"},
+  {"step_id": "report", "tool": "report"},
+  {"step_id": "quant", "tool": "quant"}
 ],"edges":[
   {"src": "convert", "dst": "search"},
   {"src": "search", "dst": "report"},
@@ -75,20 +75,20 @@
 ]}
 ```
 
-### `fp-chemprot-abpp-ipiaa`
-- **用途**:Migrated from FragPipe 'chemprot-ABPP-ipIAA.workflow'. Original workflow also enabled: ['skyline'] (dropped — non-critical layers; downstream FDR still valid). Requires user-supplied target FASTA (the `database` step builds the decoy variant).
+### `chemprot-abpp-ipiaa`
+- **用途**:迁移自官方模板 'chemprot-ABPP-ipIAA.workflow'. Original workflow also enabled: ['skyline'] (dropped — non-critical layers; downstream FDR still valid). Requires user-supplied target FASTA (the `database` step builds the decoy variant).
 - **输入**:谱图 `raw_files`(mzML/raw);`fasta_path`=**target 蛋白库**(database 步自动建 decoy)
-- **调用(推荐)**:`{"template_id":"fp-chemprot-abpp-ipiaa","raw_files":["谱图"],"fasta_path":"蛋白库"}`
+- **调用(推荐)**:`{"template_id":"chemprot-abpp-ipiaa","raw_files":["谱图"],"fasta_path":"蛋白库"}`
 - **DAG**(同 pipeline.json 格式,可复制改造):
 ```json
 {"steps":[
   {"step_id": "convert", "tool": "msconvert"},
-  {"step_id": "database", "tool": "philosopher-database"},
-  {"step_id": "search", "tool": "msfragger-closed"},
-  {"step_id": "rescore", "tool": "percolator"},
-  {"step_id": "to_pepxml", "tool": "percolator-to-pepxml"},
-  {"step_id": "report", "tool": "philosopher-report"},
-  {"step_id": "quant", "tool": "ionquant"}
+  {"step_id": "database", "tool": "database"},
+  {"step_id": "search", "tool": "search-closed"},
+  {"step_id": "rescore", "tool": "rescore"},
+  {"step_id": "to_pepxml", "tool": "rescore-export"},
+  {"step_id": "report", "tool": "report"},
+  {"step_id": "quant", "tool": "quant"}
 ],"edges":[
   {"src": "convert", "dst": "search"},
   {"src": "search", "dst": "rescore"},
@@ -102,20 +102,20 @@
 ]}
 ```
 
-### `fp-chemprot-abpp-isodtb`
-- **用途**:Migrated from FragPipe 'chemprot-ABPP-isoDTB.workflow'. Original workflow also enabled: ['msbooster', 'skyline'] (dropped — non-critical layers; downstream FDR still valid). Requires user-supplied target FASTA (the `database` step builds the decoy variant).
+### `chemprot-abpp-isodtb`
+- **用途**:迁移自官方模板 'chemprot-ABPP-isoDTB.workflow'. Original workflow also enabled: ['msbooster', 'skyline'] (dropped — non-critical layers; downstream FDR still valid). Requires user-supplied target FASTA (the `database` step builds the decoy variant).
 - **输入**:谱图 `raw_files`(mzML/raw);`fasta_path`=**target 蛋白库**(database 步自动建 decoy)
-- **调用(推荐)**:`{"template_id":"fp-chemprot-abpp-isodtb","raw_files":["谱图"],"fasta_path":"蛋白库"}`
+- **调用(推荐)**:`{"template_id":"chemprot-abpp-isodtb","raw_files":["谱图"],"fasta_path":"蛋白库"}`
 - **DAG**(同 pipeline.json 格式,可复制改造):
 ```json
 {"steps":[
   {"step_id": "convert", "tool": "msconvert"},
-  {"step_id": "database", "tool": "philosopher-database"},
-  {"step_id": "search", "tool": "msfragger-closed"},
-  {"step_id": "rescore", "tool": "percolator"},
-  {"step_id": "to_pepxml", "tool": "percolator-to-pepxml"},
-  {"step_id": "report", "tool": "philosopher-report"},
-  {"step_id": "quant", "tool": "ionquant"}
+  {"step_id": "database", "tool": "database"},
+  {"step_id": "search", "tool": "search-closed"},
+  {"step_id": "rescore", "tool": "rescore"},
+  {"step_id": "to_pepxml", "tool": "rescore-export"},
+  {"step_id": "report", "tool": "report"},
+  {"step_id": "quant", "tool": "quant"}
 ],"edges":[
   {"src": "convert", "dst": "search"},
   {"src": "search", "dst": "rescore"},
@@ -129,20 +129,20 @@
 ]}
 ```
 
-### `fp-chemprot-abpp-isotop`
-- **用途**:Migrated from FragPipe 'chemprot-ABPP-isoTOP.workflow'. Original workflow also enabled: ['msbooster', 'skyline'] (dropped — non-critical layers; downstream FDR still valid). Requires user-supplied target FASTA (the `database` step builds the decoy variant).
+### `chemprot-abpp-isotop`
+- **用途**:迁移自官方模板 'chemprot-ABPP-isoTOP.workflow'. Original workflow also enabled: ['msbooster', 'skyline'] (dropped — non-critical layers; downstream FDR still valid). Requires user-supplied target FASTA (the `database` step builds the decoy variant).
 - **输入**:谱图 `raw_files`(mzML/raw);`fasta_path`=**target 蛋白库**(database 步自动建 decoy)
-- **调用(推荐)**:`{"template_id":"fp-chemprot-abpp-isotop","raw_files":["谱图"],"fasta_path":"蛋白库"}`
+- **调用(推荐)**:`{"template_id":"chemprot-abpp-isotop","raw_files":["谱图"],"fasta_path":"蛋白库"}`
 - **DAG**(同 pipeline.json 格式,可复制改造):
 ```json
 {"steps":[
   {"step_id": "convert", "tool": "msconvert"},
-  {"step_id": "database", "tool": "philosopher-database"},
-  {"step_id": "search", "tool": "msfragger-closed"},
-  {"step_id": "rescore", "tool": "percolator"},
-  {"step_id": "to_pepxml", "tool": "percolator-to-pepxml"},
-  {"step_id": "report", "tool": "philosopher-report"},
-  {"step_id": "quant", "tool": "ionquant"}
+  {"step_id": "database", "tool": "database"},
+  {"step_id": "search", "tool": "search-closed"},
+  {"step_id": "rescore", "tool": "rescore"},
+  {"step_id": "to_pepxml", "tool": "rescore-export"},
+  {"step_id": "report", "tool": "report"},
+  {"step_id": "quant", "tool": "quant"}
 ],"edges":[
   {"src": "convert", "dst": "search"},
   {"src": "search", "dst": "rescore"},
@@ -156,21 +156,21 @@
 ]}
 ```
 
-### `fp-chemprot-pal`
-- **用途**:Migrated from FragPipe 'chemprot-PAL.workflow'. Original workflow also enabled: ['msbooster', 'skyline'] (dropped — non-critical layers; downstream FDR still valid). Requires user-supplied target FASTA (the `database` step builds the decoy variant).
+### `chemprot-pal`
+- **用途**:迁移自官方模板 'chemprot-PAL.workflow'. Original workflow also enabled: ['msbooster', 'skyline'] (dropped — non-critical layers; downstream FDR still valid). Requires user-supplied target FASTA (the `database` step builds the decoy variant).
 - **输入**:谱图 `raw_files`(mzML/raw);`fasta_path`=**target 蛋白库**(database 步自动建 decoy)
-- **调用(推荐)**:`{"template_id":"fp-chemprot-pal","raw_files":["谱图"],"fasta_path":"蛋白库"}`
+- **调用(推荐)**:`{"template_id":"chemprot-pal","raw_files":["谱图"],"fasta_path":"蛋白库"}`
 - **DAG**(同 pipeline.json 格式,可复制改造):
 ```json
 {"steps":[
   {"step_id": "convert", "tool": "msconvert"},
-  {"step_id": "database", "tool": "philosopher-database"},
-  {"step_id": "search", "tool": "msfragger-closed"},
-  {"step_id": "rescore", "tool": "percolator"},
-  {"step_id": "to_pepxml", "tool": "percolator-to-pepxml"},
-  {"step_id": "report", "tool": "philosopher-report"},
-  {"step_id": "quant", "tool": "ionquant"},
-  {"step_id": "ptm_summary", "tool": "ptmshepherd"}
+  {"step_id": "database", "tool": "database"},
+  {"step_id": "search", "tool": "search-closed"},
+  {"step_id": "rescore", "tool": "rescore"},
+  {"step_id": "to_pepxml", "tool": "rescore-export"},
+  {"step_id": "report", "tool": "report"},
+  {"step_id": "quant", "tool": "quant"},
+  {"step_id": "ptm_summary", "tool": "ptm-profile"}
 ],"edges":[
   {"src": "convert", "dst": "search"},
   {"src": "search", "dst": "rescore"},
@@ -186,20 +186,20 @@
 ]}
 ```
 
-### `fp-citrullination`
-- **用途**:Migrated from FragPipe 'citrullination.workflow'. Original workflow also enabled: ['msbooster', 'skyline'] (dropped — non-critical layers; downstream FDR still valid). Requires user-supplied target FASTA (the `database` step builds the decoy variant).
+### `citrullination`
+- **用途**:迁移自官方模板 'citrullination.workflow'. Original workflow also enabled: ['msbooster', 'skyline'] (dropped — non-critical layers; downstream FDR still valid). Requires user-supplied target FASTA (the `database` step builds the decoy variant).
 - **输入**:谱图 `raw_files`(mzML/raw);`fasta_path`=**target 蛋白库**(database 步自动建 decoy)
-- **调用(推荐)**:`{"template_id":"fp-citrullination","raw_files":["谱图"],"fasta_path":"蛋白库"}`
+- **调用(推荐)**:`{"template_id":"citrullination","raw_files":["谱图"],"fasta_path":"蛋白库"}`
 - **DAG**(同 pipeline.json 格式,可复制改造):
 ```json
 {"steps":[
   {"step_id": "convert", "tool": "msconvert"},
-  {"step_id": "database", "tool": "philosopher-database"},
-  {"step_id": "search", "tool": "msfragger-closed"},
-  {"step_id": "rescore", "tool": "percolator"},
-  {"step_id": "to_pepxml", "tool": "percolator-to-pepxml"},
-  {"step_id": "report", "tool": "philosopher-report"},
-  {"step_id": "quant", "tool": "ionquant"}
+  {"step_id": "database", "tool": "database"},
+  {"step_id": "search", "tool": "search-closed"},
+  {"step_id": "rescore", "tool": "rescore"},
+  {"step_id": "to_pepxml", "tool": "rescore-export"},
+  {"step_id": "report", "tool": "report"},
+  {"step_id": "quant", "tool": "quant"}
 ],"edges":[
   {"src": "convert", "dst": "search"},
   {"src": "search", "dst": "rescore"},
@@ -213,19 +213,19 @@
 ]}
 ```
 
-### `fp-fpop`
-- **用途**:Migrated from FragPipe 'FPOP.workflow'. Original workflow also enabled: ['skyline'] (dropped — non-critical layers; downstream FDR still valid). Requires user-supplied target FASTA (the `database` step builds the decoy variant).
+### `fpop`
+- **用途**:迁移自官方模板 'FPOP.workflow'. Original workflow also enabled: ['skyline'] (dropped — non-critical layers; downstream FDR still valid). Requires user-supplied target FASTA (the `database` step builds the decoy variant).
 - **输入**:谱图 `raw_files`(mzML/raw);`fasta_path`=**target 蛋白库**(database 步自动建 decoy)
-- **调用(推荐)**:`{"template_id":"fp-fpop","raw_files":["谱图"],"fasta_path":"蛋白库"}`
+- **调用(推荐)**:`{"template_id":"fpop","raw_files":["谱图"],"fasta_path":"蛋白库"}`
 - **DAG**(同 pipeline.json 格式,可复制改造):
 ```json
 {"steps":[
   {"step_id": "convert", "tool": "msconvert"},
-  {"step_id": "database", "tool": "philosopher-database"},
-  {"step_id": "search", "tool": "msfragger-closed"},
-  {"step_id": "validate", "tool": "peptideprophet"},
-  {"step_id": "report", "tool": "philosopher-report"},
-  {"step_id": "quant", "tool": "ionquant"}
+  {"step_id": "database", "tool": "database"},
+  {"step_id": "search", "tool": "search-closed"},
+  {"step_id": "validate", "tool": "validate-psm"},
+  {"step_id": "report", "tool": "report"},
+  {"step_id": "quant", "tool": "quant"}
 ],"edges":[
   {"src": "convert", "dst": "search"},
   {"src": "search", "dst": "validate"},
@@ -237,20 +237,20 @@
 ]}
 ```
 
-### `fp-lfq-mbr`
-- **用途**:Migrated from FragPipe 'LFQ-MBR.workflow'. Original workflow also enabled: ['msbooster', 'skyline'] (dropped — non-critical layers; downstream FDR still valid). Requires user-supplied target FASTA (the `database` step builds the decoy variant).
+### `lfq-mbr`
+- **用途**:迁移自官方模板 'LFQ-MBR.workflow'. Original workflow also enabled: ['msbooster', 'skyline'] (dropped — non-critical layers; downstream FDR still valid). Requires user-supplied target FASTA (the `database` step builds the decoy variant).
 - **输入**:谱图 `raw_files`(mzML/raw);`fasta_path`=**target 蛋白库**(database 步自动建 decoy)
-- **调用(推荐)**:`{"template_id":"fp-lfq-mbr","raw_files":["谱图"],"fasta_path":"蛋白库"}`
+- **调用(推荐)**:`{"template_id":"lfq-mbr","raw_files":["谱图"],"fasta_path":"蛋白库"}`
 - **DAG**(同 pipeline.json 格式,可复制改造):
 ```json
 {"steps":[
   {"step_id": "convert", "tool": "msconvert"},
-  {"step_id": "database", "tool": "philosopher-database"},
-  {"step_id": "search", "tool": "msfragger-closed"},
-  {"step_id": "rescore", "tool": "percolator"},
-  {"step_id": "to_pepxml", "tool": "percolator-to-pepxml"},
-  {"step_id": "report", "tool": "philosopher-report"},
-  {"step_id": "quant", "tool": "ionquant"}
+  {"step_id": "database", "tool": "database"},
+  {"step_id": "search", "tool": "search-closed"},
+  {"step_id": "rescore", "tool": "rescore"},
+  {"step_id": "to_pepxml", "tool": "rescore-export"},
+  {"step_id": "report", "tool": "report"},
+  {"step_id": "quant", "tool": "quant"}
 ],"edges":[
   {"src": "convert", "dst": "search"},
   {"src": "search", "dst": "rescore"},
@@ -264,20 +264,20 @@
 ]}
 ```
 
-### `fp-silac3`
-- **用途**:Migrated from FragPipe 'SILAC3.workflow'. Original workflow also enabled: ['msbooster', 'skyline'] (dropped — non-critical layers; downstream FDR still valid). Requires user-supplied target FASTA (the `database` step builds the decoy variant).
+### `silac3`
+- **用途**:迁移自官方模板 'SILAC3.workflow'. Original workflow also enabled: ['msbooster', 'skyline'] (dropped — non-critical layers; downstream FDR still valid). Requires user-supplied target FASTA (the `database` step builds the decoy variant).
 - **输入**:谱图 `raw_files`(mzML/raw);`fasta_path`=**target 蛋白库**(database 步自动建 decoy)
-- **调用(推荐)**:`{"template_id":"fp-silac3","raw_files":["谱图"],"fasta_path":"蛋白库"}`
+- **调用(推荐)**:`{"template_id":"silac3","raw_files":["谱图"],"fasta_path":"蛋白库"}`
 - **DAG**(同 pipeline.json 格式,可复制改造):
 ```json
 {"steps":[
   {"step_id": "convert", "tool": "msconvert"},
-  {"step_id": "database", "tool": "philosopher-database"},
-  {"step_id": "search", "tool": "msfragger-closed"},
-  {"step_id": "rescore", "tool": "percolator"},
-  {"step_id": "to_pepxml", "tool": "percolator-to-pepxml"},
-  {"step_id": "report", "tool": "philosopher-report"},
-  {"step_id": "quant", "tool": "ionquant"}
+  {"step_id": "database", "tool": "database"},
+  {"step_id": "search", "tool": "search-closed"},
+  {"step_id": "rescore", "tool": "rescore"},
+  {"step_id": "to_pepxml", "tool": "rescore-export"},
+  {"step_id": "report", "tool": "report"},
+  {"step_id": "quant", "tool": "quant"}
 ],"edges":[
   {"src": "convert", "dst": "search"},
   {"src": "search", "dst": "rescore"},
@@ -291,20 +291,20 @@
 ]}
 ```
 
-### `fp-stellar-dda`
-- **用途**:Migrated from FragPipe 'Stellar-DDA.workflow'. Original workflow also enabled: ['msbooster', 'skyline'] (dropped — non-critical layers; downstream FDR still valid). Requires user-supplied target FASTA (the `database` step builds the decoy variant).
+### `stellar-dda`
+- **用途**:迁移自官方模板 'Stellar-DDA.workflow'. Original workflow also enabled: ['msbooster', 'skyline'] (dropped — non-critical layers; downstream FDR still valid). Requires user-supplied target FASTA (the `database` step builds the decoy variant).
 - **输入**:谱图 `raw_files`(mzML/raw);`fasta_path`=**target 蛋白库**(database 步自动建 decoy)
-- **调用(推荐)**:`{"template_id":"fp-stellar-dda","raw_files":["谱图"],"fasta_path":"蛋白库"}`
+- **调用(推荐)**:`{"template_id":"stellar-dda","raw_files":["谱图"],"fasta_path":"蛋白库"}`
 - **DAG**(同 pipeline.json 格式,可复制改造):
 ```json
 {"steps":[
   {"step_id": "convert", "tool": "msconvert"},
-  {"step_id": "database", "tool": "philosopher-database"},
-  {"step_id": "search", "tool": "msfragger-closed"},
-  {"step_id": "rescore", "tool": "percolator"},
-  {"step_id": "to_pepxml", "tool": "percolator-to-pepxml"},
-  {"step_id": "report", "tool": "philosopher-report"},
-  {"step_id": "quant", "tool": "ionquant"}
+  {"step_id": "database", "tool": "database"},
+  {"step_id": "search", "tool": "search-closed"},
+  {"step_id": "rescore", "tool": "rescore"},
+  {"step_id": "to_pepxml", "tool": "rescore-export"},
+  {"step_id": "report", "tool": "report"},
+  {"step_id": "quant", "tool": "quant"}
 ],"edges":[
   {"src": "convert", "dst": "search"},
   {"src": "search", "dst": "rescore"},
@@ -318,20 +318,20 @@
 ]}
 ```
 
-### `fp-wwa`
-- **用途**:Migrated from FragPipe 'WWA.workflow'. Original workflow also enabled: ['msbooster', 'skyline'] (dropped — non-critical layers; downstream FDR still valid). Requires user-supplied target FASTA (the `database` step builds the decoy variant).
+### `wwa`
+- **用途**:迁移自官方模板 'WWA.workflow'. Original workflow also enabled: ['msbooster', 'skyline'] (dropped — non-critical layers; downstream FDR still valid). Requires user-supplied target FASTA (the `database` step builds the decoy variant).
 - **输入**:谱图 `raw_files`(mzML/raw);`fasta_path`=**target 蛋白库**(database 步自动建 decoy)
-- **调用(推荐)**:`{"template_id":"fp-wwa","raw_files":["谱图"],"fasta_path":"蛋白库"}`
+- **调用(推荐)**:`{"template_id":"wwa","raw_files":["谱图"],"fasta_path":"蛋白库"}`
 - **DAG**(同 pipeline.json 格式,可复制改造):
 ```json
 {"steps":[
   {"step_id": "convert", "tool": "msconvert"},
-  {"step_id": "database", "tool": "philosopher-database"},
-  {"step_id": "search", "tool": "msfragger-closed"},
-  {"step_id": "rescore", "tool": "percolator"},
-  {"step_id": "to_pepxml", "tool": "percolator-to-pepxml"},
-  {"step_id": "report", "tool": "philosopher-report"},
-  {"step_id": "quant", "tool": "ionquant"}
+  {"step_id": "database", "tool": "database"},
+  {"step_id": "search", "tool": "search-closed"},
+  {"step_id": "rescore", "tool": "rescore"},
+  {"step_id": "to_pepxml", "tool": "rescore-export"},
+  {"step_id": "report", "tool": "report"},
+  {"step_id": "quant", "tool": "quant"}
 ],"edges":[
   {"src": "convert", "dst": "search"},
   {"src": "search", "dst": "rescore"},
@@ -348,20 +348,20 @@
 
 ## 3. 开放搜索 / 质量偏移
 
-### `fp-mass-offset-commonptms`
-- **用途**:Migrated from FragPipe 'Mass-Offset-CommonPTMs.workflow'. Original workflow also enabled: ['skyline'] (dropped — non-critical layers; downstream FDR still valid). Requires user-supplied target FASTA (the `database` step builds the decoy variant).
+### `mass-offset-commonptms`
+- **用途**:迁移自官方模板 'Mass-Offset-CommonPTMs.workflow'. Original workflow also enabled: ['skyline'] (dropped — non-critical layers; downstream FDR still valid). Requires user-supplied target FASTA (the `database` step builds the decoy variant).
 - **输入**:谱图 `raw_files`(mzML/raw);`fasta_path`=**target 蛋白库**(database 步自动建 decoy)
-- **调用(推荐)**:`{"template_id":"fp-mass-offset-commonptms","raw_files":["谱图"],"fasta_path":"蛋白库"}`
+- **调用(推荐)**:`{"template_id":"mass-offset-commonptms","raw_files":["谱图"],"fasta_path":"蛋白库"}`
 - **DAG**(同 pipeline.json 格式,可复制改造):
 ```json
 {"steps":[
   {"step_id": "convert", "tool": "msconvert"},
-  {"step_id": "database", "tool": "philosopher-database"},
-  {"step_id": "search", "tool": "msfragger-closed"},
-  {"step_id": "rescore", "tool": "percolator"},
-  {"step_id": "to_pepxml", "tool": "percolator-to-pepxml"},
-  {"step_id": "report", "tool": "philosopher-report"},
-  {"step_id": "ptm_summary", "tool": "ptmshepherd"}
+  {"step_id": "database", "tool": "database"},
+  {"step_id": "search", "tool": "search-closed"},
+  {"step_id": "rescore", "tool": "rescore"},
+  {"step_id": "to_pepxml", "tool": "rescore-export"},
+  {"step_id": "report", "tool": "report"},
+  {"step_id": "ptm_summary", "tool": "ptm-profile"}
 ],"edges":[
   {"src": "convert", "dst": "search"},
   {"src": "search", "dst": "rescore"},
@@ -375,20 +375,20 @@
 ]}
 ```
 
-### `fp-open`
-- **用途**:Migrated from FragPipe 'Open.workflow'. Original workflow also enabled: ['skyline'] (dropped — non-critical layers; downstream FDR still valid). Requires user-supplied target FASTA (the `database` step builds the decoy variant).
+### `open`
+- **用途**:迁移自官方模板 'Open.workflow'. Original workflow also enabled: ['skyline'] (dropped — non-critical layers; downstream FDR still valid). Requires user-supplied target FASTA (the `database` step builds the decoy variant).
 - **输入**:谱图 `raw_files`(mzML/raw);`fasta_path`=**target 蛋白库**(database 步自动建 decoy)
-- **调用(推荐)**:`{"template_id":"fp-open","raw_files":["谱图"],"fasta_path":"蛋白库"}`
+- **调用(推荐)**:`{"template_id":"open","raw_files":["谱图"],"fasta_path":"蛋白库"}`
 - **DAG**(同 pipeline.json 格式,可复制改造):
 ```json
 {"steps":[
   {"step_id": "convert", "tool": "msconvert"},
-  {"step_id": "database", "tool": "philosopher-database"},
-  {"step_id": "search", "tool": "msfragger-closed"},
-  {"step_id": "cleanup", "tool": "crystalc"},
-  {"step_id": "validate", "tool": "peptideprophet"},
-  {"step_id": "report", "tool": "philosopher-report"},
-  {"step_id": "ptm_summary", "tool": "ptmshepherd"}
+  {"step_id": "database", "tool": "database"},
+  {"step_id": "search", "tool": "search-closed"},
+  {"step_id": "cleanup", "tool": "precursor-refine"},
+  {"step_id": "validate", "tool": "validate-psm"},
+  {"step_id": "report", "tool": "report"},
+  {"step_id": "ptm_summary", "tool": "ptm-profile"}
 ],"edges":[
   {"src": "convert", "dst": "search"},
   {"src": "search", "dst": "cleanup"},
@@ -403,20 +403,20 @@
 ]}
 ```
 
-### `fp-open-quickscan`
-- **用途**:Migrated from FragPipe 'Open-quickscan.workflow'. Original workflow also enabled: ['skyline'] (dropped — non-critical layers; downstream FDR still valid). Requires user-supplied target FASTA (the `database` step builds the decoy variant).
+### `open-quickscan`
+- **用途**:迁移自官方模板 'Open-quickscan.workflow'. Original workflow also enabled: ['skyline'] (dropped — non-critical layers; downstream FDR still valid). Requires user-supplied target FASTA (the `database` step builds the decoy variant).
 - **输入**:谱图 `raw_files`(mzML/raw);`fasta_path`=**target 蛋白库**(database 步自动建 decoy)
-- **调用(推荐)**:`{"template_id":"fp-open-quickscan","raw_files":["谱图"],"fasta_path":"蛋白库"}`
+- **调用(推荐)**:`{"template_id":"open-quickscan","raw_files":["谱图"],"fasta_path":"蛋白库"}`
 - **DAG**(同 pipeline.json 格式,可复制改造):
 ```json
 {"steps":[
   {"step_id": "convert", "tool": "msconvert"},
-  {"step_id": "database", "tool": "philosopher-database"},
-  {"step_id": "search", "tool": "msfragger-closed"},
-  {"step_id": "cleanup", "tool": "crystalc"},
-  {"step_id": "validate", "tool": "peptideprophet"},
-  {"step_id": "report", "tool": "philosopher-report"},
-  {"step_id": "ptm_summary", "tool": "ptmshepherd"}
+  {"step_id": "database", "tool": "database"},
+  {"step_id": "search", "tool": "search-closed"},
+  {"step_id": "cleanup", "tool": "precursor-refine"},
+  {"step_id": "validate", "tool": "validate-psm"},
+  {"step_id": "report", "tool": "report"},
+  {"step_id": "ptm_summary", "tool": "ptm-profile"}
 ],"edges":[
   {"src": "convert", "dst": "search"},
   {"src": "search", "dst": "cleanup"},
@@ -431,20 +431,20 @@
 ]}
 ```
 
-### `fp-xrnax-massoffset`
-- **用途**:Migrated from FragPipe 'XRNAX-MassOffset.workflow'. Original workflow also enabled: ['skyline'] (dropped — non-critical layers; downstream FDR still valid). Requires user-supplied target FASTA (the `database` step builds the decoy variant).
+### `xrnax-massoffset`
+- **用途**:迁移自官方模板 'XRNAX-MassOffset.workflow'. Original workflow also enabled: ['skyline'] (dropped — non-critical layers; downstream FDR still valid). Requires user-supplied target FASTA (the `database` step builds the decoy variant).
 - **输入**:谱图 `raw_files`(mzML/raw);`fasta_path`=**target 蛋白库**(database 步自动建 decoy)
-- **调用(推荐)**:`{"template_id":"fp-xrnax-massoffset","raw_files":["谱图"],"fasta_path":"蛋白库"}`
+- **调用(推荐)**:`{"template_id":"xrnax-massoffset","raw_files":["谱图"],"fasta_path":"蛋白库"}`
 - **DAG**(同 pipeline.json 格式,可复制改造):
 ```json
 {"steps":[
   {"step_id": "convert", "tool": "msconvert"},
-  {"step_id": "database", "tool": "philosopher-database"},
-  {"step_id": "search", "tool": "msfragger-closed"},
-  {"step_id": "cleanup", "tool": "crystalc"},
-  {"step_id": "validate", "tool": "peptideprophet"},
-  {"step_id": "report", "tool": "philosopher-report"},
-  {"step_id": "ptm_summary", "tool": "ptmshepherd"}
+  {"step_id": "database", "tool": "database"},
+  {"step_id": "search", "tool": "search-closed"},
+  {"step_id": "cleanup", "tool": "precursor-refine"},
+  {"step_id": "validate", "tool": "validate-psm"},
+  {"step_id": "report", "tool": "report"},
+  {"step_id": "ptm_summary", "tool": "ptm-profile"}
 ],"edges":[
   {"src": "convert", "dst": "search"},
   {"src": "search", "dst": "cleanup"},
@@ -462,21 +462,21 @@
 
 ## 4. 同位素标记定量(TMT / iTRAQ)
 
-### `fp-chemprot-abpp-iadtb-tmt16`
-- **用途**:Migrated from FragPipe 'chemprot-ABPP-IADTB-TMT16.workflow'. Original workflow also enabled: ['msbooster', 'skyline'] (dropped — non-critical layers; downstream FDR still valid). Requires user-supplied target FASTA (the `database` step builds the decoy variant).
+### `chemprot-abpp-iadtb-tmt16`
+- **用途**:迁移自官方模板 'chemprot-ABPP-IADTB-TMT16.workflow'. Original workflow also enabled: ['msbooster', 'skyline'] (dropped — non-critical layers; downstream FDR still valid). Requires user-supplied target FASTA (the `database` step builds the decoy variant).
 - **输入**:谱图 `raw_files`(mzML/raw);`fasta_path`=**target 蛋白库**(database 步自动建 decoy)；**`annotation_path`**=通道→样本标注(TMT/iTRAQ 必需)
-- **调用(推荐)**:`{"template_id":"fp-chemprot-abpp-iadtb-tmt16","raw_files":["谱图"],"fasta_path":"蛋白库","annotation_path":"annotation.txt"}`
+- **调用(推荐)**:`{"template_id":"chemprot-abpp-iadtb-tmt16","raw_files":["谱图"],"fasta_path":"蛋白库","annotation_path":"annotation.txt"}`
 - **DAG**(同 pipeline.json 格式,可复制改造):
 ```json
 {"steps":[
   {"step_id": "convert", "tool": "msconvert"},
-  {"step_id": "database", "tool": "philosopher-database"},
-  {"step_id": "search", "tool": "msfragger-closed"},
-  {"step_id": "rescore", "tool": "percolator"},
-  {"step_id": "to_pepxml", "tool": "percolator-to-pepxml"},
-  {"step_id": "report", "tool": "philosopher-report"},
-  {"step_id": "quant", "tool": "ionquant"},
-  {"step_id": "tmtquant", "tool": "tmtintegrator"}
+  {"step_id": "database", "tool": "database"},
+  {"step_id": "search", "tool": "search-closed"},
+  {"step_id": "rescore", "tool": "rescore"},
+  {"step_id": "to_pepxml", "tool": "rescore-export"},
+  {"step_id": "report", "tool": "report"},
+  {"step_id": "quant", "tool": "quant"},
+  {"step_id": "tmtquant", "tool": "quant-isobaric"}
 ],"edges":[
   {"src": "convert", "dst": "search"},
   {"src": "search", "dst": "rescore"},
@@ -491,21 +491,21 @@
 ]}
 ```
 
-### `fp-glyco-n-tmt`
-- **用途**:Migrated from FragPipe 'glyco-N-TMT.workflow'. Original workflow also enabled: ['skyline'] (dropped — non-critical layers; downstream FDR still valid). Requires user-supplied target FASTA (the `database` step builds the decoy variant).
+### `glyco-n-tmt`
+- **用途**:迁移自官方模板 'glyco-N-TMT.workflow'. Original workflow also enabled: ['skyline'] (dropped — non-critical layers; downstream FDR still valid). Requires user-supplied target FASTA (the `database` step builds the decoy variant).
 - **输入**:谱图 `raw_files`(mzML/raw);`fasta_path`=**target 蛋白库**(database 步自动建 decoy)；**`annotation_path`**=通道→样本标注(TMT/iTRAQ 必需)
-- **调用(推荐)**:`{"template_id":"fp-glyco-n-tmt","raw_files":["谱图"],"fasta_path":"蛋白库","annotation_path":"annotation.txt"}`
+- **调用(推荐)**:`{"template_id":"glyco-n-tmt","raw_files":["谱图"],"fasta_path":"蛋白库","annotation_path":"annotation.txt"}`
 - **DAG**(同 pipeline.json 格式,可复制改造):
 ```json
 {"steps":[
   {"step_id": "convert", "tool": "msconvert"},
-  {"step_id": "database", "tool": "philosopher-database"},
-  {"step_id": "search", "tool": "msfragger-closed"},
-  {"step_id": "validate", "tool": "peptideprophet"},
-  {"step_id": "report", "tool": "philosopher-report"},
-  {"step_id": "quant", "tool": "ionquant"},
-  {"step_id": "ptm_summary", "tool": "ptmshepherd"},
-  {"step_id": "tmtquant", "tool": "tmtintegrator"}
+  {"step_id": "database", "tool": "database"},
+  {"step_id": "search", "tool": "search-closed"},
+  {"step_id": "validate", "tool": "validate-psm"},
+  {"step_id": "report", "tool": "report"},
+  {"step_id": "quant", "tool": "quant"},
+  {"step_id": "ptm_summary", "tool": "ptm-profile"},
+  {"step_id": "tmtquant", "tool": "quant-isobaric"}
 ],"edges":[
   {"src": "convert", "dst": "search"},
   {"src": "search", "dst": "validate"},
@@ -520,21 +520,21 @@
 ]}
 ```
 
-### `fp-itraq4`
-- **用途**:Migrated from FragPipe 'iTRAQ4.workflow'. Original workflow also enabled: ['skyline'] (dropped — non-critical layers; downstream FDR still valid). Requires user-supplied target FASTA (the `database` step builds the decoy variant).
+### `itraq4`
+- **用途**:迁移自官方模板 'iTRAQ4.workflow'. Original workflow also enabled: ['skyline'] (dropped — non-critical layers; downstream FDR still valid). Requires user-supplied target FASTA (the `database` step builds the decoy variant).
 - **输入**:谱图 `raw_files`(mzML/raw);`fasta_path`=**target 蛋白库**(database 步自动建 decoy)；**`annotation_path`**=通道→样本标注(TMT/iTRAQ 必需)
-- **调用(推荐)**:`{"template_id":"fp-itraq4","raw_files":["谱图"],"fasta_path":"蛋白库","annotation_path":"annotation.txt"}`
+- **调用(推荐)**:`{"template_id":"itraq4","raw_files":["谱图"],"fasta_path":"蛋白库","annotation_path":"annotation.txt"}`
 - **DAG**(同 pipeline.json 格式,可复制改造):
 ```json
 {"steps":[
   {"step_id": "convert", "tool": "msconvert"},
-  {"step_id": "database", "tool": "philosopher-database"},
-  {"step_id": "search", "tool": "msfragger-closed"},
-  {"step_id": "rescore", "tool": "percolator"},
-  {"step_id": "to_pepxml", "tool": "percolator-to-pepxml"},
-  {"step_id": "report", "tool": "philosopher-report"},
-  {"step_id": "quant", "tool": "ionquant"},
-  {"step_id": "tmtquant", "tool": "tmtintegrator"}
+  {"step_id": "database", "tool": "database"},
+  {"step_id": "search", "tool": "search-closed"},
+  {"step_id": "rescore", "tool": "rescore"},
+  {"step_id": "to_pepxml", "tool": "rescore-export"},
+  {"step_id": "report", "tool": "report"},
+  {"step_id": "quant", "tool": "quant"},
+  {"step_id": "tmtquant", "tool": "quant-isobaric"}
 ],"edges":[
   {"src": "convert", "dst": "search"},
   {"src": "search", "dst": "rescore"},
@@ -549,22 +549,22 @@
 ]}
 ```
 
-### `fp-itraq4-phospho`
-- **用途**:Migrated from FragPipe 'iTRAQ4-phospho.workflow'. Original workflow also enabled: ['skyline'] (dropped — non-critical layers; downstream FDR still valid). Requires user-supplied target FASTA (the `database` step builds the decoy variant).
+### `itraq4-phospho`
+- **用途**:迁移自官方模板 'iTRAQ4-phospho.workflow'. Original workflow also enabled: ['skyline'] (dropped — non-critical layers; downstream FDR still valid). Requires user-supplied target FASTA (the `database` step builds the decoy variant).
 - **输入**:谱图 `raw_files`(mzML/raw);`fasta_path`=**target 蛋白库**(database 步自动建 decoy)；**`annotation_path`**=通道→样本标注(TMT/iTRAQ 必需)
-- **调用(推荐)**:`{"template_id":"fp-itraq4-phospho","raw_files":["谱图"],"fasta_path":"蛋白库","annotation_path":"annotation.txt"}`
+- **调用(推荐)**:`{"template_id":"itraq4-phospho","raw_files":["谱图"],"fasta_path":"蛋白库","annotation_path":"annotation.txt"}`
 - **DAG**(同 pipeline.json 格式,可复制改造):
 ```json
 {"steps":[
   {"step_id": "convert", "tool": "msconvert"},
-  {"step_id": "database", "tool": "philosopher-database"},
-  {"step_id": "search", "tool": "msfragger-closed"},
-  {"step_id": "rescore", "tool": "percolator"},
-  {"step_id": "to_pepxml", "tool": "percolator-to-pepxml"},
-  {"step_id": "localize", "tool": "ptmprophet"},
-  {"step_id": "report", "tool": "philosopher-report"},
-  {"step_id": "quant", "tool": "ionquant"},
-  {"step_id": "tmtquant", "tool": "tmtintegrator"}
+  {"step_id": "database", "tool": "database"},
+  {"step_id": "search", "tool": "search-closed"},
+  {"step_id": "rescore", "tool": "rescore"},
+  {"step_id": "to_pepxml", "tool": "rescore-export"},
+  {"step_id": "localize", "tool": "ptm-localize"},
+  {"step_id": "report", "tool": "report"},
+  {"step_id": "quant", "tool": "quant"},
+  {"step_id": "tmtquant", "tool": "quant-isobaric"}
 ],"edges":[
   {"src": "convert", "dst": "search"},
   {"src": "search", "dst": "rescore"},
@@ -580,21 +580,21 @@
 ]}
 ```
 
-### `fp-nonspecific-hla-tmt10`
-- **用途**:Migrated from FragPipe 'Nonspecific-HLA-TMT10.workflow'. Original workflow also enabled: ['msbooster', 'skyline'] (dropped — non-critical layers; downstream FDR still valid). Requires user-supplied target FASTA (the `database` step builds the decoy variant).
+### `nonspecific-hla-tmt10`
+- **用途**:迁移自官方模板 'Nonspecific-HLA-TMT10.workflow'. Original workflow also enabled: ['msbooster', 'skyline'] (dropped — non-critical layers; downstream FDR still valid). Requires user-supplied target FASTA (the `database` step builds the decoy variant).
 - **输入**:谱图 `raw_files`(mzML/raw);`fasta_path`=**target 蛋白库**(database 步自动建 decoy)；**`annotation_path`**=通道→样本标注(TMT/iTRAQ 必需)
-- **调用(推荐)**:`{"template_id":"fp-nonspecific-hla-tmt10","raw_files":["谱图"],"fasta_path":"蛋白库","annotation_path":"annotation.txt"}`
+- **调用(推荐)**:`{"template_id":"nonspecific-hla-tmt10","raw_files":["谱图"],"fasta_path":"蛋白库","annotation_path":"annotation.txt"}`
 - **DAG**(同 pipeline.json 格式,可复制改造):
 ```json
 {"steps":[
   {"step_id": "convert", "tool": "msconvert"},
-  {"step_id": "database", "tool": "philosopher-database"},
-  {"step_id": "search", "tool": "msfragger-closed"},
-  {"step_id": "rescore", "tool": "percolator"},
-  {"step_id": "to_pepxml", "tool": "percolator-to-pepxml"},
-  {"step_id": "report", "tool": "philosopher-report"},
-  {"step_id": "quant", "tool": "ionquant"},
-  {"step_id": "tmtquant", "tool": "tmtintegrator"}
+  {"step_id": "database", "tool": "database"},
+  {"step_id": "search", "tool": "search-closed"},
+  {"step_id": "rescore", "tool": "rescore"},
+  {"step_id": "to_pepxml", "tool": "rescore-export"},
+  {"step_id": "report", "tool": "report"},
+  {"step_id": "quant", "tool": "quant"},
+  {"step_id": "tmtquant", "tool": "quant-isobaric"}
 ],"edges":[
   {"src": "convert", "dst": "search"},
   {"src": "search", "dst": "rescore"},
@@ -609,21 +609,21 @@
 ]}
 ```
 
-### `fp-tmt10`
-- **用途**:Migrated from FragPipe 'TMT10.workflow'. Original workflow also enabled: ['msbooster', 'skyline'] (dropped — non-critical layers; downstream FDR still valid). Requires user-supplied target FASTA (the `database` step builds the decoy variant).
+### `tmt10`
+- **用途**:迁移自官方模板 'TMT10.workflow'. Original workflow also enabled: ['msbooster', 'skyline'] (dropped — non-critical layers; downstream FDR still valid). Requires user-supplied target FASTA (the `database` step builds the decoy variant).
 - **输入**:谱图 `raw_files`(mzML/raw);`fasta_path`=**target 蛋白库**(database 步自动建 decoy)；**`annotation_path`**=通道→样本标注(TMT/iTRAQ 必需)
-- **调用(推荐)**:`{"template_id":"fp-tmt10","raw_files":["谱图"],"fasta_path":"蛋白库","annotation_path":"annotation.txt"}`
+- **调用(推荐)**:`{"template_id":"tmt10","raw_files":["谱图"],"fasta_path":"蛋白库","annotation_path":"annotation.txt"}`
 - **DAG**(同 pipeline.json 格式,可复制改造):
 ```json
 {"steps":[
   {"step_id": "convert", "tool": "msconvert"},
-  {"step_id": "database", "tool": "philosopher-database"},
-  {"step_id": "search", "tool": "msfragger-closed"},
-  {"step_id": "rescore", "tool": "percolator"},
-  {"step_id": "to_pepxml", "tool": "percolator-to-pepxml"},
-  {"step_id": "report", "tool": "philosopher-report"},
-  {"step_id": "quant", "tool": "ionquant"},
-  {"step_id": "tmtquant", "tool": "tmtintegrator"}
+  {"step_id": "database", "tool": "database"},
+  {"step_id": "search", "tool": "search-closed"},
+  {"step_id": "rescore", "tool": "rescore"},
+  {"step_id": "to_pepxml", "tool": "rescore-export"},
+  {"step_id": "report", "tool": "report"},
+  {"step_id": "quant", "tool": "quant"},
+  {"step_id": "tmtquant", "tool": "quant-isobaric"}
 ],"edges":[
   {"src": "convert", "dst": "search"},
   {"src": "search", "dst": "rescore"},
@@ -638,22 +638,22 @@
 ]}
 ```
 
-### `fp-tmt10-acetyl`
-- **用途**:Migrated from FragPipe 'TMT10-acetyl.workflow'. Original workflow also enabled: ['skyline'] (dropped — non-critical layers; downstream FDR still valid). Requires user-supplied target FASTA (the `database` step builds the decoy variant).
+### `tmt10-acetyl`
+- **用途**:迁移自官方模板 'TMT10-acetyl.workflow'. Original workflow also enabled: ['skyline'] (dropped — non-critical layers; downstream FDR still valid). Requires user-supplied target FASTA (the `database` step builds the decoy variant).
 - **输入**:谱图 `raw_files`(mzML/raw);`fasta_path`=**target 蛋白库**(database 步自动建 decoy)；**`annotation_path`**=通道→样本标注(TMT/iTRAQ 必需)
-- **调用(推荐)**:`{"template_id":"fp-tmt10-acetyl","raw_files":["谱图"],"fasta_path":"蛋白库","annotation_path":"annotation.txt"}`
+- **调用(推荐)**:`{"template_id":"tmt10-acetyl","raw_files":["谱图"],"fasta_path":"蛋白库","annotation_path":"annotation.txt"}`
 - **DAG**(同 pipeline.json 格式,可复制改造):
 ```json
 {"steps":[
   {"step_id": "convert", "tool": "msconvert"},
-  {"step_id": "database", "tool": "philosopher-database"},
-  {"step_id": "search", "tool": "msfragger-closed"},
-  {"step_id": "rescore", "tool": "percolator"},
-  {"step_id": "to_pepxml", "tool": "percolator-to-pepxml"},
-  {"step_id": "localize", "tool": "ptmprophet"},
-  {"step_id": "report", "tool": "philosopher-report"},
-  {"step_id": "quant", "tool": "ionquant"},
-  {"step_id": "tmtquant", "tool": "tmtintegrator"}
+  {"step_id": "database", "tool": "database"},
+  {"step_id": "search", "tool": "search-closed"},
+  {"step_id": "rescore", "tool": "rescore"},
+  {"step_id": "to_pepxml", "tool": "rescore-export"},
+  {"step_id": "localize", "tool": "ptm-localize"},
+  {"step_id": "report", "tool": "report"},
+  {"step_id": "quant", "tool": "quant"},
+  {"step_id": "tmtquant", "tool": "quant-isobaric"}
 ],"edges":[
   {"src": "convert", "dst": "search"},
   {"src": "search", "dst": "rescore"},
@@ -669,21 +669,21 @@
 ]}
 ```
 
-### `fp-tmt10-acetyl-noloc`
-- **用途**:Migrated from FragPipe 'TMT10-acetyl-noloc.workflow'. Original workflow also enabled: ['skyline'] (dropped — non-critical layers; downstream FDR still valid). Requires user-supplied target FASTA (the `database` step builds the decoy variant).
+### `tmt10-acetyl-noloc`
+- **用途**:迁移自官方模板 'TMT10-acetyl-noloc.workflow'. Original workflow also enabled: ['skyline'] (dropped — non-critical layers; downstream FDR still valid). Requires user-supplied target FASTA (the `database` step builds the decoy variant).
 - **输入**:谱图 `raw_files`(mzML/raw);`fasta_path`=**target 蛋白库**(database 步自动建 decoy)；**`annotation_path`**=通道→样本标注(TMT/iTRAQ 必需)
-- **调用(推荐)**:`{"template_id":"fp-tmt10-acetyl-noloc","raw_files":["谱图"],"fasta_path":"蛋白库","annotation_path":"annotation.txt"}`
+- **调用(推荐)**:`{"template_id":"tmt10-acetyl-noloc","raw_files":["谱图"],"fasta_path":"蛋白库","annotation_path":"annotation.txt"}`
 - **DAG**(同 pipeline.json 格式,可复制改造):
 ```json
 {"steps":[
   {"step_id": "convert", "tool": "msconvert"},
-  {"step_id": "database", "tool": "philosopher-database"},
-  {"step_id": "search", "tool": "msfragger-closed"},
-  {"step_id": "rescore", "tool": "percolator"},
-  {"step_id": "to_pepxml", "tool": "percolator-to-pepxml"},
-  {"step_id": "report", "tool": "philosopher-report"},
-  {"step_id": "quant", "tool": "ionquant"},
-  {"step_id": "tmtquant", "tool": "tmtintegrator"}
+  {"step_id": "database", "tool": "database"},
+  {"step_id": "search", "tool": "search-closed"},
+  {"step_id": "rescore", "tool": "rescore"},
+  {"step_id": "to_pepxml", "tool": "rescore-export"},
+  {"step_id": "report", "tool": "report"},
+  {"step_id": "quant", "tool": "quant"},
+  {"step_id": "tmtquant", "tool": "quant-isobaric"}
 ],"edges":[
   {"src": "convert", "dst": "search"},
   {"src": "search", "dst": "rescore"},
@@ -698,21 +698,21 @@
 ]}
 ```
 
-### `fp-tmt10-bridge`
-- **用途**:Migrated from FragPipe 'TMT10-bridge.workflow'. Original workflow also enabled: ['msbooster', 'skyline'] (dropped — non-critical layers; downstream FDR still valid). Requires user-supplied target FASTA (the `database` step builds the decoy variant).
+### `tmt10-bridge`
+- **用途**:迁移自官方模板 'TMT10-bridge.workflow'. Original workflow also enabled: ['msbooster', 'skyline'] (dropped — non-critical layers; downstream FDR still valid). Requires user-supplied target FASTA (the `database` step builds the decoy variant).
 - **输入**:谱图 `raw_files`(mzML/raw);`fasta_path`=**target 蛋白库**(database 步自动建 decoy)；**`annotation_path`**=通道→样本标注(TMT/iTRAQ 必需)
-- **调用(推荐)**:`{"template_id":"fp-tmt10-bridge","raw_files":["谱图"],"fasta_path":"蛋白库","annotation_path":"annotation.txt"}`
+- **调用(推荐)**:`{"template_id":"tmt10-bridge","raw_files":["谱图"],"fasta_path":"蛋白库","annotation_path":"annotation.txt"}`
 - **DAG**(同 pipeline.json 格式,可复制改造):
 ```json
 {"steps":[
   {"step_id": "convert", "tool": "msconvert"},
-  {"step_id": "database", "tool": "philosopher-database"},
-  {"step_id": "search", "tool": "msfragger-closed"},
-  {"step_id": "rescore", "tool": "percolator"},
-  {"step_id": "to_pepxml", "tool": "percolator-to-pepxml"},
-  {"step_id": "report", "tool": "philosopher-report"},
-  {"step_id": "quant", "tool": "ionquant"},
-  {"step_id": "tmtquant", "tool": "tmtintegrator"}
+  {"step_id": "database", "tool": "database"},
+  {"step_id": "search", "tool": "search-closed"},
+  {"step_id": "rescore", "tool": "rescore"},
+  {"step_id": "to_pepxml", "tool": "rescore-export"},
+  {"step_id": "report", "tool": "report"},
+  {"step_id": "quant", "tool": "quant"},
+  {"step_id": "tmtquant", "tool": "quant-isobaric"}
 ],"edges":[
   {"src": "convert", "dst": "search"},
   {"src": "search", "dst": "rescore"},
@@ -727,21 +727,21 @@
 ]}
 ```
 
-### `fp-tmt10-ms3`
-- **用途**:Migrated from FragPipe 'TMT10-MS3.workflow'. Original workflow also enabled: ['msbooster', 'skyline'] (dropped — non-critical layers; downstream FDR still valid). Requires user-supplied target FASTA (the `database` step builds the decoy variant).
+### `tmt10-ms3`
+- **用途**:迁移自官方模板 'TMT10-MS3.workflow'. Original workflow also enabled: ['msbooster', 'skyline'] (dropped — non-critical layers; downstream FDR still valid). Requires user-supplied target FASTA (the `database` step builds the decoy variant).
 - **输入**:谱图 `raw_files`(mzML/raw);`fasta_path`=**target 蛋白库**(database 步自动建 decoy)；**`annotation_path`**=通道→样本标注(TMT/iTRAQ 必需)
-- **调用(推荐)**:`{"template_id":"fp-tmt10-ms3","raw_files":["谱图"],"fasta_path":"蛋白库","annotation_path":"annotation.txt"}`
+- **调用(推荐)**:`{"template_id":"tmt10-ms3","raw_files":["谱图"],"fasta_path":"蛋白库","annotation_path":"annotation.txt"}`
 - **DAG**(同 pipeline.json 格式,可复制改造):
 ```json
 {"steps":[
   {"step_id": "convert", "tool": "msconvert"},
-  {"step_id": "database", "tool": "philosopher-database"},
-  {"step_id": "search", "tool": "msfragger-closed"},
-  {"step_id": "rescore", "tool": "percolator"},
-  {"step_id": "to_pepxml", "tool": "percolator-to-pepxml"},
-  {"step_id": "report", "tool": "philosopher-report"},
-  {"step_id": "quant", "tool": "ionquant"},
-  {"step_id": "tmtquant", "tool": "tmtintegrator"}
+  {"step_id": "database", "tool": "database"},
+  {"step_id": "search", "tool": "search-closed"},
+  {"step_id": "rescore", "tool": "rescore"},
+  {"step_id": "to_pepxml", "tool": "rescore-export"},
+  {"step_id": "report", "tool": "report"},
+  {"step_id": "quant", "tool": "quant"},
+  {"step_id": "tmtquant", "tool": "quant-isobaric"}
 ],"edges":[
   {"src": "convert", "dst": "search"},
   {"src": "search", "dst": "rescore"},
@@ -756,22 +756,22 @@
 ]}
 ```
 
-### `fp-tmt10-ms3-phospho`
-- **用途**:Migrated from FragPipe 'TMT10-MS3-phospho.workflow'. Original workflow also enabled: ['skyline'] (dropped — non-critical layers; downstream FDR still valid). Requires user-supplied target FASTA (the `database` step builds the decoy variant).
+### `tmt10-ms3-phospho`
+- **用途**:迁移自官方模板 'TMT10-MS3-phospho.workflow'. Original workflow also enabled: ['skyline'] (dropped — non-critical layers; downstream FDR still valid). Requires user-supplied target FASTA (the `database` step builds the decoy variant).
 - **输入**:谱图 `raw_files`(mzML/raw);`fasta_path`=**target 蛋白库**(database 步自动建 decoy)；**`annotation_path`**=通道→样本标注(TMT/iTRAQ 必需)
-- **调用(推荐)**:`{"template_id":"fp-tmt10-ms3-phospho","raw_files":["谱图"],"fasta_path":"蛋白库","annotation_path":"annotation.txt"}`
+- **调用(推荐)**:`{"template_id":"tmt10-ms3-phospho","raw_files":["谱图"],"fasta_path":"蛋白库","annotation_path":"annotation.txt"}`
 - **DAG**(同 pipeline.json 格式,可复制改造):
 ```json
 {"steps":[
   {"step_id": "convert", "tool": "msconvert"},
-  {"step_id": "database", "tool": "philosopher-database"},
-  {"step_id": "search", "tool": "msfragger-closed"},
-  {"step_id": "rescore", "tool": "percolator"},
-  {"step_id": "to_pepxml", "tool": "percolator-to-pepxml"},
-  {"step_id": "localize", "tool": "ptmprophet"},
-  {"step_id": "report", "tool": "philosopher-report"},
-  {"step_id": "quant", "tool": "ionquant"},
-  {"step_id": "tmtquant", "tool": "tmtintegrator"}
+  {"step_id": "database", "tool": "database"},
+  {"step_id": "search", "tool": "search-closed"},
+  {"step_id": "rescore", "tool": "rescore"},
+  {"step_id": "to_pepxml", "tool": "rescore-export"},
+  {"step_id": "localize", "tool": "ptm-localize"},
+  {"step_id": "report", "tool": "report"},
+  {"step_id": "quant", "tool": "quant"},
+  {"step_id": "tmtquant", "tool": "quant-isobaric"}
 ],"edges":[
   {"src": "convert", "dst": "search"},
   {"src": "search", "dst": "rescore"},
@@ -787,22 +787,22 @@
 ]}
 ```
 
-### `fp-tmt10-open`
-- **用途**:Migrated from FragPipe 'TMT10-Open.workflow'. Original workflow also enabled: ['skyline'] (dropped — non-critical layers; downstream FDR still valid). Requires user-supplied target FASTA (the `database` step builds the decoy variant).
+### `tmt10-open`
+- **用途**:迁移自官方模板 'TMT10-Open.workflow'. Original workflow also enabled: ['skyline'] (dropped — non-critical layers; downstream FDR still valid). Requires user-supplied target FASTA (the `database` step builds the decoy variant).
 - **输入**:谱图 `raw_files`(mzML/raw);`fasta_path`=**target 蛋白库**(database 步自动建 decoy)；**`annotation_path`**=通道→样本标注(TMT/iTRAQ 必需)
-- **调用(推荐)**:`{"template_id":"fp-tmt10-open","raw_files":["谱图"],"fasta_path":"蛋白库","annotation_path":"annotation.txt"}`
+- **调用(推荐)**:`{"template_id":"tmt10-open","raw_files":["谱图"],"fasta_path":"蛋白库","annotation_path":"annotation.txt"}`
 - **DAG**(同 pipeline.json 格式,可复制改造):
 ```json
 {"steps":[
   {"step_id": "convert", "tool": "msconvert"},
-  {"step_id": "database", "tool": "philosopher-database"},
-  {"step_id": "search", "tool": "msfragger-closed"},
-  {"step_id": "cleanup", "tool": "crystalc"},
-  {"step_id": "validate", "tool": "peptideprophet"},
-  {"step_id": "report", "tool": "philosopher-report"},
-  {"step_id": "ptm_summary", "tool": "ptmshepherd"},
-  {"step_id": "quant", "tool": "ionquant"},
-  {"step_id": "tmtquant", "tool": "tmtintegrator"}
+  {"step_id": "database", "tool": "database"},
+  {"step_id": "search", "tool": "search-closed"},
+  {"step_id": "cleanup", "tool": "precursor-refine"},
+  {"step_id": "validate", "tool": "validate-psm"},
+  {"step_id": "report", "tool": "report"},
+  {"step_id": "ptm_summary", "tool": "ptm-profile"},
+  {"step_id": "quant", "tool": "quant"},
+  {"step_id": "tmtquant", "tool": "quant-isobaric"}
 ],"edges":[
   {"src": "convert", "dst": "search"},
   {"src": "search", "dst": "cleanup"},
@@ -820,22 +820,22 @@
 ]}
 ```
 
-### `fp-tmt10-phospho`
-- **用途**:Migrated from FragPipe 'TMT10-phospho.workflow'. Original workflow also enabled: ['skyline'] (dropped — non-critical layers; downstream FDR still valid). Requires user-supplied target FASTA (the `database` step builds the decoy variant).
+### `tmt10-phospho`
+- **用途**:迁移自官方模板 'TMT10-phospho.workflow'. Original workflow also enabled: ['skyline'] (dropped — non-critical layers; downstream FDR still valid). Requires user-supplied target FASTA (the `database` step builds the decoy variant).
 - **输入**:谱图 `raw_files`(mzML/raw);`fasta_path`=**target 蛋白库**(database 步自动建 decoy)；**`annotation_path`**=通道→样本标注(TMT/iTRAQ 必需)
-- **调用(推荐)**:`{"template_id":"fp-tmt10-phospho","raw_files":["谱图"],"fasta_path":"蛋白库","annotation_path":"annotation.txt"}`
+- **调用(推荐)**:`{"template_id":"tmt10-phospho","raw_files":["谱图"],"fasta_path":"蛋白库","annotation_path":"annotation.txt"}`
 - **DAG**(同 pipeline.json 格式,可复制改造):
 ```json
 {"steps":[
   {"step_id": "convert", "tool": "msconvert"},
-  {"step_id": "database", "tool": "philosopher-database"},
-  {"step_id": "search", "tool": "msfragger-closed"},
-  {"step_id": "rescore", "tool": "percolator"},
-  {"step_id": "to_pepxml", "tool": "percolator-to-pepxml"},
-  {"step_id": "localize", "tool": "ptmprophet"},
-  {"step_id": "report", "tool": "philosopher-report"},
-  {"step_id": "quant", "tool": "ionquant"},
-  {"step_id": "tmtquant", "tool": "tmtintegrator"}
+  {"step_id": "database", "tool": "database"},
+  {"step_id": "search", "tool": "search-closed"},
+  {"step_id": "rescore", "tool": "rescore"},
+  {"step_id": "to_pepxml", "tool": "rescore-export"},
+  {"step_id": "localize", "tool": "ptm-localize"},
+  {"step_id": "report", "tool": "report"},
+  {"step_id": "quant", "tool": "quant"},
+  {"step_id": "tmtquant", "tool": "quant-isobaric"}
 ],"edges":[
   {"src": "convert", "dst": "search"},
   {"src": "search", "dst": "rescore"},
@@ -851,22 +851,22 @@
 ]}
 ```
 
-### `fp-tmt10-phospho-bridge`
-- **用途**:Migrated from FragPipe 'TMT10-phospho-bridge.workflow'. Original workflow also enabled: ['skyline'] (dropped — non-critical layers; downstream FDR still valid). Requires user-supplied target FASTA (the `database` step builds the decoy variant).
+### `tmt10-phospho-bridge`
+- **用途**:迁移自官方模板 'TMT10-phospho-bridge.workflow'. Original workflow also enabled: ['skyline'] (dropped — non-critical layers; downstream FDR still valid). Requires user-supplied target FASTA (the `database` step builds the decoy variant).
 - **输入**:谱图 `raw_files`(mzML/raw);`fasta_path`=**target 蛋白库**(database 步自动建 decoy)；**`annotation_path`**=通道→样本标注(TMT/iTRAQ 必需)
-- **调用(推荐)**:`{"template_id":"fp-tmt10-phospho-bridge","raw_files":["谱图"],"fasta_path":"蛋白库","annotation_path":"annotation.txt"}`
+- **调用(推荐)**:`{"template_id":"tmt10-phospho-bridge","raw_files":["谱图"],"fasta_path":"蛋白库","annotation_path":"annotation.txt"}`
 - **DAG**(同 pipeline.json 格式,可复制改造):
 ```json
 {"steps":[
   {"step_id": "convert", "tool": "msconvert"},
-  {"step_id": "database", "tool": "philosopher-database"},
-  {"step_id": "search", "tool": "msfragger-closed"},
-  {"step_id": "rescore", "tool": "percolator"},
-  {"step_id": "to_pepxml", "tool": "percolator-to-pepxml"},
-  {"step_id": "localize", "tool": "ptmprophet"},
-  {"step_id": "report", "tool": "philosopher-report"},
-  {"step_id": "quant", "tool": "ionquant"},
-  {"step_id": "tmtquant", "tool": "tmtintegrator"}
+  {"step_id": "database", "tool": "database"},
+  {"step_id": "search", "tool": "search-closed"},
+  {"step_id": "rescore", "tool": "rescore"},
+  {"step_id": "to_pepxml", "tool": "rescore-export"},
+  {"step_id": "localize", "tool": "ptm-localize"},
+  {"step_id": "report", "tool": "report"},
+  {"step_id": "quant", "tool": "quant"},
+  {"step_id": "tmtquant", "tool": "quant-isobaric"}
 ],"edges":[
   {"src": "convert", "dst": "search"},
   {"src": "search", "dst": "rescore"},
@@ -882,21 +882,21 @@
 ]}
 ```
 
-### `fp-tmt10-ubiquitin`
-- **用途**:Migrated from FragPipe 'TMT10-ubiquitin.workflow'. Original workflow also enabled: ['skyline'] (dropped — non-critical layers; downstream FDR still valid). Requires user-supplied target FASTA (the `database` step builds the decoy variant).
+### `tmt10-ubiquitin`
+- **用途**:迁移自官方模板 'TMT10-ubiquitin.workflow'. Original workflow also enabled: ['skyline'] (dropped — non-critical layers; downstream FDR still valid). Requires user-supplied target FASTA (the `database` step builds the decoy variant).
 - **输入**:谱图 `raw_files`(mzML/raw);`fasta_path`=**target 蛋白库**(database 步自动建 decoy)；**`annotation_path`**=通道→样本标注(TMT/iTRAQ 必需)
-- **调用(推荐)**:`{"template_id":"fp-tmt10-ubiquitin","raw_files":["谱图"],"fasta_path":"蛋白库","annotation_path":"annotation.txt"}`
+- **调用(推荐)**:`{"template_id":"tmt10-ubiquitin","raw_files":["谱图"],"fasta_path":"蛋白库","annotation_path":"annotation.txt"}`
 - **DAG**(同 pipeline.json 格式,可复制改造):
 ```json
 {"steps":[
   {"step_id": "convert", "tool": "msconvert"},
-  {"step_id": "database", "tool": "philosopher-database"},
-  {"step_id": "search", "tool": "msfragger-closed"},
-  {"step_id": "rescore", "tool": "percolator"},
-  {"step_id": "to_pepxml", "tool": "percolator-to-pepxml"},
-  {"step_id": "report", "tool": "philosopher-report"},
-  {"step_id": "quant", "tool": "ionquant"},
-  {"step_id": "tmtquant", "tool": "tmtintegrator"}
+  {"step_id": "database", "tool": "database"},
+  {"step_id": "search", "tool": "search-closed"},
+  {"step_id": "rescore", "tool": "rescore"},
+  {"step_id": "to_pepxml", "tool": "rescore-export"},
+  {"step_id": "report", "tool": "report"},
+  {"step_id": "quant", "tool": "quant"},
+  {"step_id": "tmtquant", "tool": "quant-isobaric"}
 ],"edges":[
   {"src": "convert", "dst": "search"},
   {"src": "search", "dst": "rescore"},
@@ -911,22 +911,22 @@
 ]}
 ```
 
-### `fp-tmt10-ubiquitination-k-tmt-or-ubiq`
-- **用途**:Migrated from FragPipe 'TMT10-ubiquitination-K_tmt_or_ubiq.workflow'. Original workflow also enabled: ['skyline'] (dropped — non-critical layers; downstream FDR still valid). Requires user-supplied target FASTA (the `database` step builds the decoy variant).
+### `tmt10-ubiquitination-k-tmt-or-ubiq`
+- **用途**:迁移自官方模板 'TMT10-ubiquitination-K_tmt_or_ubiq.workflow'. Original workflow also enabled: ['skyline'] (dropped — non-critical layers; downstream FDR still valid). Requires user-supplied target FASTA (the `database` step builds the decoy variant).
 - **输入**:谱图 `raw_files`(mzML/raw);`fasta_path`=**target 蛋白库**(database 步自动建 decoy)；**`annotation_path`**=通道→样本标注(TMT/iTRAQ 必需)
-- **调用(推荐)**:`{"template_id":"fp-tmt10-ubiquitination-k-tmt-or-ubiq","raw_files":["谱图"],"fasta_path":"蛋白库","annotation_path":"annotation.txt"}`
+- **调用(推荐)**:`{"template_id":"tmt10-ubiquitination-k-tmt-or-ubiq","raw_files":["谱图"],"fasta_path":"蛋白库","annotation_path":"annotation.txt"}`
 - **DAG**(同 pipeline.json 格式,可复制改造):
 ```json
 {"steps":[
   {"step_id": "convert", "tool": "msconvert"},
-  {"step_id": "database", "tool": "philosopher-database"},
-  {"step_id": "search", "tool": "msfragger-closed"},
-  {"step_id": "rescore", "tool": "percolator"},
-  {"step_id": "to_pepxml", "tool": "percolator-to-pepxml"},
-  {"step_id": "localize", "tool": "ptmprophet"},
-  {"step_id": "report", "tool": "philosopher-report"},
-  {"step_id": "quant", "tool": "ionquant"},
-  {"step_id": "tmtquant", "tool": "tmtintegrator"}
+  {"step_id": "database", "tool": "database"},
+  {"step_id": "search", "tool": "search-closed"},
+  {"step_id": "rescore", "tool": "rescore"},
+  {"step_id": "to_pepxml", "tool": "rescore-export"},
+  {"step_id": "localize", "tool": "ptm-localize"},
+  {"step_id": "report", "tool": "report"},
+  {"step_id": "quant", "tool": "quant"},
+  {"step_id": "tmtquant", "tool": "quant-isobaric"}
 ],"edges":[
   {"src": "convert", "dst": "search"},
   {"src": "search", "dst": "rescore"},
@@ -942,22 +942,22 @@
 ]}
 ```
 
-### `fp-tmt10-ubiquitination-k-tmt-plus-ubiq`
-- **用途**:Migrated from FragPipe 'TMT10-ubiquitination-K_tmt_plus_ubiq.workflow'. Original workflow also enabled: ['skyline'] (dropped — non-critical layers; downstream FDR still valid). Requires user-supplied target FASTA (the `database` step builds the decoy variant).
+### `tmt10-ubiquitination-k-tmt-plus-ubiq`
+- **用途**:迁移自官方模板 'TMT10-ubiquitination-K_tmt_plus_ubiq.workflow'. Original workflow also enabled: ['skyline'] (dropped — non-critical layers; downstream FDR still valid). Requires user-supplied target FASTA (the `database` step builds the decoy variant).
 - **输入**:谱图 `raw_files`(mzML/raw);`fasta_path`=**target 蛋白库**(database 步自动建 decoy)；**`annotation_path`**=通道→样本标注(TMT/iTRAQ 必需)
-- **调用(推荐)**:`{"template_id":"fp-tmt10-ubiquitination-k-tmt-plus-ubiq","raw_files":["谱图"],"fasta_path":"蛋白库","annotation_path":"annotation.txt"}`
+- **调用(推荐)**:`{"template_id":"tmt10-ubiquitination-k-tmt-plus-ubiq","raw_files":["谱图"],"fasta_path":"蛋白库","annotation_path":"annotation.txt"}`
 - **DAG**(同 pipeline.json 格式,可复制改造):
 ```json
 {"steps":[
   {"step_id": "convert", "tool": "msconvert"},
-  {"step_id": "database", "tool": "philosopher-database"},
-  {"step_id": "search", "tool": "msfragger-closed"},
-  {"step_id": "rescore", "tool": "percolator"},
-  {"step_id": "to_pepxml", "tool": "percolator-to-pepxml"},
-  {"step_id": "localize", "tool": "ptmprophet"},
-  {"step_id": "report", "tool": "philosopher-report"},
-  {"step_id": "quant", "tool": "ionquant"},
-  {"step_id": "tmtquant", "tool": "tmtintegrator"}
+  {"step_id": "database", "tool": "database"},
+  {"step_id": "search", "tool": "search-closed"},
+  {"step_id": "rescore", "tool": "rescore"},
+  {"step_id": "to_pepxml", "tool": "rescore-export"},
+  {"step_id": "localize", "tool": "ptm-localize"},
+  {"step_id": "report", "tool": "report"},
+  {"step_id": "quant", "tool": "quant"},
+  {"step_id": "tmtquant", "tool": "quant-isobaric"}
 ],"edges":[
   {"src": "convert", "dst": "search"},
   {"src": "search", "dst": "rescore"},
@@ -973,21 +973,21 @@
 ]}
 ```
 
-### `fp-tmt16`
-- **用途**:Migrated from FragPipe 'TMT16.workflow'. Original workflow also enabled: ['skyline'] (dropped — non-critical layers; downstream FDR still valid). Requires user-supplied target FASTA (the `database` step builds the decoy variant).
+### `tmt16`
+- **用途**:迁移自官方模板 'TMT16.workflow'. Original workflow also enabled: ['skyline'] (dropped — non-critical layers; downstream FDR still valid). Requires user-supplied target FASTA (the `database` step builds the decoy variant).
 - **输入**:谱图 `raw_files`(mzML/raw);`fasta_path`=**target 蛋白库**(database 步自动建 decoy)；**`annotation_path`**=通道→样本标注(TMT/iTRAQ 必需)
-- **调用(推荐)**:`{"template_id":"fp-tmt16","raw_files":["谱图"],"fasta_path":"蛋白库","annotation_path":"annotation.txt"}`
+- **调用(推荐)**:`{"template_id":"tmt16","raw_files":["谱图"],"fasta_path":"蛋白库","annotation_path":"annotation.txt"}`
 - **DAG**(同 pipeline.json 格式,可复制改造):
 ```json
 {"steps":[
   {"step_id": "convert", "tool": "msconvert"},
-  {"step_id": "database", "tool": "philosopher-database"},
-  {"step_id": "search", "tool": "msfragger-closed"},
-  {"step_id": "rescore", "tool": "percolator"},
-  {"step_id": "to_pepxml", "tool": "percolator-to-pepxml"},
-  {"step_id": "report", "tool": "philosopher-report"},
-  {"step_id": "quant", "tool": "ionquant"},
-  {"step_id": "tmtquant", "tool": "tmtintegrator"}
+  {"step_id": "database", "tool": "database"},
+  {"step_id": "search", "tool": "search-closed"},
+  {"step_id": "rescore", "tool": "rescore"},
+  {"step_id": "to_pepxml", "tool": "rescore-export"},
+  {"step_id": "report", "tool": "report"},
+  {"step_id": "quant", "tool": "quant"},
+  {"step_id": "tmtquant", "tool": "quant-isobaric"}
 ],"edges":[
   {"src": "convert", "dst": "search"},
   {"src": "search", "dst": "rescore"},
@@ -1002,22 +1002,22 @@
 ]}
 ```
 
-### `fp-tmt16-acetyl`
-- **用途**:Migrated from FragPipe 'TMT16-acetyl.workflow'. Original workflow also enabled: ['skyline'] (dropped — non-critical layers; downstream FDR still valid). Requires user-supplied target FASTA (the `database` step builds the decoy variant).
+### `tmt16-acetyl`
+- **用途**:迁移自官方模板 'TMT16-acetyl.workflow'. Original workflow also enabled: ['skyline'] (dropped — non-critical layers; downstream FDR still valid). Requires user-supplied target FASTA (the `database` step builds the decoy variant).
 - **输入**:谱图 `raw_files`(mzML/raw);`fasta_path`=**target 蛋白库**(database 步自动建 decoy)；**`annotation_path`**=通道→样本标注(TMT/iTRAQ 必需)
-- **调用(推荐)**:`{"template_id":"fp-tmt16-acetyl","raw_files":["谱图"],"fasta_path":"蛋白库","annotation_path":"annotation.txt"}`
+- **调用(推荐)**:`{"template_id":"tmt16-acetyl","raw_files":["谱图"],"fasta_path":"蛋白库","annotation_path":"annotation.txt"}`
 - **DAG**(同 pipeline.json 格式,可复制改造):
 ```json
 {"steps":[
   {"step_id": "convert", "tool": "msconvert"},
-  {"step_id": "database", "tool": "philosopher-database"},
-  {"step_id": "search", "tool": "msfragger-closed"},
-  {"step_id": "rescore", "tool": "percolator"},
-  {"step_id": "to_pepxml", "tool": "percolator-to-pepxml"},
-  {"step_id": "localize", "tool": "ptmprophet"},
-  {"step_id": "report", "tool": "philosopher-report"},
-  {"step_id": "quant", "tool": "ionquant"},
-  {"step_id": "tmtquant", "tool": "tmtintegrator"}
+  {"step_id": "database", "tool": "database"},
+  {"step_id": "search", "tool": "search-closed"},
+  {"step_id": "rescore", "tool": "rescore"},
+  {"step_id": "to_pepxml", "tool": "rescore-export"},
+  {"step_id": "localize", "tool": "ptm-localize"},
+  {"step_id": "report", "tool": "report"},
+  {"step_id": "quant", "tool": "quant"},
+  {"step_id": "tmtquant", "tool": "quant-isobaric"}
 ],"edges":[
   {"src": "convert", "dst": "search"},
   {"src": "search", "dst": "rescore"},
@@ -1033,21 +1033,21 @@
 ]}
 ```
 
-### `fp-tmt16-acetyl-noloc`
-- **用途**:Migrated from FragPipe 'TMT16-acetyl-noloc.workflow'. Original workflow also enabled: ['skyline'] (dropped — non-critical layers; downstream FDR still valid). Requires user-supplied target FASTA (the `database` step builds the decoy variant).
+### `tmt16-acetyl-noloc`
+- **用途**:迁移自官方模板 'TMT16-acetyl-noloc.workflow'. Original workflow also enabled: ['skyline'] (dropped — non-critical layers; downstream FDR still valid). Requires user-supplied target FASTA (the `database` step builds the decoy variant).
 - **输入**:谱图 `raw_files`(mzML/raw);`fasta_path`=**target 蛋白库**(database 步自动建 decoy)；**`annotation_path`**=通道→样本标注(TMT/iTRAQ 必需)
-- **调用(推荐)**:`{"template_id":"fp-tmt16-acetyl-noloc","raw_files":["谱图"],"fasta_path":"蛋白库","annotation_path":"annotation.txt"}`
+- **调用(推荐)**:`{"template_id":"tmt16-acetyl-noloc","raw_files":["谱图"],"fasta_path":"蛋白库","annotation_path":"annotation.txt"}`
 - **DAG**(同 pipeline.json 格式,可复制改造):
 ```json
 {"steps":[
   {"step_id": "convert", "tool": "msconvert"},
-  {"step_id": "database", "tool": "philosopher-database"},
-  {"step_id": "search", "tool": "msfragger-closed"},
-  {"step_id": "rescore", "tool": "percolator"},
-  {"step_id": "to_pepxml", "tool": "percolator-to-pepxml"},
-  {"step_id": "report", "tool": "philosopher-report"},
-  {"step_id": "quant", "tool": "ionquant"},
-  {"step_id": "tmtquant", "tool": "tmtintegrator"}
+  {"step_id": "database", "tool": "database"},
+  {"step_id": "search", "tool": "search-closed"},
+  {"step_id": "rescore", "tool": "rescore"},
+  {"step_id": "to_pepxml", "tool": "rescore-export"},
+  {"step_id": "report", "tool": "report"},
+  {"step_id": "quant", "tool": "quant"},
+  {"step_id": "tmtquant", "tool": "quant-isobaric"}
 ],"edges":[
   {"src": "convert", "dst": "search"},
   {"src": "search", "dst": "rescore"},
@@ -1062,21 +1062,21 @@
 ]}
 ```
 
-### `fp-tmt16-ms3`
-- **用途**:Migrated from FragPipe 'TMT16-MS3.workflow'. Original workflow also enabled: ['skyline'] (dropped — non-critical layers; downstream FDR still valid). Requires user-supplied target FASTA (the `database` step builds the decoy variant).
+### `tmt16-ms3`
+- **用途**:迁移自官方模板 'TMT16-MS3.workflow'. Original workflow also enabled: ['skyline'] (dropped — non-critical layers; downstream FDR still valid). Requires user-supplied target FASTA (the `database` step builds the decoy variant).
 - **输入**:谱图 `raw_files`(mzML/raw);`fasta_path`=**target 蛋白库**(database 步自动建 decoy)；**`annotation_path`**=通道→样本标注(TMT/iTRAQ 必需)
-- **调用(推荐)**:`{"template_id":"fp-tmt16-ms3","raw_files":["谱图"],"fasta_path":"蛋白库","annotation_path":"annotation.txt"}`
+- **调用(推荐)**:`{"template_id":"tmt16-ms3","raw_files":["谱图"],"fasta_path":"蛋白库","annotation_path":"annotation.txt"}`
 - **DAG**(同 pipeline.json 格式,可复制改造):
 ```json
 {"steps":[
   {"step_id": "convert", "tool": "msconvert"},
-  {"step_id": "database", "tool": "philosopher-database"},
-  {"step_id": "search", "tool": "msfragger-closed"},
-  {"step_id": "rescore", "tool": "percolator"},
-  {"step_id": "to_pepxml", "tool": "percolator-to-pepxml"},
-  {"step_id": "report", "tool": "philosopher-report"},
-  {"step_id": "quant", "tool": "ionquant"},
-  {"step_id": "tmtquant", "tool": "tmtintegrator"}
+  {"step_id": "database", "tool": "database"},
+  {"step_id": "search", "tool": "search-closed"},
+  {"step_id": "rescore", "tool": "rescore"},
+  {"step_id": "to_pepxml", "tool": "rescore-export"},
+  {"step_id": "report", "tool": "report"},
+  {"step_id": "quant", "tool": "quant"},
+  {"step_id": "tmtquant", "tool": "quant-isobaric"}
 ],"edges":[
   {"src": "convert", "dst": "search"},
   {"src": "search", "dst": "rescore"},
@@ -1091,22 +1091,22 @@
 ]}
 ```
 
-### `fp-tmt16-phospho`
-- **用途**:Migrated from FragPipe 'TMT16-phospho.workflow'. Original workflow also enabled: ['skyline'] (dropped — non-critical layers; downstream FDR still valid). Requires user-supplied target FASTA (the `database` step builds the decoy variant).
+### `tmt16-phospho`
+- **用途**:迁移自官方模板 'TMT16-phospho.workflow'. Original workflow also enabled: ['skyline'] (dropped — non-critical layers; downstream FDR still valid). Requires user-supplied target FASTA (the `database` step builds the decoy variant).
 - **输入**:谱图 `raw_files`(mzML/raw);`fasta_path`=**target 蛋白库**(database 步自动建 decoy)；**`annotation_path`**=通道→样本标注(TMT/iTRAQ 必需)
-- **调用(推荐)**:`{"template_id":"fp-tmt16-phospho","raw_files":["谱图"],"fasta_path":"蛋白库","annotation_path":"annotation.txt"}`
+- **调用(推荐)**:`{"template_id":"tmt16-phospho","raw_files":["谱图"],"fasta_path":"蛋白库","annotation_path":"annotation.txt"}`
 - **DAG**(同 pipeline.json 格式,可复制改造):
 ```json
 {"steps":[
   {"step_id": "convert", "tool": "msconvert"},
-  {"step_id": "database", "tool": "philosopher-database"},
-  {"step_id": "search", "tool": "msfragger-closed"},
-  {"step_id": "rescore", "tool": "percolator"},
-  {"step_id": "to_pepxml", "tool": "percolator-to-pepxml"},
-  {"step_id": "localize", "tool": "ptmprophet"},
-  {"step_id": "report", "tool": "philosopher-report"},
-  {"step_id": "quant", "tool": "ionquant"},
-  {"step_id": "tmtquant", "tool": "tmtintegrator"}
+  {"step_id": "database", "tool": "database"},
+  {"step_id": "search", "tool": "search-closed"},
+  {"step_id": "rescore", "tool": "rescore"},
+  {"step_id": "to_pepxml", "tool": "rescore-export"},
+  {"step_id": "localize", "tool": "ptm-localize"},
+  {"step_id": "report", "tool": "report"},
+  {"step_id": "quant", "tool": "quant"},
+  {"step_id": "tmtquant", "tool": "quant-isobaric"}
 ],"edges":[
   {"src": "convert", "dst": "search"},
   {"src": "search", "dst": "rescore"},
@@ -1122,22 +1122,22 @@
 ]}
 ```
 
-### `fp-tmt16-ubiquitination-k-tmt-or-ubiq`
-- **用途**:Migrated from FragPipe 'TMT16-ubiquitination-K_tmt_or_ubiq.workflow'. Original workflow also enabled: ['skyline'] (dropped — non-critical layers; downstream FDR still valid). Requires user-supplied target FASTA (the `database` step builds the decoy variant).
+### `tmt16-ubiquitination-k-tmt-or-ubiq`
+- **用途**:迁移自官方模板 'TMT16-ubiquitination-K_tmt_or_ubiq.workflow'. Original workflow also enabled: ['skyline'] (dropped — non-critical layers; downstream FDR still valid). Requires user-supplied target FASTA (the `database` step builds the decoy variant).
 - **输入**:谱图 `raw_files`(mzML/raw);`fasta_path`=**target 蛋白库**(database 步自动建 decoy)；**`annotation_path`**=通道→样本标注(TMT/iTRAQ 必需)
-- **调用(推荐)**:`{"template_id":"fp-tmt16-ubiquitination-k-tmt-or-ubiq","raw_files":["谱图"],"fasta_path":"蛋白库","annotation_path":"annotation.txt"}`
+- **调用(推荐)**:`{"template_id":"tmt16-ubiquitination-k-tmt-or-ubiq","raw_files":["谱图"],"fasta_path":"蛋白库","annotation_path":"annotation.txt"}`
 - **DAG**(同 pipeline.json 格式,可复制改造):
 ```json
 {"steps":[
   {"step_id": "convert", "tool": "msconvert"},
-  {"step_id": "database", "tool": "philosopher-database"},
-  {"step_id": "search", "tool": "msfragger-closed"},
-  {"step_id": "rescore", "tool": "percolator"},
-  {"step_id": "to_pepxml", "tool": "percolator-to-pepxml"},
-  {"step_id": "localize", "tool": "ptmprophet"},
-  {"step_id": "report", "tool": "philosopher-report"},
-  {"step_id": "quant", "tool": "ionquant"},
-  {"step_id": "tmtquant", "tool": "tmtintegrator"}
+  {"step_id": "database", "tool": "database"},
+  {"step_id": "search", "tool": "search-closed"},
+  {"step_id": "rescore", "tool": "rescore"},
+  {"step_id": "to_pepxml", "tool": "rescore-export"},
+  {"step_id": "localize", "tool": "ptm-localize"},
+  {"step_id": "report", "tool": "report"},
+  {"step_id": "quant", "tool": "quant"},
+  {"step_id": "tmtquant", "tool": "quant-isobaric"}
 ],"edges":[
   {"src": "convert", "dst": "search"},
   {"src": "search", "dst": "rescore"},
@@ -1153,22 +1153,22 @@
 ]}
 ```
 
-### `fp-tmt16-ubiquitination-k-tmt-plus-ubiq`
-- **用途**:Migrated from FragPipe 'TMT16-ubiquitination-K_tmt_plus_ubiq.workflow'. Original workflow also enabled: ['skyline'] (dropped — non-critical layers; downstream FDR still valid). Requires user-supplied target FASTA (the `database` step builds the decoy variant).
+### `tmt16-ubiquitination-k-tmt-plus-ubiq`
+- **用途**:迁移自官方模板 'TMT16-ubiquitination-K_tmt_plus_ubiq.workflow'. Original workflow also enabled: ['skyline'] (dropped — non-critical layers; downstream FDR still valid). Requires user-supplied target FASTA (the `database` step builds the decoy variant).
 - **输入**:谱图 `raw_files`(mzML/raw);`fasta_path`=**target 蛋白库**(database 步自动建 decoy)；**`annotation_path`**=通道→样本标注(TMT/iTRAQ 必需)
-- **调用(推荐)**:`{"template_id":"fp-tmt16-ubiquitination-k-tmt-plus-ubiq","raw_files":["谱图"],"fasta_path":"蛋白库","annotation_path":"annotation.txt"}`
+- **调用(推荐)**:`{"template_id":"tmt16-ubiquitination-k-tmt-plus-ubiq","raw_files":["谱图"],"fasta_path":"蛋白库","annotation_path":"annotation.txt"}`
 - **DAG**(同 pipeline.json 格式,可复制改造):
 ```json
 {"steps":[
   {"step_id": "convert", "tool": "msconvert"},
-  {"step_id": "database", "tool": "philosopher-database"},
-  {"step_id": "search", "tool": "msfragger-closed"},
-  {"step_id": "rescore", "tool": "percolator"},
-  {"step_id": "to_pepxml", "tool": "percolator-to-pepxml"},
-  {"step_id": "localize", "tool": "ptmprophet"},
-  {"step_id": "report", "tool": "philosopher-report"},
-  {"step_id": "quant", "tool": "ionquant"},
-  {"step_id": "tmtquant", "tool": "tmtintegrator"}
+  {"step_id": "database", "tool": "database"},
+  {"step_id": "search", "tool": "search-closed"},
+  {"step_id": "rescore", "tool": "rescore"},
+  {"step_id": "to_pepxml", "tool": "rescore-export"},
+  {"step_id": "localize", "tool": "ptm-localize"},
+  {"step_id": "report", "tool": "report"},
+  {"step_id": "quant", "tool": "quant"},
+  {"step_id": "tmtquant", "tool": "quant-isobaric"}
 ],"edges":[
   {"src": "convert", "dst": "search"},
   {"src": "search", "dst": "rescore"},
@@ -1184,21 +1184,21 @@
 ]}
 ```
 
-### `fp-tmt18-astral`
-- **用途**:Migrated from FragPipe 'TMT18-Astral.workflow'. Original workflow also enabled: ['skyline'] (dropped — non-critical layers; downstream FDR still valid). Requires user-supplied target FASTA (the `database` step builds the decoy variant).
+### `tmt18-astral`
+- **用途**:迁移自官方模板 'TMT18-Astral.workflow'. Original workflow also enabled: ['skyline'] (dropped — non-critical layers; downstream FDR still valid). Requires user-supplied target FASTA (the `database` step builds the decoy variant).
 - **输入**:谱图 `raw_files`(mzML/raw);`fasta_path`=**target 蛋白库**(database 步自动建 decoy)；**`annotation_path`**=通道→样本标注(TMT/iTRAQ 必需)
-- **调用(推荐)**:`{"template_id":"fp-tmt18-astral","raw_files":["谱图"],"fasta_path":"蛋白库","annotation_path":"annotation.txt"}`
+- **调用(推荐)**:`{"template_id":"tmt18-astral","raw_files":["谱图"],"fasta_path":"蛋白库","annotation_path":"annotation.txt"}`
 - **DAG**(同 pipeline.json 格式,可复制改造):
 ```json
 {"steps":[
   {"step_id": "convert", "tool": "msconvert"},
-  {"step_id": "database", "tool": "philosopher-database"},
-  {"step_id": "search", "tool": "msfragger-closed"},
-  {"step_id": "rescore", "tool": "percolator"},
-  {"step_id": "to_pepxml", "tool": "percolator-to-pepxml"},
-  {"step_id": "report", "tool": "philosopher-report"},
-  {"step_id": "quant", "tool": "ionquant"},
-  {"step_id": "tmtquant", "tool": "tmtintegrator"}
+  {"step_id": "database", "tool": "database"},
+  {"step_id": "search", "tool": "search-closed"},
+  {"step_id": "rescore", "tool": "rescore"},
+  {"step_id": "to_pepxml", "tool": "rescore-export"},
+  {"step_id": "report", "tool": "report"},
+  {"step_id": "quant", "tool": "quant"},
+  {"step_id": "tmtquant", "tool": "quant-isobaric"}
 ],"edges":[
   {"src": "convert", "dst": "search"},
   {"src": "search", "dst": "rescore"},
@@ -1213,22 +1213,22 @@
 ]}
 ```
 
-### `fp-tmt18-phospho`
+### `tmt18-phospho`
 - **用途**:Custom TMTpro-18 phospho workflow derived by hand from FragPipe 'TMT16-phospho.workflow' (channel_num bumped 16→18); FragPipe ships no official TMT18-phospho. Original TMT16 workflow also enabled: ['skyline'] (dropped — non-critical layers; downstream FDR still valid). Requires user-supplied target FASTA (the `database` step builds the decoy variant).
 - **输入**:谱图 `raw_files`(mzML/raw);`fasta_path`=**target 蛋白库**(database 步自动建 decoy)；**`annotation_path`**=通道→样本标注(TMT/iTRAQ 必需)
-- **调用(推荐)**:`{"template_id":"fp-tmt18-phospho","raw_files":["谱图"],"fasta_path":"蛋白库","annotation_path":"annotation.txt"}`
+- **调用(推荐)**:`{"template_id":"tmt18-phospho","raw_files":["谱图"],"fasta_path":"蛋白库","annotation_path":"annotation.txt"}`
 - **DAG**(同 pipeline.json 格式,可复制改造):
 ```json
 {"steps":[
   {"step_id": "convert", "tool": "msconvert"},
-  {"step_id": "database", "tool": "philosopher-database"},
-  {"step_id": "search", "tool": "msfragger-closed"},
-  {"step_id": "rescore", "tool": "percolator"},
-  {"step_id": "to_pepxml", "tool": "percolator-to-pepxml"},
-  {"step_id": "localize", "tool": "ptmprophet"},
-  {"step_id": "report", "tool": "philosopher-report"},
-  {"step_id": "quant", "tool": "ionquant"},
-  {"step_id": "tmtquant", "tool": "tmtintegrator"}
+  {"step_id": "database", "tool": "database"},
+  {"step_id": "search", "tool": "search-closed"},
+  {"step_id": "rescore", "tool": "rescore"},
+  {"step_id": "to_pepxml", "tool": "rescore-export"},
+  {"step_id": "localize", "tool": "ptm-localize"},
+  {"step_id": "report", "tool": "report"},
+  {"step_id": "quant", "tool": "quant"},
+  {"step_id": "tmtquant", "tool": "quant-isobaric"}
 ],"edges":[
   {"src": "convert", "dst": "search"},
   {"src": "search", "dst": "rescore"},
@@ -1244,21 +1244,21 @@
 ]}
 ```
 
-### `fp-tmt35`
-- **用途**:Migrated from FragPipe 'TMT35.workflow'. Original workflow also enabled: ['skyline'] (dropped — non-critical layers; downstream FDR still valid). Requires user-supplied target FASTA (the `database` step builds the decoy variant).
+### `tmt35`
+- **用途**:迁移自官方模板 'TMT35.workflow'. Original workflow also enabled: ['skyline'] (dropped — non-critical layers; downstream FDR still valid). Requires user-supplied target FASTA (the `database` step builds the decoy variant).
 - **输入**:谱图 `raw_files`(mzML/raw);`fasta_path`=**target 蛋白库**(database 步自动建 decoy)；**`annotation_path`**=通道→样本标注(TMT/iTRAQ 必需)
-- **调用(推荐)**:`{"template_id":"fp-tmt35","raw_files":["谱图"],"fasta_path":"蛋白库","annotation_path":"annotation.txt"}`
+- **调用(推荐)**:`{"template_id":"tmt35","raw_files":["谱图"],"fasta_path":"蛋白库","annotation_path":"annotation.txt"}`
 - **DAG**(同 pipeline.json 格式,可复制改造):
 ```json
 {"steps":[
   {"step_id": "convert", "tool": "msconvert"},
-  {"step_id": "database", "tool": "philosopher-database"},
-  {"step_id": "search", "tool": "msfragger-closed"},
-  {"step_id": "rescore", "tool": "percolator"},
-  {"step_id": "to_pepxml", "tool": "percolator-to-pepxml"},
-  {"step_id": "report", "tool": "philosopher-report"},
-  {"step_id": "quant", "tool": "ionquant"},
-  {"step_id": "tmtquant", "tool": "tmtintegrator"}
+  {"step_id": "database", "tool": "database"},
+  {"step_id": "search", "tool": "search-closed"},
+  {"step_id": "rescore", "tool": "rescore"},
+  {"step_id": "to_pepxml", "tool": "rescore-export"},
+  {"step_id": "report", "tool": "report"},
+  {"step_id": "quant", "tool": "quant"},
+  {"step_id": "tmtquant", "tool": "quant-isobaric"}
 ],"edges":[
   {"src": "convert", "dst": "search"},
   {"src": "search", "dst": "rescore"},
@@ -1276,19 +1276,19 @@
 
 ## 5. 糖肽(N-/O-glyco)
 
-### `fp-glyco-n-hcd`
-- **用途**:Migrated from FragPipe 'glyco-N-HCD.workflow'. Original workflow also enabled: ['skyline'] (dropped — non-critical layers; downstream FDR still valid). Requires user-supplied target FASTA (the `database` step builds the decoy variant).
+### `glyco-n-hcd`
+- **用途**:迁移自官方模板 'glyco-N-HCD.workflow'. Original workflow also enabled: ['skyline'] (dropped — non-critical layers; downstream FDR still valid). Requires user-supplied target FASTA (the `database` step builds the decoy variant).
 - **输入**:谱图 `raw_files`(mzML/raw);`fasta_path`=**target 蛋白库**(database 步自动建 decoy)
-- **调用(推荐)**:`{"template_id":"fp-glyco-n-hcd","raw_files":["谱图"],"fasta_path":"蛋白库"}`
+- **调用(推荐)**:`{"template_id":"glyco-n-hcd","raw_files":["谱图"],"fasta_path":"蛋白库"}`
 - **DAG**(同 pipeline.json 格式,可复制改造):
 ```json
 {"steps":[
   {"step_id": "convert", "tool": "msconvert"},
-  {"step_id": "database", "tool": "philosopher-database"},
-  {"step_id": "search", "tool": "msfragger-closed"},
-  {"step_id": "validate", "tool": "peptideprophet"},
-  {"step_id": "report", "tool": "philosopher-report"},
-  {"step_id": "quant", "tool": "ionquant"}
+  {"step_id": "database", "tool": "database"},
+  {"step_id": "search", "tool": "search-closed"},
+  {"step_id": "validate", "tool": "validate-psm"},
+  {"step_id": "report", "tool": "report"},
+  {"step_id": "quant", "tool": "quant"}
 ],"edges":[
   {"src": "convert", "dst": "search"},
   {"src": "search", "dst": "validate"},
@@ -1300,19 +1300,19 @@
 ]}
 ```
 
-### `fp-glyco-n-hybrid`
-- **用途**:Migrated from FragPipe 'glyco-N-Hybrid.workflow'. Original workflow also enabled: ['skyline'] (dropped — non-critical layers; downstream FDR still valid). Requires user-supplied target FASTA (the `database` step builds the decoy variant).
+### `glyco-n-hybrid`
+- **用途**:迁移自官方模板 'glyco-N-Hybrid.workflow'. Original workflow also enabled: ['skyline'] (dropped — non-critical layers; downstream FDR still valid). Requires user-supplied target FASTA (the `database` step builds the decoy variant).
 - **输入**:谱图 `raw_files`(mzML/raw);`fasta_path`=**target 蛋白库**(database 步自动建 decoy)
-- **调用(推荐)**:`{"template_id":"fp-glyco-n-hybrid","raw_files":["谱图"],"fasta_path":"蛋白库"}`
+- **调用(推荐)**:`{"template_id":"glyco-n-hybrid","raw_files":["谱图"],"fasta_path":"蛋白库"}`
 - **DAG**(同 pipeline.json 格式,可复制改造):
 ```json
 {"steps":[
   {"step_id": "convert", "tool": "msconvert"},
-  {"step_id": "database", "tool": "philosopher-database"},
-  {"step_id": "search", "tool": "msfragger-closed"},
-  {"step_id": "validate", "tool": "peptideprophet"},
-  {"step_id": "report", "tool": "philosopher-report"},
-  {"step_id": "quant", "tool": "ionquant"}
+  {"step_id": "database", "tool": "database"},
+  {"step_id": "search", "tool": "search-closed"},
+  {"step_id": "validate", "tool": "validate-psm"},
+  {"step_id": "report", "tool": "report"},
+  {"step_id": "quant", "tool": "quant"}
 ],"edges":[
   {"src": "convert", "dst": "search"},
   {"src": "search", "dst": "validate"},
@@ -1324,19 +1324,19 @@
 ]}
 ```
 
-### `fp-glyco-n-lfq`
-- **用途**:Migrated from FragPipe 'glyco-N-LFQ.workflow'. Original workflow also enabled: ['skyline'] (dropped — non-critical layers; downstream FDR still valid). Requires user-supplied target FASTA (the `database` step builds the decoy variant).
+### `glyco-n-lfq`
+- **用途**:迁移自官方模板 'glyco-N-LFQ.workflow'. Original workflow also enabled: ['skyline'] (dropped — non-critical layers; downstream FDR still valid). Requires user-supplied target FASTA (the `database` step builds the decoy variant).
 - **输入**:谱图 `raw_files`(mzML/raw);`fasta_path`=**target 蛋白库**(database 步自动建 decoy)
-- **调用(推荐)**:`{"template_id":"fp-glyco-n-lfq","raw_files":["谱图"],"fasta_path":"蛋白库"}`
+- **调用(推荐)**:`{"template_id":"glyco-n-lfq","raw_files":["谱图"],"fasta_path":"蛋白库"}`
 - **DAG**(同 pipeline.json 格式,可复制改造):
 ```json
 {"steps":[
   {"step_id": "convert", "tool": "msconvert"},
-  {"step_id": "database", "tool": "philosopher-database"},
-  {"step_id": "search", "tool": "msfragger-closed"},
-  {"step_id": "validate", "tool": "peptideprophet"},
-  {"step_id": "report", "tool": "philosopher-report"},
-  {"step_id": "quant", "tool": "ionquant"}
+  {"step_id": "database", "tool": "database"},
+  {"step_id": "search", "tool": "search-closed"},
+  {"step_id": "validate", "tool": "validate-psm"},
+  {"step_id": "report", "tool": "report"},
+  {"step_id": "quant", "tool": "quant"}
 ],"edges":[
   {"src": "convert", "dst": "search"},
   {"src": "search", "dst": "validate"},
@@ -1348,21 +1348,21 @@
 ]}
 ```
 
-### `fp-glyco-n-open-hcd`
-- **用途**:Migrated from FragPipe 'glyco-N-open-HCD.workflow'. Original workflow also enabled: ['skyline'] (dropped — non-critical layers; downstream FDR still valid). Requires user-supplied target FASTA (the `database` step builds the decoy variant).
+### `glyco-n-open-hcd`
+- **用途**:迁移自官方模板 'glyco-N-open-HCD.workflow'. Original workflow also enabled: ['skyline'] (dropped — non-critical layers; downstream FDR still valid). Requires user-supplied target FASTA (the `database` step builds the decoy variant).
 - **输入**:谱图 `raw_files`(mzML/raw);`fasta_path`=**target 蛋白库**(database 步自动建 decoy)
-- **调用(推荐)**:`{"template_id":"fp-glyco-n-open-hcd","raw_files":["谱图"],"fasta_path":"蛋白库"}`
+- **调用(推荐)**:`{"template_id":"glyco-n-open-hcd","raw_files":["谱图"],"fasta_path":"蛋白库"}`
 - **DAG**(同 pipeline.json 格式,可复制改造):
 ```json
 {"steps":[
   {"step_id": "convert", "tool": "msconvert"},
-  {"step_id": "database", "tool": "philosopher-database"},
-  {"step_id": "search", "tool": "msfragger-closed"},
-  {"step_id": "cleanup", "tool": "crystalc"},
-  {"step_id": "validate", "tool": "peptideprophet"},
-  {"step_id": "report", "tool": "philosopher-report"},
-  {"step_id": "quant", "tool": "ionquant"},
-  {"step_id": "ptm_summary", "tool": "ptmshepherd"}
+  {"step_id": "database", "tool": "database"},
+  {"step_id": "search", "tool": "search-closed"},
+  {"step_id": "cleanup", "tool": "precursor-refine"},
+  {"step_id": "validate", "tool": "validate-psm"},
+  {"step_id": "report", "tool": "report"},
+  {"step_id": "quant", "tool": "quant"},
+  {"step_id": "ptm_summary", "tool": "ptm-profile"}
 ],"edges":[
   {"src": "convert", "dst": "search"},
   {"src": "search", "dst": "cleanup"},
@@ -1379,21 +1379,21 @@
 ]}
 ```
 
-### `fp-glyco-n-open-hybrid`
-- **用途**:Migrated from FragPipe 'glyco-N-open-Hybrid.workflow'. Original workflow also enabled: ['skyline'] (dropped — non-critical layers; downstream FDR still valid). Requires user-supplied target FASTA (the `database` step builds the decoy variant).
+### `glyco-n-open-hybrid`
+- **用途**:迁移自官方模板 'glyco-N-open-Hybrid.workflow'. Original workflow also enabled: ['skyline'] (dropped — non-critical layers; downstream FDR still valid). Requires user-supplied target FASTA (the `database` step builds the decoy variant).
 - **输入**:谱图 `raw_files`(mzML/raw);`fasta_path`=**target 蛋白库**(database 步自动建 decoy)
-- **调用(推荐)**:`{"template_id":"fp-glyco-n-open-hybrid","raw_files":["谱图"],"fasta_path":"蛋白库"}`
+- **调用(推荐)**:`{"template_id":"glyco-n-open-hybrid","raw_files":["谱图"],"fasta_path":"蛋白库"}`
 - **DAG**(同 pipeline.json 格式,可复制改造):
 ```json
 {"steps":[
   {"step_id": "convert", "tool": "msconvert"},
-  {"step_id": "database", "tool": "philosopher-database"},
-  {"step_id": "search", "tool": "msfragger-closed"},
-  {"step_id": "cleanup", "tool": "crystalc"},
-  {"step_id": "validate", "tool": "peptideprophet"},
-  {"step_id": "report", "tool": "philosopher-report"},
-  {"step_id": "quant", "tool": "ionquant"},
-  {"step_id": "ptm_summary", "tool": "ptmshepherd"}
+  {"step_id": "database", "tool": "database"},
+  {"step_id": "search", "tool": "search-closed"},
+  {"step_id": "cleanup", "tool": "precursor-refine"},
+  {"step_id": "validate", "tool": "validate-psm"},
+  {"step_id": "report", "tool": "report"},
+  {"step_id": "quant", "tool": "quant"},
+  {"step_id": "ptm_summary", "tool": "ptm-profile"}
 ],"edges":[
   {"src": "convert", "dst": "search"},
   {"src": "search", "dst": "cleanup"},
@@ -1410,19 +1410,19 @@
 ]}
 ```
 
-### `fp-glyco-o-hcd`
-- **用途**:Migrated from FragPipe 'glyco-O-HCD.workflow'. Original workflow also enabled: ['skyline'] (dropped — non-critical layers; downstream FDR still valid). Requires user-supplied target FASTA (the `database` step builds the decoy variant).
+### `glyco-o-hcd`
+- **用途**:迁移自官方模板 'glyco-O-HCD.workflow'. Original workflow also enabled: ['skyline'] (dropped — non-critical layers; downstream FDR still valid). Requires user-supplied target FASTA (the `database` step builds the decoy variant).
 - **输入**:谱图 `raw_files`(mzML/raw);`fasta_path`=**target 蛋白库**(database 步自动建 decoy)
-- **调用(推荐)**:`{"template_id":"fp-glyco-o-hcd","raw_files":["谱图"],"fasta_path":"蛋白库"}`
+- **调用(推荐)**:`{"template_id":"glyco-o-hcd","raw_files":["谱图"],"fasta_path":"蛋白库"}`
 - **DAG**(同 pipeline.json 格式,可复制改造):
 ```json
 {"steps":[
   {"step_id": "convert", "tool": "msconvert"},
-  {"step_id": "database", "tool": "philosopher-database"},
-  {"step_id": "search", "tool": "msfragger-closed"},
-  {"step_id": "validate", "tool": "peptideprophet"},
-  {"step_id": "report", "tool": "philosopher-report"},
-  {"step_id": "quant", "tool": "ionquant"}
+  {"step_id": "database", "tool": "database"},
+  {"step_id": "search", "tool": "search-closed"},
+  {"step_id": "validate", "tool": "validate-psm"},
+  {"step_id": "report", "tool": "report"},
+  {"step_id": "quant", "tool": "quant"}
 ],"edges":[
   {"src": "convert", "dst": "search"},
   {"src": "search", "dst": "validate"},
@@ -1434,20 +1434,20 @@
 ]}
 ```
 
-### `fp-glyco-o-hybrid`
-- **用途**:Migrated from FragPipe 'glyco-O-Hybrid.workflow'. Original workflow also enabled: ['skyline'] (dropped — non-critical layers; downstream FDR still valid). Requires user-supplied target FASTA (the `database` step builds the decoy variant).
+### `glyco-o-hybrid`
+- **用途**:迁移自官方模板 'glyco-O-Hybrid.workflow'. Original workflow also enabled: ['skyline'] (dropped — non-critical layers; downstream FDR still valid). Requires user-supplied target FASTA (the `database` step builds the decoy variant).
 - **输入**:谱图 `raw_files`(mzML/raw);`fasta_path`=**target 蛋白库**(database 步自动建 decoy)
-- **调用(推荐)**:`{"template_id":"fp-glyco-o-hybrid","raw_files":["谱图"],"fasta_path":"蛋白库"}`
+- **调用(推荐)**:`{"template_id":"glyco-o-hybrid","raw_files":["谱图"],"fasta_path":"蛋白库"}`
 - **DAG**(同 pipeline.json 格式,可复制改造):
 ```json
 {"steps":[
   {"step_id": "convert", "tool": "msconvert"},
-  {"step_id": "database", "tool": "philosopher-database"},
-  {"step_id": "search", "tool": "msfragger-closed"},
-  {"step_id": "validate", "tool": "peptideprophet"},
-  {"step_id": "report", "tool": "philosopher-report"},
-  {"step_id": "quant", "tool": "ionquant"},
-  {"step_id": "oglyc_localize", "tool": "opair"}
+  {"step_id": "database", "tool": "database"},
+  {"step_id": "search", "tool": "search-closed"},
+  {"step_id": "validate", "tool": "validate-psm"},
+  {"step_id": "report", "tool": "report"},
+  {"step_id": "quant", "tool": "quant"},
+  {"step_id": "oglyc_localize", "tool": "glyco-localize"}
 ],"edges":[
   {"src": "convert", "dst": "search"},
   {"src": "search", "dst": "validate"},
@@ -1461,21 +1461,21 @@
 ]}
 ```
 
-### `fp-glyco-o-open-hcd`
-- **用途**:Migrated from FragPipe 'glyco-O-open-HCD.workflow'. Original workflow also enabled: ['skyline'] (dropped — non-critical layers; downstream FDR still valid). Requires user-supplied target FASTA (the `database` step builds the decoy variant).
+### `glyco-o-open-hcd`
+- **用途**:迁移自官方模板 'glyco-O-open-HCD.workflow'. Original workflow also enabled: ['skyline'] (dropped — non-critical layers; downstream FDR still valid). Requires user-supplied target FASTA (the `database` step builds the decoy variant).
 - **输入**:谱图 `raw_files`(mzML/raw);`fasta_path`=**target 蛋白库**(database 步自动建 decoy)
-- **调用(推荐)**:`{"template_id":"fp-glyco-o-open-hcd","raw_files":["谱图"],"fasta_path":"蛋白库"}`
+- **调用(推荐)**:`{"template_id":"glyco-o-open-hcd","raw_files":["谱图"],"fasta_path":"蛋白库"}`
 - **DAG**(同 pipeline.json 格式,可复制改造):
 ```json
 {"steps":[
   {"step_id": "convert", "tool": "msconvert"},
-  {"step_id": "database", "tool": "philosopher-database"},
-  {"step_id": "search", "tool": "msfragger-closed"},
-  {"step_id": "cleanup", "tool": "crystalc"},
-  {"step_id": "validate", "tool": "peptideprophet"},
-  {"step_id": "report", "tool": "philosopher-report"},
-  {"step_id": "quant", "tool": "ionquant"},
-  {"step_id": "ptm_summary", "tool": "ptmshepherd"}
+  {"step_id": "database", "tool": "database"},
+  {"step_id": "search", "tool": "search-closed"},
+  {"step_id": "cleanup", "tool": "precursor-refine"},
+  {"step_id": "validate", "tool": "validate-psm"},
+  {"step_id": "report", "tool": "report"},
+  {"step_id": "quant", "tool": "quant"},
+  {"step_id": "ptm_summary", "tool": "ptm-profile"}
 ],"edges":[
   {"src": "convert", "dst": "search"},
   {"src": "search", "dst": "cleanup"},
@@ -1492,21 +1492,21 @@
 ]}
 ```
 
-### `fp-glyco-o-open-hybrid`
-- **用途**:Migrated from FragPipe 'glyco-O-open-Hybrid.workflow'. Original workflow also enabled: ['skyline'] (dropped — non-critical layers; downstream FDR still valid). Requires user-supplied target FASTA (the `database` step builds the decoy variant).
+### `glyco-o-open-hybrid`
+- **用途**:迁移自官方模板 'glyco-O-open-Hybrid.workflow'. Original workflow also enabled: ['skyline'] (dropped — non-critical layers; downstream FDR still valid). Requires user-supplied target FASTA (the `database` step builds the decoy variant).
 - **输入**:谱图 `raw_files`(mzML/raw);`fasta_path`=**target 蛋白库**(database 步自动建 decoy)
-- **调用(推荐)**:`{"template_id":"fp-glyco-o-open-hybrid","raw_files":["谱图"],"fasta_path":"蛋白库"}`
+- **调用(推荐)**:`{"template_id":"glyco-o-open-hybrid","raw_files":["谱图"],"fasta_path":"蛋白库"}`
 - **DAG**(同 pipeline.json 格式,可复制改造):
 ```json
 {"steps":[
   {"step_id": "convert", "tool": "msconvert"},
-  {"step_id": "database", "tool": "philosopher-database"},
-  {"step_id": "search", "tool": "msfragger-closed"},
-  {"step_id": "cleanup", "tool": "crystalc"},
-  {"step_id": "validate", "tool": "peptideprophet"},
-  {"step_id": "report", "tool": "philosopher-report"},
-  {"step_id": "quant", "tool": "ionquant"},
-  {"step_id": "ptm_summary", "tool": "ptmshepherd"}
+  {"step_id": "database", "tool": "database"},
+  {"step_id": "search", "tool": "search-closed"},
+  {"step_id": "cleanup", "tool": "precursor-refine"},
+  {"step_id": "validate", "tool": "validate-psm"},
+  {"step_id": "report", "tool": "report"},
+  {"step_id": "quant", "tool": "quant"},
+  {"step_id": "ptm_summary", "tool": "ptm-profile"}
 ],"edges":[
   {"src": "convert", "dst": "search"},
   {"src": "search", "dst": "cleanup"},
@@ -1523,20 +1523,20 @@
 ]}
 ```
 
-### `fp-glyco-o-pair`
-- **用途**:Migrated from FragPipe 'glyco-O-Pair.workflow'. Original workflow also enabled: ['skyline'] (dropped — non-critical layers; downstream FDR still valid). Requires user-supplied target FASTA (the `database` step builds the decoy variant).
+### `glyco-o-pair`
+- **用途**:迁移自官方模板 'glyco-O-Pair.workflow'. Original workflow also enabled: ['skyline'] (dropped — non-critical layers; downstream FDR still valid). Requires user-supplied target FASTA (the `database` step builds the decoy variant).
 - **输入**:谱图 `raw_files`(mzML/raw);`fasta_path`=**target 蛋白库**(database 步自动建 decoy)
-- **调用(推荐)**:`{"template_id":"fp-glyco-o-pair","raw_files":["谱图"],"fasta_path":"蛋白库"}`
+- **调用(推荐)**:`{"template_id":"glyco-o-pair","raw_files":["谱图"],"fasta_path":"蛋白库"}`
 - **DAG**(同 pipeline.json 格式,可复制改造):
 ```json
 {"steps":[
   {"step_id": "convert", "tool": "msconvert"},
-  {"step_id": "database", "tool": "philosopher-database"},
-  {"step_id": "search", "tool": "msfragger-closed"},
-  {"step_id": "validate", "tool": "peptideprophet"},
-  {"step_id": "report", "tool": "philosopher-report"},
-  {"step_id": "quant", "tool": "ionquant"},
-  {"step_id": "oglyc_localize", "tool": "opair"}
+  {"step_id": "database", "tool": "database"},
+  {"step_id": "search", "tool": "search-closed"},
+  {"step_id": "validate", "tool": "validate-psm"},
+  {"step_id": "report", "tool": "report"},
+  {"step_id": "quant", "tool": "quant"},
+  {"step_id": "oglyc_localize", "tool": "glyco-localize"}
 ],"edges":[
   {"src": "convert", "dst": "search"},
   {"src": "search", "dst": "validate"},
@@ -1550,19 +1550,19 @@
 ]}
 ```
 
-### `fp-nonspecific-hla-glyco`
-- **用途**:Migrated from FragPipe 'Nonspecific-HLA-glyco.workflow'. Original workflow also enabled: ['skyline'] (dropped — non-critical layers; downstream FDR still valid). Requires user-supplied target FASTA (the `database` step builds the decoy variant).
+### `nonspecific-hla-glyco`
+- **用途**:迁移自官方模板 'Nonspecific-HLA-glyco.workflow'. Original workflow also enabled: ['skyline'] (dropped — non-critical layers; downstream FDR still valid). Requires user-supplied target FASTA (the `database` step builds the decoy variant).
 - **输入**:谱图 `raw_files`(mzML/raw);`fasta_path`=**target 蛋白库**(database 步自动建 decoy)
-- **调用(推荐)**:`{"template_id":"fp-nonspecific-hla-glyco","raw_files":["谱图"],"fasta_path":"蛋白库"}`
+- **调用(推荐)**:`{"template_id":"nonspecific-hla-glyco","raw_files":["谱图"],"fasta_path":"蛋白库"}`
 - **DAG**(同 pipeline.json 格式,可复制改造):
 ```json
 {"steps":[
   {"step_id": "convert", "tool": "msconvert"},
-  {"step_id": "database", "tool": "philosopher-database"},
-  {"step_id": "search", "tool": "msfragger-closed"},
-  {"step_id": "validate", "tool": "peptideprophet"},
-  {"step_id": "report", "tool": "philosopher-report"},
-  {"step_id": "ptm_summary", "tool": "ptmshepherd"}
+  {"step_id": "database", "tool": "database"},
+  {"step_id": "search", "tool": "search-closed"},
+  {"step_id": "validate", "tool": "validate-psm"},
+  {"step_id": "report", "tool": "report"},
+  {"step_id": "ptm_summary", "tool": "ptm-profile"}
 ],"edges":[
   {"src": "convert", "dst": "search"},
   {"src": "search", "dst": "validate"},
@@ -1577,129 +1577,129 @@
 
 ## 6. DIA / diaPASEF
 
-### `fp-chemprot-abpp-diatop`
-- **用途**:Migrated from FragPipe 'chemprot-ABPP-diaTOP.workflow' (DIA path). Original workflow also enabled: ['msbooster', 'skyline'] (dropped). Requires user-supplied spectral library (.tsv/.speclib) on the `diann_quant` step's `library_path` param. Library generation (easypqp / msfragger pre-search) is NOT migrated; supply a pre-built library or generate one separately.
+### `chemprot-abpp-diatop`
+- **用途**:迁移自官方模板 'chemprot-ABPP-diaTOP.workflow' (DIA path). Original workflow also enabled: ['msbooster', 'skyline'] (dropped). Requires user-supplied spectral library (.tsv/.speclib) on the `diann_quant` step's `library_path` param. Library generation (easypqp / msfragger pre-search) is NOT migrated; supply a pre-built library or generate one separately.
 - **输入**:谱图 `raw_files`(mzML/raw);`fasta_path`=蛋白库(DIA-NN 库无关预测;或 overrides 给 diann 步 `library_path` 现成谱图库)
-- **调用(推荐)**:`{"template_id":"fp-chemprot-abpp-diatop","raw_files":["谱图"],"fasta_path":"蛋白库"}`
+- **调用(推荐)**:`{"template_id":"chemprot-abpp-diatop","raw_files":["谱图"],"fasta_path":"蛋白库"}`
 - **DAG**(同 pipeline.json 格式,可复制改造):
 ```json
 {"steps":[
   {"step_id": "convert", "tool": "msconvert"},
-  {"step_id": "diann_quant", "tool": "diann"}
+  {"step_id": "diann_quant", "tool": "dia-search"}
 ],"edges":[
   {"src": "convert", "dst": "diann_quant"}
 ]}
 ```
 
-### `fp-chemprot-abpp-iadtb-diapasef`
-- **用途**:Migrated from FragPipe 'chemprot-ABPP-IADTB-diaPASEF.workflow' (DIA path). Original workflow also enabled: ['msbooster', 'skyline'] (dropped). Requires user-supplied spectral library (.tsv/.speclib) on the `diann_quant` step's `library_path` param. Library generation (easypqp / msfragger pre-search) is NOT migrated; supply a pre-built library or generate one separately.
+### `chemprot-abpp-iadtb-diapasef`
+- **用途**:迁移自官方模板 'chemprot-ABPP-IADTB-diaPASEF.workflow' (DIA path). Original workflow also enabled: ['msbooster', 'skyline'] (dropped). Requires user-supplied spectral library (.tsv/.speclib) on the `diann_quant` step's `library_path` param. Library generation (easypqp / msfragger pre-search) is NOT migrated; supply a pre-built library or generate one separately.
 - **输入**:谱图 `raw_files`(.d(Bruker timsTOF));`fasta_path`=蛋白库(DIA-NN 库无关预测;或 overrides 给 diann 步 `library_path` 现成谱图库)
-- **调用(推荐)**:`{"template_id":"fp-chemprot-abpp-iadtb-diapasef","raw_files":["谱图"],"fasta_path":"蛋白库"}`
+- **调用(推荐)**:`{"template_id":"chemprot-abpp-iadtb-diapasef","raw_files":["谱图"],"fasta_path":"蛋白库"}`
 - **DAG**(同 pipeline.json 格式,可复制改造):
 ```json
 {"steps":[
-  {"step_id": "diann_quant", "tool": "diann"}
+  {"step_id": "diann_quant", "tool": "dia-search"}
 ],"edges":[
   
 ]}
 ```
 
-### `fp-dia-dia-umpire-speclib-quant`
-- **用途**:Migrated from FragPipe 'DIA_DIA-Umpire_SpecLib_Quant.workflow' (DIA path). Original workflow also enabled: ['diaumpire', 'msbooster', 'skyline'] (dropped). Requires user-supplied spectral library (.tsv/.speclib) on the `diann_quant` step's `library_path` param. Library generation (easypqp / msfragger pre-search) is NOT migrated; supply a pre-built library or generate one separately.
+### `dia-dia-umpire-speclib-quant`
+- **用途**:迁移自官方模板 'DIA_DIA-Umpire_SpecLib_Quant.workflow' (DIA path). Original workflow also enabled: ['diaumpire', 'msbooster', 'skyline'] (dropped). Requires user-supplied spectral library (.tsv/.speclib) on the `diann_quant` step's `library_path` param. Library generation (easypqp / msfragger pre-search) is NOT migrated; supply a pre-built library or generate one separately.
 - **输入**:谱图 `raw_files`(mzML/raw);`fasta_path`=蛋白库(DIA-NN 库无关预测;或 overrides 给 diann 步 `library_path` 现成谱图库)
-- **调用(推荐)**:`{"template_id":"fp-dia-dia-umpire-speclib-quant","raw_files":["谱图"],"fasta_path":"蛋白库"}`
+- **调用(推荐)**:`{"template_id":"dia-dia-umpire-speclib-quant","raw_files":["谱图"],"fasta_path":"蛋白库"}`
 - **DAG**(同 pipeline.json 格式,可复制改造):
 ```json
 {"steps":[
   {"step_id": "convert", "tool": "msconvert"},
-  {"step_id": "diann_quant", "tool": "diann"}
+  {"step_id": "diann_quant", "tool": "dia-search"}
 ],"edges":[
   {"src": "convert", "dst": "diann_quant"}
 ]}
 ```
 
-### `fp-dia-speclib-quant`
-- **用途**:Migrated from FragPipe 'DIA_SpecLib_Quant.workflow' (DIA path). Original workflow also enabled: ['msbooster', 'skyline'] (dropped). Requires user-supplied spectral library (.tsv/.speclib) on the `diann_quant` step's `library_path` param. Library generation (easypqp / msfragger pre-search) is NOT migrated; supply a pre-built library or generate one separately.
+### `dia-speclib-quant`
+- **用途**:迁移自官方模板 'DIA_SpecLib_Quant.workflow' (DIA path). Original workflow also enabled: ['msbooster', 'skyline'] (dropped). Requires user-supplied spectral library (.tsv/.speclib) on the `diann_quant` step's `library_path` param. Library generation (easypqp / msfragger pre-search) is NOT migrated; supply a pre-built library or generate one separately.
 - **输入**:谱图 `raw_files`(mzML/raw);`fasta_path`=蛋白库(DIA-NN 库无关预测;或 overrides 给 diann 步 `library_path` 现成谱图库)
-- **调用(推荐)**:`{"template_id":"fp-dia-speclib-quant","raw_files":["谱图"],"fasta_path":"蛋白库"}`
+- **调用(推荐)**:`{"template_id":"dia-speclib-quant","raw_files":["谱图"],"fasta_path":"蛋白库"}`
 - **DAG**(同 pipeline.json 格式,可复制改造):
 ```json
 {"steps":[
   {"step_id": "convert", "tool": "msconvert"},
-  {"step_id": "diann_quant", "tool": "diann"}
+  {"step_id": "diann_quant", "tool": "dia-search"}
 ],"edges":[
   {"src": "convert", "dst": "diann_quant"}
 ]}
 ```
 
-### `fp-dia-speclib-quant-diapasef`
-- **用途**:Migrated from FragPipe 'DIA_SpecLib_Quant_diaPASEF.workflow' (DIA path). Original workflow also enabled: ['msbooster', 'skyline'] (dropped). Requires user-supplied spectral library (.tsv/.speclib) on the `diann_quant` step's `library_path` param. Library generation (easypqp / msfragger pre-search) is NOT migrated; supply a pre-built library or generate one separately.
+### `dia-speclib-quant-diapasef`
+- **用途**:迁移自官方模板 'DIA_SpecLib_Quant_diaPASEF.workflow' (DIA path). Original workflow also enabled: ['msbooster', 'skyline'] (dropped). Requires user-supplied spectral library (.tsv/.speclib) on the `diann_quant` step's `library_path` param. Library generation (easypqp / msfragger pre-search) is NOT migrated; supply a pre-built library or generate one separately.
 - **输入**:谱图 `raw_files`(.d(Bruker timsTOF));`fasta_path`=蛋白库(DIA-NN 库无关预测;或 overrides 给 diann 步 `library_path` 现成谱图库)
-- **调用(推荐)**:`{"template_id":"fp-dia-speclib-quant-diapasef","raw_files":["谱图"],"fasta_path":"蛋白库"}`
+- **调用(推荐)**:`{"template_id":"dia-speclib-quant-diapasef","raw_files":["谱图"],"fasta_path":"蛋白库"}`
 - **DAG**(同 pipeline.json 格式,可复制改造):
 ```json
 {"steps":[
-  {"step_id": "diann_quant", "tool": "diann"}
+  {"step_id": "diann_quant", "tool": "dia-search"}
 ],"edges":[
   
 ]}
 ```
 
-### `fp-dia-speclib-quant-phospho`
-- **用途**:Migrated from FragPipe 'DIA_SpecLib_Quant_Phospho.workflow' (DIA path). Original workflow also enabled: ['msbooster', 'skyline'] (dropped). Requires user-supplied spectral library (.tsv/.speclib) on the `diann_quant` step's `library_path` param. Library generation (easypqp / msfragger pre-search) is NOT migrated; supply a pre-built library or generate one separately.
+### `dia-speclib-quant-phospho`
+- **用途**:迁移自官方模板 'DIA_SpecLib_Quant_Phospho.workflow' (DIA path). Original workflow also enabled: ['msbooster', 'skyline'] (dropped). Requires user-supplied spectral library (.tsv/.speclib) on the `diann_quant` step's `library_path` param. Library generation (easypqp / msfragger pre-search) is NOT migrated; supply a pre-built library or generate one separately.
 - **输入**:谱图 `raw_files`(mzML/raw);`fasta_path`=蛋白库(DIA-NN 库无关预测;或 overrides 给 diann 步 `library_path` 现成谱图库)
-- **调用(推荐)**:`{"template_id":"fp-dia-speclib-quant-phospho","raw_files":["谱图"],"fasta_path":"蛋白库"}`
+- **调用(推荐)**:`{"template_id":"dia-speclib-quant-phospho","raw_files":["谱图"],"fasta_path":"蛋白库"}`
 - **DAG**(同 pipeline.json 格式,可复制改造):
 ```json
 {"steps":[
   {"step_id": "convert", "tool": "msconvert"},
-  {"step_id": "diann_quant", "tool": "diann"}
+  {"step_id": "diann_quant", "tool": "dia-search"}
 ],"edges":[
   {"src": "convert", "dst": "diann_quant"}
 ]}
 ```
 
-### `fp-dia-speclib-quant-phospho-diapasef`
-- **用途**:Migrated from FragPipe 'DIA_SpecLib_Quant_Phospho_diaPASEF.workflow' (DIA path). Original workflow also enabled: ['msbooster', 'skyline'] (dropped). Requires user-supplied spectral library (.tsv/.speclib) on the `diann_quant` step's `library_path` param. Library generation (easypqp / msfragger pre-search) is NOT migrated; supply a pre-built library or generate one separately.
+### `dia-speclib-quant-phospho-diapasef`
+- **用途**:迁移自官方模板 'DIA_SpecLib_Quant_Phospho_diaPASEF.workflow' (DIA path). Original workflow also enabled: ['msbooster', 'skyline'] (dropped). Requires user-supplied spectral library (.tsv/.speclib) on the `diann_quant` step's `library_path` param. Library generation (easypqp / msfragger pre-search) is NOT migrated; supply a pre-built library or generate one separately.
 - **输入**:谱图 `raw_files`(.d(Bruker timsTOF));`fasta_path`=蛋白库(DIA-NN 库无关预测;或 overrides 给 diann 步 `library_path` 现成谱图库)
-- **调用(推荐)**:`{"template_id":"fp-dia-speclib-quant-phospho-diapasef","raw_files":["谱图"],"fasta_path":"蛋白库"}`
+- **调用(推荐)**:`{"template_id":"dia-speclib-quant-phospho-diapasef","raw_files":["谱图"],"fasta_path":"蛋白库"}`
 - **DAG**(同 pipeline.json 格式,可复制改造):
 ```json
 {"steps":[
-  {"step_id": "diann_quant", "tool": "diann"}
+  {"step_id": "diann_quant", "tool": "dia-search"}
 ],"edges":[
   
 ]}
 ```
 
-### `fp-dia-speclib-quant-ubiq`
-- **用途**:Migrated from FragPipe 'DIA_SpecLib_Quant_Ubiq.workflow' (DIA path). Original workflow also enabled: ['msbooster', 'skyline'] (dropped). Requires user-supplied spectral library (.tsv/.speclib) on the `diann_quant` step's `library_path` param. Library generation (easypqp / msfragger pre-search) is NOT migrated; supply a pre-built library or generate one separately.
+### `dia-speclib-quant-ubiq`
+- **用途**:迁移自官方模板 'DIA_SpecLib_Quant_Ubiq.workflow' (DIA path). Original workflow also enabled: ['msbooster', 'skyline'] (dropped). Requires user-supplied spectral library (.tsv/.speclib) on the `diann_quant` step's `library_path` param. Library generation (easypqp / msfragger pre-search) is NOT migrated; supply a pre-built library or generate one separately.
 - **输入**:谱图 `raw_files`(mzML/raw);`fasta_path`=蛋白库(DIA-NN 库无关预测;或 overrides 给 diann 步 `library_path` 现成谱图库)
-- **调用(推荐)**:`{"template_id":"fp-dia-speclib-quant-ubiq","raw_files":["谱图"],"fasta_path":"蛋白库"}`
+- **调用(推荐)**:`{"template_id":"dia-speclib-quant-ubiq","raw_files":["谱图"],"fasta_path":"蛋白库"}`
 - **DAG**(同 pipeline.json 格式,可复制改造):
 ```json
 {"steps":[
   {"step_id": "convert", "tool": "msconvert"},
-  {"step_id": "diann_quant", "tool": "diann"}
+  {"step_id": "diann_quant", "tool": "dia-search"}
 ],"edges":[
   {"src": "convert", "dst": "diann_quant"}
 ]}
 ```
 
-### `fp-diagnostic-ion-mining`
-- **用途**:Migrated from FragPipe 'Diagnostic-ion-mining.workflow'. Original workflow also enabled: ['skyline'] (dropped — non-critical layers; downstream FDR still valid). Requires user-supplied target FASTA (the `database` step builds the decoy variant).
+### `diagnostic-ion-mining`
+- **用途**:迁移自官方模板 'Diagnostic-ion-mining.workflow'. Original workflow also enabled: ['skyline'] (dropped — non-critical layers; downstream FDR still valid). Requires user-supplied target FASTA (the `database` step builds the decoy variant).
 - **输入**:谱图 `raw_files`(mzML/raw);`fasta_path`=**target 蛋白库**(database 步自动建 decoy)
-- **调用(推荐)**:`{"template_id":"fp-diagnostic-ion-mining","raw_files":["谱图"],"fasta_path":"蛋白库"}`
+- **调用(推荐)**:`{"template_id":"diagnostic-ion-mining","raw_files":["谱图"],"fasta_path":"蛋白库"}`
 - **DAG**(同 pipeline.json 格式,可复制改造):
 ```json
 {"steps":[
   {"step_id": "convert", "tool": "msconvert"},
-  {"step_id": "database", "tool": "philosopher-database"},
-  {"step_id": "search", "tool": "msfragger-closed"},
-  {"step_id": "cleanup", "tool": "crystalc"},
-  {"step_id": "validate", "tool": "peptideprophet"},
-  {"step_id": "report", "tool": "philosopher-report"},
-  {"step_id": "ptm_summary", "tool": "ptmshepherd"}
+  {"step_id": "database", "tool": "database"},
+  {"step_id": "search", "tool": "search-closed"},
+  {"step_id": "cleanup", "tool": "precursor-refine"},
+  {"step_id": "validate", "tool": "validate-psm"},
+  {"step_id": "report", "tool": "report"},
+  {"step_id": "ptm_summary", "tool": "ptm-profile"}
 ],"edges":[
   {"src": "convert", "dst": "search"},
   {"src": "search", "dst": "cleanup"},
@@ -1714,49 +1714,49 @@
 ]}
 ```
 
-### `fp-glyco-n-dia`
-- **用途**:Migrated from FragPipe 'glyco-N-DIA.workflow' (DIA path). Original workflow also enabled: ['skyline'] (dropped). Requires user-supplied spectral library (.tsv/.speclib) on the `diann_quant` step's `library_path` param. Library generation (easypqp / msfragger pre-search) is NOT migrated; supply a pre-built library or generate one separately.
+### `glyco-n-dia`
+- **用途**:迁移自官方模板 'glyco-N-DIA.workflow' (DIA path). Original workflow also enabled: ['skyline'] (dropped). Requires user-supplied spectral library (.tsv/.speclib) on the `diann_quant` step's `library_path` param. Library generation (easypqp / msfragger pre-search) is NOT migrated; supply a pre-built library or generate one separately.
 - **输入**:谱图 `raw_files`(mzML/raw);`fasta_path`=蛋白库(DIA-NN 库无关预测;或 overrides 给 diann 步 `library_path` 现成谱图库)
-- **调用(推荐)**:`{"template_id":"fp-glyco-n-dia","raw_files":["谱图"],"fasta_path":"蛋白库"}`
+- **调用(推荐)**:`{"template_id":"glyco-n-dia","raw_files":["谱图"],"fasta_path":"蛋白库"}`
 - **DAG**(同 pipeline.json 格式,可复制改造):
 ```json
 {"steps":[
   {"step_id": "convert", "tool": "msconvert"},
-  {"step_id": "diann_quant", "tool": "diann"}
+  {"step_id": "diann_quant", "tool": "dia-search"}
 ],"edges":[
   {"src": "convert", "dst": "diann_quant"}
 ]}
 ```
 
-### `fp-glyco-o-dia-hcd`
-- **用途**:Migrated from FragPipe 'glyco-O-DIA-HCD.workflow' (DIA path). Original workflow also enabled: ['skyline'] (dropped). Requires user-supplied spectral library (.tsv/.speclib) on the `diann_quant` step's `library_path` param. Library generation (easypqp / msfragger pre-search) is NOT migrated; supply a pre-built library or generate one separately.
+### `glyco-o-dia-hcd`
+- **用途**:迁移自官方模板 'glyco-O-DIA-HCD.workflow' (DIA path). Original workflow also enabled: ['skyline'] (dropped). Requires user-supplied spectral library (.tsv/.speclib) on the `diann_quant` step's `library_path` param. Library generation (easypqp / msfragger pre-search) is NOT migrated; supply a pre-built library or generate one separately.
 - **输入**:谱图 `raw_files`(mzML/raw);`fasta_path`=蛋白库(DIA-NN 库无关预测;或 overrides 给 diann 步 `library_path` 现成谱图库)
-- **调用(推荐)**:`{"template_id":"fp-glyco-o-dia-hcd","raw_files":["谱图"],"fasta_path":"蛋白库"}`
+- **调用(推荐)**:`{"template_id":"glyco-o-dia-hcd","raw_files":["谱图"],"fasta_path":"蛋白库"}`
 - **DAG**(同 pipeline.json 格式,可复制改造):
 ```json
 {"steps":[
   {"step_id": "convert", "tool": "msconvert"},
-  {"step_id": "diann_quant", "tool": "diann"}
+  {"step_id": "diann_quant", "tool": "dia-search"}
 ],"edges":[
   {"src": "convert", "dst": "diann_quant"}
 ]}
 ```
 
-### `fp-glyco-o-dia-opair`
-- **用途**:Migrated from FragPipe 'glyco-O-DIA-OPair.workflow' (hybrid DDA-library + DIA-quant + OPair O-glycan localization). The DDA chain (msfragger → peptideprophet → report) builds a spectral library via easypqp, which DIA-NN then uses to quantify the same mzMLs in DIA mode. OPair localizes O-glycans on the DDA psm.tsv.
+### `glyco-o-dia-opair`
+- **用途**:迁移自官方模板 'glyco-O-DIA-OPair.workflow' (hybrid DDA-library + DIA-quant + OPair O-glycan localization). The DDA chain (msfragger → peptideprophet → report) builds a spectral library via easypqp, which DIA-NN then uses to quantify the same mzMLs in DIA mode. OPair localizes O-glycans on the DDA psm.tsv.
 - **输入**:谱图 `raw_files`(mzML/raw);`fasta_path`=**target 蛋白库**(database 步自动建 decoy)
-- **调用(推荐)**:`{"template_id":"fp-glyco-o-dia-opair","raw_files":["谱图"],"fasta_path":"蛋白库"}`
+- **调用(推荐)**:`{"template_id":"glyco-o-dia-opair","raw_files":["谱图"],"fasta_path":"蛋白库"}`
 - **DAG**(同 pipeline.json 格式,可复制改造):
 ```json
 {"steps":[
   {"step_id": "convert", "tool": "msconvert"},
-  {"step_id": "database", "tool": "philosopher-database"},
-  {"step_id": "search", "tool": "msfragger-closed"},
-  {"step_id": "validate", "tool": "peptideprophet"},
-  {"step_id": "report", "tool": "philosopher-report"},
-  {"step_id": "build_library", "tool": "easypqp"},
-  {"step_id": "diann_quant", "tool": "diann"},
-  {"step_id": "oglyc_localize", "tool": "opair"}
+  {"step_id": "database", "tool": "database"},
+  {"step_id": "search", "tool": "search-closed"},
+  {"step_id": "validate", "tool": "validate-psm"},
+  {"step_id": "report", "tool": "report"},
+  {"step_id": "build_library", "tool": "speclib-build"},
+  {"step_id": "diann_quant", "tool": "dia-search"},
+  {"step_id": "oglyc_localize", "tool": "glyco-localize"}
 ],"edges":[
   {"src": "convert", "dst": "search"},
   {"src": "search", "dst": "validate"},
@@ -1773,61 +1773,61 @@
 ]}
 ```
 
-### `fp-nonspecific-hla-dia`
-- **用途**:Migrated from FragPipe 'Nonspecific-HLA-DIA.workflow' (DIA path). Original workflow also enabled: ['diaumpire', 'msbooster', 'skyline'] (dropped). Requires user-supplied spectral library (.tsv/.speclib) on the `diann_quant` step's `library_path` param. Library generation (easypqp / msfragger pre-search) is NOT migrated; supply a pre-built library or generate one separately.
+### `nonspecific-hla-dia`
+- **用途**:迁移自官方模板 'Nonspecific-HLA-DIA.workflow' (DIA path). Original workflow also enabled: ['diaumpire', 'msbooster', 'skyline'] (dropped). Requires user-supplied spectral library (.tsv/.speclib) on the `diann_quant` step's `library_path` param. Library generation (easypqp / msfragger pre-search) is NOT migrated; supply a pre-built library or generate one separately.
 - **输入**:谱图 `raw_files`(mzML/raw);`fasta_path`=蛋白库(DIA-NN 库无关预测;或 overrides 给 diann 步 `library_path` 现成谱图库)
-- **调用(推荐)**:`{"template_id":"fp-nonspecific-hla-dia","raw_files":["谱图"],"fasta_path":"蛋白库"}`
+- **调用(推荐)**:`{"template_id":"nonspecific-hla-dia","raw_files":["谱图"],"fasta_path":"蛋白库"}`
 - **DAG**(同 pipeline.json 格式,可复制改造):
 ```json
 {"steps":[
   {"step_id": "convert", "tool": "msconvert"},
-  {"step_id": "diann_quant", "tool": "diann"}
+  {"step_id": "diann_quant", "tool": "dia-search"}
 ],"edges":[
   {"src": "convert", "dst": "diann_quant"}
 ]}
 ```
 
-### `fp-nonspecific-hla-dia-astral`
-- **用途**:Migrated from FragPipe 'Nonspecific-HLA-DIA-Astral.workflow' (DIA path). Original workflow also enabled: ['msbooster', 'skyline'] (dropped). Requires user-supplied spectral library (.tsv/.speclib) on the `diann_quant` step's `library_path` param. Library generation (easypqp / msfragger pre-search) is NOT migrated; supply a pre-built library or generate one separately.
+### `nonspecific-hla-dia-astral`
+- **用途**:迁移自官方模板 'Nonspecific-HLA-DIA-Astral.workflow' (DIA path). Original workflow also enabled: ['msbooster', 'skyline'] (dropped). Requires user-supplied spectral library (.tsv/.speclib) on the `diann_quant` step's `library_path` param. Library generation (easypqp / msfragger pre-search) is NOT migrated; supply a pre-built library or generate one separately.
 - **输入**:谱图 `raw_files`(mzML/raw);`fasta_path`=蛋白库(DIA-NN 库无关预测;或 overrides 给 diann 步 `library_path` 现成谱图库)
-- **调用(推荐)**:`{"template_id":"fp-nonspecific-hla-dia-astral","raw_files":["谱图"],"fasta_path":"蛋白库"}`
+- **调用(推荐)**:`{"template_id":"nonspecific-hla-dia-astral","raw_files":["谱图"],"fasta_path":"蛋白库"}`
 - **DAG**(同 pipeline.json 格式,可复制改造):
 ```json
 {"steps":[
   {"step_id": "convert", "tool": "msconvert"},
-  {"step_id": "diann_quant", "tool": "diann"}
+  {"step_id": "diann_quant", "tool": "dia-search"}
 ],"edges":[
   {"src": "convert", "dst": "diann_quant"}
 ]}
 ```
 
-### `fp-nonspecific-hla-diapasef`
-- **用途**:Migrated from FragPipe 'Nonspecific-HLA-diaPASEF.workflow' (DIA path). Original workflow also enabled: ['msbooster', 'skyline'] (dropped). Requires user-supplied spectral library (.tsv/.speclib) on the `diann_quant` step's `library_path` param. Library generation (easypqp / msfragger pre-search) is NOT migrated; supply a pre-built library or generate one separately.
+### `nonspecific-hla-diapasef`
+- **用途**:迁移自官方模板 'Nonspecific-HLA-diaPASEF.workflow' (DIA path). Original workflow also enabled: ['msbooster', 'skyline'] (dropped). Requires user-supplied spectral library (.tsv/.speclib) on the `diann_quant` step's `library_path` param. Library generation (easypqp / msfragger pre-search) is NOT migrated; supply a pre-built library or generate one separately.
 - **输入**:谱图 `raw_files`(.d(Bruker timsTOF));`fasta_path`=蛋白库(DIA-NN 库无关预测;或 overrides 给 diann 步 `library_path` 现成谱图库)
-- **调用(推荐)**:`{"template_id":"fp-nonspecific-hla-diapasef","raw_files":["谱图"],"fasta_path":"蛋白库"}`
+- **调用(推荐)**:`{"template_id":"nonspecific-hla-diapasef","raw_files":["谱图"],"fasta_path":"蛋白库"}`
 - **DAG**(同 pipeline.json 格式,可复制改造):
 ```json
 {"steps":[
-  {"step_id": "diann_quant", "tool": "diann"}
+  {"step_id": "diann_quant", "tool": "dia-search"}
 ],"edges":[
   
 ]}
 ```
 
-### `fp-stellar-gpfdia`
-- **用途**:Migrated from FragPipe 'Stellar-GPFDIA.workflow'. Original workflow also enabled: ['msbooster', 'skyline'] (dropped — non-critical layers; downstream FDR still valid). Requires user-supplied target FASTA (the `database` step builds the decoy variant).
+### `stellar-gpfdia`
+- **用途**:迁移自官方模板 'Stellar-GPFDIA.workflow'. Original workflow also enabled: ['msbooster', 'skyline'] (dropped — non-critical layers; downstream FDR still valid). Requires user-supplied target FASTA (the `database` step builds the decoy variant).
 - **输入**:谱图 `raw_files`(mzML/raw);`fasta_path`=**target 蛋白库**(database 步自动建 decoy)
-- **调用(推荐)**:`{"template_id":"fp-stellar-gpfdia","raw_files":["谱图"],"fasta_path":"蛋白库"}`
+- **调用(推荐)**:`{"template_id":"stellar-gpfdia","raw_files":["谱图"],"fasta_path":"蛋白库"}`
 - **DAG**(同 pipeline.json 格式,可复制改造):
 ```json
 {"steps":[
   {"step_id": "convert", "tool": "msconvert"},
-  {"step_id": "database", "tool": "philosopher-database"},
-  {"step_id": "search", "tool": "msfragger-closed"},
-  {"step_id": "rescore", "tool": "percolator"},
-  {"step_id": "to_pepxml", "tool": "percolator-to-pepxml"},
-  {"step_id": "report", "tool": "philosopher-report"},
-  {"step_id": "quant", "tool": "ionquant"}
+  {"step_id": "database", "tool": "database"},
+  {"step_id": "search", "tool": "search-closed"},
+  {"step_id": "rescore", "tool": "rescore"},
+  {"step_id": "to_pepxml", "tool": "rescore-export"},
+  {"step_id": "report", "tool": "report"},
+  {"step_id": "quant", "tool": "quant"}
 ],"edges":[
   {"src": "convert", "dst": "search"},
   {"src": "search", "dst": "rescore"},
@@ -1844,20 +1844,20 @@
 
 ## 7. PTM(磷酸化/泛素化/乙酰化/labile)
 
-### `fp-labile-adp-ribosylation`
-- **用途**:Migrated from FragPipe 'Labile_ADP-ribosylation.workflow'. Original workflow also enabled: ['skyline'] (dropped — non-critical layers; downstream FDR still valid). Requires user-supplied target FASTA (the `database` step builds the decoy variant).
+### `labile-adp-ribosylation`
+- **用途**:迁移自官方模板 'Labile_ADP-ribosylation.workflow'. Original workflow also enabled: ['skyline'] (dropped — non-critical layers; downstream FDR still valid). Requires user-supplied target FASTA (the `database` step builds the decoy variant).
 - **输入**:谱图 `raw_files`(mzML/raw);`fasta_path`=**target 蛋白库**(database 步自动建 decoy)
-- **调用(推荐)**:`{"template_id":"fp-labile-adp-ribosylation","raw_files":["谱图"],"fasta_path":"蛋白库"}`
+- **调用(推荐)**:`{"template_id":"labile-adp-ribosylation","raw_files":["谱图"],"fasta_path":"蛋白库"}`
 - **DAG**(同 pipeline.json 格式,可复制改造):
 ```json
 {"steps":[
   {"step_id": "convert", "tool": "msconvert"},
-  {"step_id": "database", "tool": "philosopher-database"},
-  {"step_id": "search", "tool": "msfragger-closed"},
-  {"step_id": "validate", "tool": "peptideprophet"},
-  {"step_id": "localize", "tool": "ptmprophet"},
-  {"step_id": "report", "tool": "philosopher-report"},
-  {"step_id": "quant", "tool": "ionquant"}
+  {"step_id": "database", "tool": "database"},
+  {"step_id": "search", "tool": "search-closed"},
+  {"step_id": "validate", "tool": "validate-psm"},
+  {"step_id": "localize", "tool": "ptm-localize"},
+  {"step_id": "report", "tool": "report"},
+  {"step_id": "quant", "tool": "quant"}
 ],"edges":[
   {"src": "convert", "dst": "search"},
   {"src": "search", "dst": "validate"},
@@ -1871,20 +1871,20 @@
 ]}
 ```
 
-### `fp-labile-phospho`
-- **用途**:Migrated from FragPipe 'Labile_phospho.workflow'. Original workflow also enabled: ['skyline'] (dropped — non-critical layers; downstream FDR still valid). Requires user-supplied target FASTA (the `database` step builds the decoy variant).
+### `labile-phospho`
+- **用途**:迁移自官方模板 'Labile_phospho.workflow'. Original workflow also enabled: ['skyline'] (dropped — non-critical layers; downstream FDR still valid). Requires user-supplied target FASTA (the `database` step builds the decoy variant).
 - **输入**:谱图 `raw_files`(mzML/raw);`fasta_path`=**target 蛋白库**(database 步自动建 decoy)
-- **调用(推荐)**:`{"template_id":"fp-labile-phospho","raw_files":["谱图"],"fasta_path":"蛋白库"}`
+- **调用(推荐)**:`{"template_id":"labile-phospho","raw_files":["谱图"],"fasta_path":"蛋白库"}`
 - **DAG**(同 pipeline.json 格式,可复制改造):
 ```json
 {"steps":[
   {"step_id": "convert", "tool": "msconvert"},
-  {"step_id": "database", "tool": "philosopher-database"},
-  {"step_id": "search", "tool": "msfragger-closed"},
-  {"step_id": "validate", "tool": "peptideprophet"},
-  {"step_id": "localize", "tool": "ptmprophet"},
-  {"step_id": "report", "tool": "philosopher-report"},
-  {"step_id": "quant", "tool": "ionquant"}
+  {"step_id": "database", "tool": "database"},
+  {"step_id": "search", "tool": "search-closed"},
+  {"step_id": "validate", "tool": "validate-psm"},
+  {"step_id": "localize", "tool": "ptm-localize"},
+  {"step_id": "report", "tool": "report"},
+  {"step_id": "quant", "tool": "quant"}
 ],"edges":[
   {"src": "convert", "dst": "search"},
   {"src": "search", "dst": "validate"},
@@ -1898,21 +1898,21 @@
 ]}
 ```
 
-### `fp-lfq-phospho`
-- **用途**:Migrated from FragPipe 'LFQ-phospho.workflow'. Original workflow also enabled: ['msbooster', 'skyline'] (dropped — non-critical layers; downstream FDR still valid). Requires user-supplied target FASTA (the `database` step builds the decoy variant).
+### `lfq-phospho`
+- **用途**:迁移自官方模板 'LFQ-phospho.workflow'. Original workflow also enabled: ['msbooster', 'skyline'] (dropped — non-critical layers; downstream FDR still valid). Requires user-supplied target FASTA (the `database` step builds the decoy variant).
 - **输入**:谱图 `raw_files`(mzML/raw);`fasta_path`=**target 蛋白库**(database 步自动建 decoy)
-- **调用(推荐)**:`{"template_id":"fp-lfq-phospho","raw_files":["谱图"],"fasta_path":"蛋白库"}`
+- **调用(推荐)**:`{"template_id":"lfq-phospho","raw_files":["谱图"],"fasta_path":"蛋白库"}`
 - **DAG**(同 pipeline.json 格式,可复制改造):
 ```json
 {"steps":[
   {"step_id": "convert", "tool": "msconvert"},
-  {"step_id": "database", "tool": "philosopher-database"},
-  {"step_id": "search", "tool": "msfragger-closed"},
-  {"step_id": "rescore", "tool": "percolator"},
-  {"step_id": "to_pepxml", "tool": "percolator-to-pepxml"},
-  {"step_id": "localize", "tool": "ptmprophet"},
-  {"step_id": "report", "tool": "philosopher-report"},
-  {"step_id": "quant", "tool": "ionquant"}
+  {"step_id": "database", "tool": "database"},
+  {"step_id": "search", "tool": "search-closed"},
+  {"step_id": "rescore", "tool": "rescore"},
+  {"step_id": "to_pepxml", "tool": "rescore-export"},
+  {"step_id": "localize", "tool": "ptm-localize"},
+  {"step_id": "report", "tool": "report"},
+  {"step_id": "quant", "tool": "quant"}
 ],"edges":[
   {"src": "convert", "dst": "search"},
   {"src": "search", "dst": "rescore"},
@@ -1927,21 +1927,21 @@
 ]}
 ```
 
-### `fp-lfq-ubiquitin`
-- **用途**:Migrated from FragPipe 'LFQ-ubiquitin.workflow'. Original workflow also enabled: ['msbooster', 'skyline'] (dropped — non-critical layers; downstream FDR still valid). Requires user-supplied target FASTA (the `database` step builds the decoy variant).
+### `lfq-ubiquitin`
+- **用途**:迁移自官方模板 'LFQ-ubiquitin.workflow'. Original workflow also enabled: ['msbooster', 'skyline'] (dropped — non-critical layers; downstream FDR still valid). Requires user-supplied target FASTA (the `database` step builds the decoy variant).
 - **输入**:谱图 `raw_files`(mzML/raw);`fasta_path`=**target 蛋白库**(database 步自动建 decoy)
-- **调用(推荐)**:`{"template_id":"fp-lfq-ubiquitin","raw_files":["谱图"],"fasta_path":"蛋白库"}`
+- **调用(推荐)**:`{"template_id":"lfq-ubiquitin","raw_files":["谱图"],"fasta_path":"蛋白库"}`
 - **DAG**(同 pipeline.json 格式,可复制改造):
 ```json
 {"steps":[
   {"step_id": "convert", "tool": "msconvert"},
-  {"step_id": "database", "tool": "philosopher-database"},
-  {"step_id": "search", "tool": "msfragger-closed"},
-  {"step_id": "rescore", "tool": "percolator"},
-  {"step_id": "to_pepxml", "tool": "percolator-to-pepxml"},
-  {"step_id": "localize", "tool": "ptmprophet"},
-  {"step_id": "report", "tool": "philosopher-report"},
-  {"step_id": "quant", "tool": "ionquant"}
+  {"step_id": "database", "tool": "database"},
+  {"step_id": "search", "tool": "search-closed"},
+  {"step_id": "rescore", "tool": "rescore"},
+  {"step_id": "to_pepxml", "tool": "rescore-export"},
+  {"step_id": "localize", "tool": "ptm-localize"},
+  {"step_id": "report", "tool": "report"},
+  {"step_id": "quant", "tool": "quant"}
 ],"edges":[
   {"src": "convert", "dst": "search"},
   {"src": "search", "dst": "rescore"},
@@ -1956,21 +1956,21 @@
 ]}
 ```
 
-### `fp-nonspecific-hla-phospho`
-- **用途**:Migrated from FragPipe 'Nonspecific-HLA-phospho.workflow'. Original workflow also enabled: ['msbooster', 'skyline'] (dropped — non-critical layers; downstream FDR still valid). Requires user-supplied target FASTA (the `database` step builds the decoy variant).
+### `nonspecific-hla-phospho`
+- **用途**:迁移自官方模板 'Nonspecific-HLA-phospho.workflow'. Original workflow also enabled: ['msbooster', 'skyline'] (dropped — non-critical layers; downstream FDR still valid). Requires user-supplied target FASTA (the `database` step builds the decoy variant).
 - **输入**:谱图 `raw_files`(mzML/raw);`fasta_path`=**target 蛋白库**(database 步自动建 decoy)
-- **调用(推荐)**:`{"template_id":"fp-nonspecific-hla-phospho","raw_files":["谱图"],"fasta_path":"蛋白库"}`
+- **调用(推荐)**:`{"template_id":"nonspecific-hla-phospho","raw_files":["谱图"],"fasta_path":"蛋白库"}`
 - **DAG**(同 pipeline.json 格式,可复制改造):
 ```json
 {"steps":[
   {"step_id": "convert", "tool": "msconvert"},
-  {"step_id": "database", "tool": "philosopher-database"},
-  {"step_id": "search", "tool": "msfragger-closed"},
-  {"step_id": "rescore", "tool": "percolator"},
-  {"step_id": "to_pepxml", "tool": "percolator-to-pepxml"},
-  {"step_id": "localize", "tool": "ptmprophet"},
-  {"step_id": "report", "tool": "philosopher-report"},
-  {"step_id": "quant", "tool": "ionquant"}
+  {"step_id": "database", "tool": "database"},
+  {"step_id": "search", "tool": "search-closed"},
+  {"step_id": "rescore", "tool": "rescore"},
+  {"step_id": "to_pepxml", "tool": "rescore-export"},
+  {"step_id": "localize", "tool": "ptm-localize"},
+  {"step_id": "report", "tool": "report"},
+  {"step_id": "quant", "tool": "quant"}
 ],"edges":[
   {"src": "convert", "dst": "search"},
   {"src": "search", "dst": "rescore"},
@@ -1985,20 +1985,20 @@
 ]}
 ```
 
-### `fp-silac3-phospho`
-- **用途**:Migrated from FragPipe 'SILAC3-phospho.workflow'. Original workflow also enabled: ['msbooster', 'skyline'] (dropped — non-critical layers; downstream FDR still valid). Requires user-supplied target FASTA (the `database` step builds the decoy variant).
+### `silac3-phospho`
+- **用途**:迁移自官方模板 'SILAC3-phospho.workflow'. Original workflow also enabled: ['msbooster', 'skyline'] (dropped — non-critical layers; downstream FDR still valid). Requires user-supplied target FASTA (the `database` step builds the decoy variant).
 - **输入**:谱图 `raw_files`(mzML/raw);`fasta_path`=**target 蛋白库**(database 步自动建 decoy)
-- **调用(推荐)**:`{"template_id":"fp-silac3-phospho","raw_files":["谱图"],"fasta_path":"蛋白库"}`
+- **调用(推荐)**:`{"template_id":"silac3-phospho","raw_files":["谱图"],"fasta_path":"蛋白库"}`
 - **DAG**(同 pipeline.json 格式,可复制改造):
 ```json
 {"steps":[
   {"step_id": "convert", "tool": "msconvert"},
-  {"step_id": "database", "tool": "philosopher-database"},
-  {"step_id": "search", "tool": "msfragger-closed"},
-  {"step_id": "rescore", "tool": "percolator"},
-  {"step_id": "to_pepxml", "tool": "percolator-to-pepxml"},
-  {"step_id": "report", "tool": "philosopher-report"},
-  {"step_id": "quant", "tool": "ionquant"}
+  {"step_id": "database", "tool": "database"},
+  {"step_id": "search", "tool": "search-closed"},
+  {"step_id": "rescore", "tool": "rescore"},
+  {"step_id": "to_pepxml", "tool": "rescore-export"},
+  {"step_id": "report", "tool": "report"},
+  {"step_id": "quant", "tool": "quant"}
 ],"edges":[
   {"src": "convert", "dst": "search"},
   {"src": "search", "dst": "rescore"},
@@ -2015,20 +2015,20 @@
 
 ## 8. 非特异酶切 / HLA 免疫肽
 
-### `fp-nonspecific-hla`
-- **用途**:Migrated from FragPipe 'Nonspecific-HLA.workflow'. Original workflow also enabled: ['msbooster', 'skyline'] (dropped — non-critical layers; downstream FDR still valid). Requires user-supplied target FASTA (the `database` step builds the decoy variant).
+### `nonspecific-hla`
+- **用途**:迁移自官方模板 'Nonspecific-HLA.workflow'. Original workflow also enabled: ['msbooster', 'skyline'] (dropped — non-critical layers; downstream FDR still valid). Requires user-supplied target FASTA (the `database` step builds the decoy variant).
 - **输入**:谱图 `raw_files`(mzML/raw);`fasta_path`=**target 蛋白库**(database 步自动建 decoy)
-- **调用(推荐)**:`{"template_id":"fp-nonspecific-hla","raw_files":["谱图"],"fasta_path":"蛋白库"}`
+- **调用(推荐)**:`{"template_id":"nonspecific-hla","raw_files":["谱图"],"fasta_path":"蛋白库"}`
 - **DAG**(同 pipeline.json 格式,可复制改造):
 ```json
 {"steps":[
   {"step_id": "convert", "tool": "msconvert"},
-  {"step_id": "database", "tool": "philosopher-database"},
-  {"step_id": "search", "tool": "msfragger-closed"},
-  {"step_id": "rescore", "tool": "percolator"},
-  {"step_id": "to_pepxml", "tool": "percolator-to-pepxml"},
-  {"step_id": "report", "tool": "philosopher-report"},
-  {"step_id": "quant", "tool": "ionquant"}
+  {"step_id": "database", "tool": "database"},
+  {"step_id": "search", "tool": "search-closed"},
+  {"step_id": "rescore", "tool": "rescore"},
+  {"step_id": "to_pepxml", "tool": "rescore-export"},
+  {"step_id": "report", "tool": "report"},
+  {"step_id": "quant", "tool": "quant"}
 ],"edges":[
   {"src": "convert", "dst": "search"},
   {"src": "search", "dst": "rescore"},
@@ -2042,20 +2042,20 @@
 ]}
 ```
 
-### `fp-nonspecific-hla-c57`
-- **用途**:Migrated from FragPipe 'Nonspecific-HLA-C57.workflow'. Original workflow also enabled: ['msbooster', 'skyline'] (dropped — non-critical layers; downstream FDR still valid). Requires user-supplied target FASTA (the `database` step builds the decoy variant).
+### `nonspecific-hla-c57`
+- **用途**:迁移自官方模板 'Nonspecific-HLA-C57.workflow'. Original workflow also enabled: ['msbooster', 'skyline'] (dropped — non-critical layers; downstream FDR still valid). Requires user-supplied target FASTA (the `database` step builds the decoy variant).
 - **输入**:谱图 `raw_files`(mzML/raw);`fasta_path`=**target 蛋白库**(database 步自动建 decoy)
-- **调用(推荐)**:`{"template_id":"fp-nonspecific-hla-c57","raw_files":["谱图"],"fasta_path":"蛋白库"}`
+- **调用(推荐)**:`{"template_id":"nonspecific-hla-c57","raw_files":["谱图"],"fasta_path":"蛋白库"}`
 - **DAG**(同 pipeline.json 格式,可复制改造):
 ```json
 {"steps":[
   {"step_id": "convert", "tool": "msconvert"},
-  {"step_id": "database", "tool": "philosopher-database"},
-  {"step_id": "search", "tool": "msfragger-closed"},
-  {"step_id": "rescore", "tool": "percolator"},
-  {"step_id": "to_pepxml", "tool": "percolator-to-pepxml"},
-  {"step_id": "report", "tool": "philosopher-report"},
-  {"step_id": "quant", "tool": "ionquant"}
+  {"step_id": "database", "tool": "database"},
+  {"step_id": "search", "tool": "search-closed"},
+  {"step_id": "rescore", "tool": "rescore"},
+  {"step_id": "to_pepxml", "tool": "rescore-export"},
+  {"step_id": "report", "tool": "report"},
+  {"step_id": "quant", "tool": "quant"}
 ],"edges":[
   {"src": "convert", "dst": "search"},
   {"src": "search", "dst": "rescore"},
@@ -2069,20 +2069,20 @@
 ]}
 ```
 
-### `fp-nonspecific-hla-customdb-groupfdr`
-- **用途**:Migrated from FragPipe 'Nonspecific-HLA-customDB-groupFDR.workflow'. Original workflow also enabled: ['msbooster', 'skyline'] (dropped — non-critical layers; downstream FDR still valid). Requires user-supplied target FASTA (the `database` step builds the decoy variant).
+### `nonspecific-hla-customdb-groupfdr`
+- **用途**:迁移自官方模板 'Nonspecific-HLA-customDB-groupFDR.workflow'. Original workflow also enabled: ['msbooster', 'skyline'] (dropped — non-critical layers; downstream FDR still valid). Requires user-supplied target FASTA (the `database` step builds the decoy variant).
 - **输入**:谱图 `raw_files`(mzML/raw);`fasta_path`=**target 蛋白库**(database 步自动建 decoy)
-- **调用(推荐)**:`{"template_id":"fp-nonspecific-hla-customdb-groupfdr","raw_files":["谱图"],"fasta_path":"蛋白库"}`
+- **调用(推荐)**:`{"template_id":"nonspecific-hla-customdb-groupfdr","raw_files":["谱图"],"fasta_path":"蛋白库"}`
 - **DAG**(同 pipeline.json 格式,可复制改造):
 ```json
 {"steps":[
   {"step_id": "convert", "tool": "msconvert"},
-  {"step_id": "database", "tool": "philosopher-database"},
-  {"step_id": "search", "tool": "msfragger-closed"},
-  {"step_id": "rescore", "tool": "percolator"},
-  {"step_id": "to_pepxml", "tool": "percolator-to-pepxml"},
-  {"step_id": "report", "tool": "philosopher-report"},
-  {"step_id": "quant", "tool": "ionquant"}
+  {"step_id": "database", "tool": "database"},
+  {"step_id": "search", "tool": "search-closed"},
+  {"step_id": "rescore", "tool": "rescore"},
+  {"step_id": "to_pepxml", "tool": "rescore-export"},
+  {"step_id": "report", "tool": "report"},
+  {"step_id": "quant", "tool": "quant"}
 ],"edges":[
   {"src": "convert", "dst": "search"},
   {"src": "search", "dst": "rescore"},
@@ -2096,20 +2096,20 @@
 ]}
 ```
 
-### `fp-nonspecific-peptidome`
-- **用途**:Migrated from FragPipe 'Nonspecific-peptidome.workflow'. Original workflow also enabled: ['msbooster', 'skyline'] (dropped — non-critical layers; downstream FDR still valid). Requires user-supplied target FASTA (the `database` step builds the decoy variant).
+### `nonspecific-peptidome`
+- **用途**:迁移自官方模板 'Nonspecific-peptidome.workflow'. Original workflow also enabled: ['msbooster', 'skyline'] (dropped — non-critical layers; downstream FDR still valid). Requires user-supplied target FASTA (the `database` step builds the decoy variant).
 - **输入**:谱图 `raw_files`(mzML/raw);`fasta_path`=**target 蛋白库**(database 步自动建 decoy)
-- **调用(推荐)**:`{"template_id":"fp-nonspecific-peptidome","raw_files":["谱图"],"fasta_path":"蛋白库"}`
+- **调用(推荐)**:`{"template_id":"nonspecific-peptidome","raw_files":["谱图"],"fasta_path":"蛋白库"}`
 - **DAG**(同 pipeline.json 格式,可复制改造):
 ```json
 {"steps":[
   {"step_id": "convert", "tool": "msconvert"},
-  {"step_id": "database", "tool": "philosopher-database"},
-  {"step_id": "search", "tool": "msfragger-closed"},
-  {"step_id": "rescore", "tool": "percolator"},
-  {"step_id": "to_pepxml", "tool": "percolator-to-pepxml"},
-  {"step_id": "report", "tool": "philosopher-report"},
-  {"step_id": "quant", "tool": "ionquant"}
+  {"step_id": "database", "tool": "database"},
+  {"step_id": "search", "tool": "search-closed"},
+  {"step_id": "rescore", "tool": "rescore"},
+  {"step_id": "to_pepxml", "tool": "rescore-export"},
+  {"step_id": "report", "tool": "report"},
+  {"step_id": "quant", "tool": "quant"}
 ],"edges":[
   {"src": "convert", "dst": "search"},
   {"src": "search", "dst": "rescore"},

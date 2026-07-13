@@ -11,6 +11,9 @@ import json
 import os
 import sys
 
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import tool_names          # noqa: E402  公开名 ⇄ 内部名(与镜像同一套映射)
+
 _BU_TOOLS = {
     "msconvert", "msfragger-closed", "crystalc", "percolator",
     "percolator-to-pepxml", "philosopher-database", "peptideprophet",
@@ -167,8 +170,23 @@ def _check_spectra_consumers(steps: list, edges: list, errs: list) -> None:
                 f"而 raw_files 只送达无入边的根节点。修复:{fix}或改用官方 template_id。")
 
 
+def _normalize_names(cfg: dict) -> None:
+    """把公开名/公开模板 id 归一成内部名 —— 与镜像执行器入口同一套映射。
+
+    param_schema.json / template_tools.json 是从镜像 specs.py 导出的,键是内部名;
+    归一之后,下面所有校验(参数名、必填、overrides)照旧生效,不必重新导出这两张表。
+    """
+    for s in (cfg.get("steps") or []):
+        if s.get("tool"):
+            s["tool"] = tool_names.to_internal(s["tool"])
+    tid = cfg.get("template_id")
+    if tid and tid not in _TPL_TOOLS and f"fp-{tid}" in _TPL_TOOLS:
+        cfg["template_id"] = f"fp-{tid}"
+
+
 def validate_config(cfg: dict) -> list[str]:
     errs: list[str] = []
+    _normalize_names(cfg)
     # 顶层字段名(raw_file/fastapath 拼错会被静默忽略 → 作业找不到输入才失败)
     for k in cfg:
         if k not in _TOP_KEYS:
