@@ -49,7 +49,7 @@ l1: >
 
 如果 `IMAGE_ADDRESS`/`PROJECT_ID`/`ACCESS_KEY` 未配置,**不要猜或找替代镜像**——用 `AskUserInput` 让用户补配置或提示去启用 `bohrium-job` skill。
 
-### 🚫 七条铁律(违反=必错)
+### 🚫 九条铁律(违反=必错)
 
 0. **开工第一件事:加载 `bohrium-dataset-manager` skill。** 谱图的查重与建集全靠它的
    `dataset_manager.py`;不加载,`/data/skills/bohrium-dataset-manager/` 根本不存在,
@@ -61,13 +61,24 @@ l1: >
      --project-id <pid> --disk-path share/<盘内路径> --json
    ```
    (内含查重:已存在就零传输直接返回 `mount_path`;未命中才自动建集。)
-1. **绝不手写 job.json / 绝不自己拼 `bohr job submit`** —— 一律 `scripts/submit_pipeline.py`。
-2. **绝不直接调工具**(msfragger/diann…)—— 只经 `submit_pipeline.py` 提交。
-3. **谱图默认一律走 dataset(不论大小)**:共享盘/个人盘的谱图**直接转 dataset、无需下载**,工作区本地用 `make_dataset.py`;仅当用户主动要求"直接上传"且谱图 ≤100MB 才 `-p`。**唯一需要下载的是 FASTA**(需可写)。结果用 `collect_results.py` 取。
-4. **取结果只用 `collect_results.py`**:**绝不手动 `bohr job download` / 解压 zip / 拷贝产物**——手动会导致目录结构混乱。collect 已给出 `result_dir`/`deliverable_paths`/`archive`,按它给的路径用即可。
-5. **标准流程不可跳**:`validate_pipeline.py` →(谱图建 dataset 时)`make_dataset.py` → `submit_pipeline.py` → `poll_job.py` → `collect_results.py`。
-6. **单次轮询,绝不自旋**:提交后查一次状态,若仍在跑向用户报 jobId + 状态后**结束本轮**;jobId 存 Memory,用户稍后回来再查。
-7. **HITL 取消 = 中止**:用户拒绝确认/参数确认时,立即停止,不得以默认值继续提交。
+1. **写 pipeline.json 之前,先翻模板目录。** 有 81 个官方 FragPipe 模板,**能套模板就绝不手写 DAG**:
+   ```bash
+   R=/data/skills/bottomup-proteomics/references/templates.md
+   grep -n '^### `' $R                                  # 列出全部 template_id
+   grep -n -A2 -i 'lfq\|tmt\|itraq\|dia\|glyco' $R   # 按需求筛
+   ```
+   命中就一行调用:`{"template_id":"fp-lfq-mbr","raw_files":[...],"fasta_path":"..."}`(要调参走 `overrides`)。
+   **确无对应模板才手写 steps/edges,且必须在回复里说明「查过模板目录、无对应项」。**
+   **已经翻过车:用户要「无标记定量 + 高丰度榜单」,agent 没翻目录,手攒了
+   `database → msfragger → peptideprophet → report` —— 等于把 `fp-lfq-mbr` 重造一遍,
+   还漏掉 `ionquant`,结果根本没有 LFQ 强度,「丰度榜单」无从谈起。**
+2. **绝不手写 job.json / 绝不自己拼 `bohr job submit`** —— 一律 `scripts/submit_pipeline.py`。
+3. **绝不直接调工具**(msfragger/diann…)—— 只经 `submit_pipeline.py` 提交。
+4. **谱图默认一律走 dataset(不论大小)**:共享盘/个人盘的谱图**直接转 dataset、无需下载**,工作区本地用 `make_dataset.py`;仅当用户主动要求"直接上传"且谱图 ≤100MB 才 `-p`。**唯一需要下载的是 FASTA**(需可写)。结果用 `collect_results.py` 取。
+5. **取结果只用 `collect_results.py`**:**绝不手动 `bohr job download` / 解压 zip / 拷贝产物**——手动会导致目录结构混乱。collect 已给出 `result_dir`/`deliverable_paths`/`archive`,按它给的路径用即可。
+6. **标准流程不可跳**:`validate_pipeline.py` →(谱图建 dataset 时)`make_dataset.py` → `submit_pipeline.py` → `poll_job.py` → `collect_results.py`。
+7. **单次轮询,绝不自旋**:提交后查一次状态,若仍在跑向用户报 jobId + 状态后**结束本轮**;jobId 存 Memory,用户稍后回来再查。
+8. **HITL 取消 = 中止**:用户拒绝确认/参数确认时,立即停止,不得以默认值继续提交。
 
 **数据与接线铁律:**
 - **decoy 必须由 `philosopher-database` 步构建**:把 target-only FASTA 直接喂给 MSFragger 会产生零 decoy 序列,FDR 估计静默崩溃。pipeline.json 的 steps 里必须有 `philosopher-database`,其输出(target+decoy .fas)会**自动注入** `msfragger-closed` 的 `database_path` 参数并自动排序在其后——**不要画 db→msfragger 边**(见形式 A 的警告)。
