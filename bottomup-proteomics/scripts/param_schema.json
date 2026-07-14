@@ -1,1182 +1,1170 @@
 {
- "msconvert": {
-  "output_format": {
-   "type": "enum",
-   "enum": [
-    "mzML",
-    "mzXML",
-    "mz5",
-    "mzMLb",
-    "mgf",
-    "text",
-    "ms1",
-    "ms2",
-    "cms1",
-    "cms2"
-   ]
+  "msconvert": {
+    "output_format": {
+      "type": "enum",
+      "enum": [
+        "mzML",
+        "mzXML",
+        "mz5",
+        "mzMLb",
+        "mgf",
+        "text",
+        "ms1",
+        "ms2",
+        "cms1",
+        "cms2"
+      ]
+    },
+    "precision": {
+      "type": "int",
+      "enum": [
+        32,
+        64
+      ]
+    },
+    "zlib": {
+      "type": "bool"
+    },
+    "filters": {
+      "type": "str_list"
+    },
+    "chromatogram_filters": {
+      "type": "str_list"
+    },
+    "extension": {
+      "type": "str"
+    },
+    "mz_precision": {
+      "type": "int"
+    },
+    "inten_precision": {
+      "type": "int"
+    },
+    "mz_truncation": {
+      "type": "int"
+    },
+    "inten_truncation": {
+      "type": "int"
+    },
+    "mz_delta": {
+      "type": "bool"
+    },
+    "inten_delta": {
+      "type": "bool"
+    },
+    "mz_linear": {
+      "type": "bool"
+    },
+    "inten_linear": {
+      "type": "bool"
+    },
+    "noindex": {
+      "type": "bool"
+    },
+    "numpress_linear": {
+      "type": "bool"
+    },
+    "numpress_linear_abs_tol": {
+      "type": "float"
+    },
+    "numpress_pic": {
+      "type": "bool"
+    },
+    "numpress_slof": {
+      "type": "bool"
+    },
+    "numpress_all": {
+      "type": "bool"
+    },
+    "outfile": {
+      "type": "str"
+    },
+    "contact_info": {
+      "type": "str"
+    },
+    "filelist": {
+      "type": "str"
+    },
+    "config_file": {
+      "type": "str"
+    },
+    "verbose": {
+      "type": "bool"
+    },
+    "single_threaded": {
+      "type": "bool"
+    },
+    "continue_on_error": {
+      "type": "bool"
+    },
+    "merge": {
+      "type": "bool"
+    },
+    "combine_ion_mobility_spectra": {
+      "type": "bool"
+    },
+    "dda_processing": {
+      "type": "bool"
+    },
+    "gzip": {
+      "type": "bool"
+    },
+    "sim_as_spectra": {
+      "type": "bool"
+    },
+    "srm_as_spectra": {
+      "type": "bool"
+    },
+    "ignore_calibration_scans": {
+      "type": "bool"
+    },
+    "accept_zero_length_spectra": {
+      "type": "bool"
+    },
+    "ignore_missing_zero_samples": {
+      "type": "bool"
+    },
+    "ignore_unknown_instrument_error": {
+      "type": "bool"
+    },
+    "strip_location_from_source_files": {
+      "type": "bool"
+    },
+    "strip_version_from_software": {
+      "type": "bool"
+    },
+    "mzmlb_chunk_size": {
+      "type": "int"
+    },
+    "mzmlb_compression_level": {
+      "type": "int"
+    },
+    "run_index_set": {
+      "type": "str"
+    }
   },
-  "precision": {
-   "type": "int",
-   "enum": [
-    32,
-    64
-   ]
+  "search-closed": {
+    "database_path": {
+      "type": "str",
+      "required": true
+    },
+    "num_threads": {
+      "type": "int",
+      "min": 1
+    },
+    "ram_gb": {
+      "type": "int",
+      "min": 2
+    },
+    "precursor_tolerance_ppm": {
+      "type": "float",
+      "min": 0
+    },
+    "precursor_mass_lower_da": {
+      "type": "float"
+    },
+    "precursor_mass_upper_da": {
+      "type": "float"
+    },
+    "fragment_tolerance_ppm": {
+      "type": "float",
+      "min": 0
+    },
+    "isotope_error": {
+      "type": "str"
+    },
+    "calibrate_mass": {
+      "type": "int",
+      "enum": [
+        0,
+        1,
+        2
+      ]
+    },
+    "mass_diff_to_variable_mod": {
+      "type": "int",
+      "enum": [
+        0,
+        1,
+        2
+      ]
+    },
+    "localize_delta_mass": {
+      "type": "int",
+      "enum": [
+        0,
+        1
+      ]
+    },
+    "mass_offsets": {
+      "type": "str"
+    },
+    "mass_offsets_detailed": {
+      "type": "str"
+    },
+    "labile_search_mode": {
+      "type": "str",
+      "enum": [
+        "off",
+        "labile",
+        "nglycan"
+      ]
+    },
+    "labile_fragment_ion_series": {
+      "type": "str"
+    },
+    "enzyme_name": {
+      "type": "str"
+    },
+    "enzyme_cut": {
+      "type": "str"
+    },
+    "enzyme_nocut": {
+      "type": "str"
+    },
+    "num_enzyme_termini": {
+      "type": "int",
+      "enum": [
+        0,
+        1,
+        2
+      ]
+    },
+    "allowed_missed_cleavage": {
+      "type": "int",
+      "min": 0,
+      "max": 5
+    },
+    "digest_min_length": {
+      "type": "int",
+      "min": 1
+    },
+    "digest_max_length": {
+      "type": "int",
+      "min": 1
+    },
+    "digest_min_mass": {
+      "type": "float"
+    },
+    "digest_max_mass": {
+      "type": "float"
+    },
+    "var_mod_oxidation_M": {
+      "type": "bool"
+    },
+    "var_mod_acetyl_nterm": {
+      "type": "bool"
+    },
+    "variable_mods": {
+      "type": "str"
+    },
+    "fixed_mod_C_carbamidomethyl": {
+      "type": "bool"
+    },
+    "tmt_label_mass": {
+      "type": "float"
+    },
+    "tmt_kside_variable": {
+      "type": "bool"
+    },
+    "max_variable_mods_per_peptide": {
+      "type": "int",
+      "min": 0,
+      "max": 10
+    },
+    "decoy_prefix": {
+      "type": "str"
+    },
+    "output_format": {
+      "type": "str",
+      "enum": [
+        "pepXML",
+        "pepXML_pin",
+        "tsv",
+        "tsv_pin"
+      ]
+    }
   },
-  "zlib": {
-   "type": "bool"
+  "precursor-refine": {
+    "ram_gb": {
+      "type": "int",
+      "min": 1
+    },
+    "num_threads": {
+      "type": "int"
+    },
+    "precursor_charge_min": {
+      "type": "int",
+      "min": 1
+    },
+    "precursor_charge_max": {
+      "type": "int",
+      "min": 1
+    },
+    "isotope_number": {
+      "type": "int",
+      "min": 1
+    },
+    "precursor_mass_ppm": {
+      "type": "float",
+      "min": 0
+    },
+    "precursor_isolation_window": {
+      "type": "float",
+      "min": 0
+    },
+    "correct_isotope_error": {
+      "type": "bool"
+    },
+    "raw_file_extension": {
+      "type": "str"
+    },
+    "grppr_jar_path": {
+      "type": "str"
+    }
   },
-  "filters": {
-   "type": "str_list"
+  "rescore": {
+    "test_fdr": {
+      "type": "float",
+      "min": 0,
+      "max": 1
+    },
+    "train_fdr": {
+      "type": "float",
+      "min": 0,
+      "max": 1
+    },
+    "max_iter": {
+      "type": "int",
+      "min": 1
+    },
+    "num_threads": {
+      "type": "int",
+      "min": 1
+    },
+    "seed": {
+      "type": "int",
+      "min": 0
+    },
+    "subset_max_train": {
+      "type": "int",
+      "min": 0
+    },
+    "only_psms": {
+      "type": "bool"
+    },
+    "post_processing_tdc": {
+      "type": "bool"
+    },
+    "decoy_prefix": {
+      "type": "str"
+    },
+    "picked_protein_fasta": {
+      "type": "str"
+    }
   },
-  "chromatogram_filters": {
-   "type": "str_list"
+  "rescore-export": {
+    "jar_path": {
+      "type": "str"
+    },
+    "data_type": {
+      "type": "enum",
+      "enum": [
+        "DDA",
+        "DIA"
+      ]
+    },
+    "min_prob": {
+      "type": "float",
+      "min": 0,
+      "max": 1
+    },
+    "updated_fasta_path": {
+      "type": "str"
+    }
   },
-  "extension": {
-   "type": "str"
+  "database": {
+    "decoy_prefix": {
+      "type": "str"
+    },
+    "add_contam": {
+      "type": "bool"
+    },
+    "contam_prefix": {
+      "type": "bool"
+    },
+    "enzyme": {
+      "type": "str",
+      "enum": [
+        "trypsin",
+        "lys_c",
+        "lys_n",
+        "glu_c",
+        "chymotrypsin"
+      ]
+    },
+    "isoform": {
+      "type": "bool"
+    },
+    "reviewed": {
+      "type": "bool"
+    }
   },
-  "mz_precision": {
-   "type": "int"
+  "validate-psm": {
+    "decoy_prefix": {
+      "type": "str"
+    },
+    "output_prefix": {
+      "type": "str"
+    },
+    "ppm": {
+      "type": "bool"
+    },
+    "accmass": {
+      "type": "bool"
+    },
+    "nonparam": {
+      "type": "bool"
+    },
+    "decoyprobs": {
+      "type": "bool"
+    },
+    "combine": {
+      "type": "bool"
+    }
   },
-  "inten_precision": {
-   "type": "int"
+  "ptm-localize": {
+    "mods": {
+      "type": "str"
+    },
+    "minprob": {
+      "type": "float",
+      "min": 0,
+      "max": 1
+    },
+    "em": {
+      "type": "int",
+      "enum": [
+        0,
+        1,
+        2,
+        3
+      ]
+    },
+    "keepold": {
+      "type": "bool"
+    },
+    "static": {
+      "type": "bool"
+    },
+    "fragppmtol": {
+      "type": "float",
+      "min": 0
+    },
+    "nions": {
+      "type": "str"
+    },
+    "nostack": {
+      "type": "bool"
+    },
+    "extra_cmdline": {
+      "type": "str"
+    }
   },
-  "mz_truncation": {
-   "type": "int"
+  "report": {
+    "decoy_prefix": {
+      "type": "str"
+    },
+    "psm_fdr": {
+      "type": "float",
+      "min": 0,
+      "max": 1
+    },
+    "peptide_fdr": {
+      "type": "float",
+      "min": 0,
+      "max": 1
+    },
+    "ion_fdr": {
+      "type": "float",
+      "min": 0,
+      "max": 1
+    },
+    "protein_fdr": {
+      "type": "float",
+      "min": 0,
+      "max": 1
+    },
+    "inference": {
+      "type": "bool"
+    },
+    "razor": {
+      "type": "bool"
+    },
+    "picked": {
+      "type": "bool"
+    },
+    "sequential": {
+      "type": "bool"
+    },
+    "report_decoys": {
+      "type": "bool"
+    },
+    "report_msstats": {
+      "type": "bool"
+    },
+    "remove_contam": {
+      "type": "bool"
+    }
   },
-  "inten_truncation": {
-   "type": "int"
+  "quant": {
+    "binary_path": {
+      "type": "str"
+    },
+    "ram_gb": {
+      "type": "int",
+      "min": 2
+    },
+    "threads": {
+      "type": "int",
+      "min": 0
+    },
+    "mztol_ppm": {
+      "type": "float",
+      "min": 0
+    },
+    "rttol_min": {
+      "type": "float",
+      "min": 0
+    },
+    "minisotopes": {
+      "type": "int",
+      "enum": [
+        1,
+        2,
+        3
+      ]
+    },
+    "minscans": {
+      "type": "int",
+      "min": 1
+    },
+    "perform_ms1quant": {
+      "type": "bool"
+    },
+    "perform_isoquant": {
+      "type": "bool"
+    },
+    "isotype": {
+      "type": "str",
+      "enum": [
+        "iTRAQ-4",
+        "iTRAQ-8",
+        "TMT-0",
+        "TMT-2",
+        "TMT-6",
+        "TMT-10",
+        "TMT-11",
+        "TMT-16",
+        "TMT-18",
+        "TMT-35"
+      ]
+    },
+    "isolevel": {
+      "type": "int",
+      "enum": [
+        2,
+        3
+      ]
+    },
+    "annotation_file": {
+      "type": "str"
+    },
+    "maxlfq": {
+      "type": "bool"
+    },
+    "mbr": {
+      "type": "bool"
+    },
+    "normalization": {
+      "type": "bool"
+    },
+    "msstats": {
+      "type": "bool"
+    }
   },
-  "mz_delta": {
-   "type": "bool"
+  "ptm-profile": {
+    "ram_gb": {
+      "type": "int",
+      "min": 1
+    },
+    "threads": {
+      "type": "int"
+    },
+    "glyco_mode": {
+      "type": "bool"
+    },
+    "n_glyco": {
+      "type": "bool"
+    },
+    "annotation_file": {
+      "type": "str"
+    },
+    "annotation_tol": {
+      "type": "float",
+      "min": 0
+    },
+    "mass_offsets": {
+      "type": "str"
+    },
+    "isotope_error": {
+      "type": "str"
+    },
+    "peakpicking_promRatio": {
+      "type": "float",
+      "min": 0
+    },
+    "peakpicking_width": {
+      "type": "float",
+      "min": 0
+    },
+    "peakpicking_topN": {
+      "type": "int",
+      "min": 1
+    },
+    "peakpicking_minPsm": {
+      "type": "int",
+      "min": 1
+    },
+    "precursor_tol": {
+      "type": "float",
+      "min": 0
+    },
+    "precursor_mass_units": {
+      "type": "int",
+      "enum": [
+        0,
+        1
+      ]
+    },
+    "varmod_masses": {
+      "type": "str"
+    },
+    "spectra_ppmtol": {
+      "type": "float",
+      "min": 0
+    },
+    "spectra_maxfragcharge": {
+      "type": "int",
+      "min": 1
+    },
+    "iontype_a": {
+      "type": "bool"
+    },
+    "iontype_b": {
+      "type": "bool"
+    },
+    "iontype_c": {
+      "type": "bool"
+    },
+    "iontype_x": {
+      "type": "bool"
+    },
+    "iontype_y": {
+      "type": "bool"
+    },
+    "iontype_z": {
+      "type": "bool"
+    },
+    "compare_betweenRuns": {
+      "type": "bool"
+    },
+    "output_extended": {
+      "type": "bool"
+    },
+    "prep_for_quant": {
+      "type": "bool"
+    }
   },
-  "inten_delta": {
-   "type": "bool"
+  "quant-isobaric": {
+    "annotation_file": {
+      "type": "str",
+      "required": true
+    },
+    "channel_num": {
+      "type": "int",
+      "enum": [
+        4,
+        8,
+        6,
+        10,
+        11,
+        16,
+        18,
+        35
+      ]
+    },
+    "ref_tag": {
+      "type": "str"
+    },
+    "add_Ref": {
+      "type": "int",
+      "enum": [
+        -2,
+        -1,
+        0,
+        1,
+        2
+      ]
+    },
+    "groupby": {
+      "type": "int",
+      "enum": [
+        -1,
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+      ]
+    },
+    "prot_norm": {
+      "type": "int",
+      "enum": [
+        -1,
+        0,
+        1,
+        2,
+        3
+      ]
+    },
+    "aggregation_method": {
+      "type": "int",
+      "enum": [
+        0,
+        1
+      ]
+    },
+    "log2transformed": {
+      "type": "bool"
+    },
+    "allow_overlabel": {
+      "type": "bool"
+    },
+    "allow_unlabeled": {
+      "type": "bool"
+    },
+    "best_psm": {
+      "type": "bool"
+    },
+    "outlier_removal": {
+      "type": "bool"
+    },
+    "psm_norm": {
+      "type": "bool"
+    },
+    "ms1_int": {
+      "type": "bool"
+    },
+    "min_pep_prob": {
+      "type": "float",
+      "min": 0,
+      "max": 1
+    },
+    "min_purity": {
+      "type": "float",
+      "min": 0,
+      "max": 1
+    },
+    "min_percent": {
+      "type": "float",
+      "min": 0,
+      "max": 1
+    },
+    "min_site_prob": {
+      "type": "float"
+    },
+    "min_snr": {
+      "type": "float"
+    },
+    "unique_pep": {
+      "type": "bool"
+    },
+    "unique_gene": {
+      "type": "int",
+      "enum": [
+        0,
+        1,
+        2
+      ]
+    },
+    "mod_tag": {
+      "type": "str"
+    },
+    "prot_exclude": {
+      "type": "str"
+    },
+    "ram_gb": {
+      "type": "int",
+      "min": 1
+    }
   },
-  "mz_linear": {
-   "type": "bool"
+  "dia-search": {
+    "library_path": {
+      "type": "str"
+    },
+    "fasta_path": {
+      "type": "str"
+    },
+    "num_threads": {
+      "type": "int",
+      "min": 1
+    },
+    "precursor_qvalue": {
+      "type": "float",
+      "min": 0,
+      "max": 1
+    },
+    "protein_qvalue": {
+      "type": "float",
+      "min": 0,
+      "max": 1
+    },
+    "matrix_spec_qvalue": {
+      "type": "float",
+      "min": 0,
+      "max": 1
+    },
+    "mbr": {
+      "type": "bool"
+    },
+    "matrices": {
+      "type": "bool"
+    },
+    "relaxed_protein_inference": {
+      "type": "bool"
+    },
+    "no_protein_inference": {
+      "type": "bool"
+    },
+    "skip_quant": {
+      "type": "bool"
+    },
+    "extra_cmdline": {
+      "type": "str"
+    }
   },
-  "inten_linear": {
-   "type": "bool"
+  "dia-pseudo": {
+    "ram_gb": {
+      "type": "int",
+      "min": 1
+    },
+    "threads": {
+      "type": "int",
+      "min": 1
+    },
+    "RPmax": {
+      "type": "int",
+      "min": 1
+    },
+    "RFmax": {
+      "type": "int",
+      "min": 1
+    },
+    "CorrThreshold": {
+      "type": "float",
+      "min": 0
+    },
+    "DeltaApex": {
+      "type": "float",
+      "min": 0
+    },
+    "RTOverlap": {
+      "type": "float",
+      "min": 0,
+      "max": 1
+    },
+    "AdjustFragIntensity": {
+      "type": "bool"
+    },
+    "BoostComplementaryIon": {
+      "type": "bool"
+    },
+    "ExportPrecursorPeak": {
+      "type": "bool"
+    },
+    "MS1PPM": {
+      "type": "float",
+      "min": 0
+    },
+    "MS2PPM": {
+      "type": "float",
+      "min": 0
+    },
+    "MS1SN": {
+      "type": "float",
+      "min": 0
+    },
+    "MS2SN": {
+      "type": "float",
+      "min": 0
+    },
+    "MassDefectFilter": {
+      "type": "bool"
+    },
+    "Q1": {
+      "type": "bool"
+    },
+    "Q2": {
+      "type": "bool"
+    },
+    "Q3": {
+      "type": "bool"
+    }
   },
-  "noindex": {
-   "type": "bool"
+  "dia-features": {
+    "ram_gb": {
+      "type": "int",
+      "min": 1
+    },
+    "threads": {
+      "type": "int",
+      "min": 1
+    },
+    "deltaApexIM": {
+      "type": "float",
+      "min": 0
+    },
+    "deltaApexRT": {
+      "type": "int",
+      "min": 0
+    },
+    "ms1MS2Corr": {
+      "type": "float",
+      "min": 0,
+      "max": 1
+    },
+    "massDefectFilter": {
+      "type": "bool"
+    },
+    "massDefectOffset": {
+      "type": "float",
+      "min": 0
+    },
+    "RFMax": {
+      "type": "int",
+      "min": 1
+    },
+    "writeInter": {
+      "type": "bool"
+    },
+    "bruker_lib_dir": {
+      "type": "str"
+    }
   },
-  "numpress_linear": {
-   "type": "bool"
+  "speclib-build": {
+    "max_delta_unimod": {
+      "type": "float",
+      "min": 0
+    },
+    "max_delta_ppm": {
+      "type": "float",
+      "min": 0
+    },
+    "max_psm_pep": {
+      "type": "float",
+      "min": 0,
+      "max": 1
+    },
+    "fragment_types": {
+      "type": "str_list"
+    },
+    "fragment_charges": {
+      "type": "str_list"
+    },
+    "enable_specific_losses": {
+      "type": "bool"
+    },
+    "enable_unspecific_losses": {
+      "type": "bool"
+    },
+    "rt_lowess_fraction": {
+      "type": "float",
+      "min": 0,
+      "max": 1
+    },
+    "im_lowess_fraction": {
+      "type": "float",
+      "min": 0,
+      "max": 1
+    },
+    "psm_fdr_threshold": {
+      "type": "float",
+      "min": 0,
+      "max": 1
+    },
+    "peptide_fdr_threshold": {
+      "type": "float",
+      "min": 0,
+      "max": 1
+    },
+    "protein_fdr_threshold": {
+      "type": "float",
+      "min": 0,
+      "max": 1
+    },
+    "perform_rt_calibration": {
+      "type": "bool"
+    },
+    "perform_im_calibration": {
+      "type": "bool"
+    },
+    "nofdr": {
+      "type": "bool"
+    }
   },
-  "numpress_linear_abs_tol": {
-   "type": "float"
+  "glyco-localize": {
+    "ms1_tol": {
+      "type": "float",
+      "min": 0
+    },
+    "ms2_tol": {
+      "type": "float",
+      "min": 0
+    },
+    "glyco_db": {
+      "type": "str"
+    },
+    "max_glycans": {
+      "type": "int",
+      "min": 1
+    },
+    "min_isotope_error": {
+      "type": "int"
+    },
+    "max_isotope_error": {
+      "type": "int"
+    },
+    "filter_oxonium": {
+      "type": "bool"
+    },
+    "oxonium_filter_file": {
+      "type": "str"
+    },
+    "oxonium_min_intensity": {
+      "type": "float",
+      "min": 0,
+      "max": 1
+    },
+    "threads": {
+      "type": "int",
+      "min": 0
+    },
+    "glycan_residues_file": {
+      "type": "str"
+    },
+    "glycan_mods_file": {
+      "type": "str"
+    },
+    "dotnet_bin": {
+      "type": "str"
+    },
+    "activation1": {
+      "type": "str"
+    },
+    "activation2": {
+      "type": "str"
+    }
   },
-  "numpress_pic": {
-   "type": "bool"
+  "predict-rescore": {
+    "ram_gb": {
+      "type": "int"
+    },
+    "num_threads": {
+      "type": "int"
+    },
+    "use_rt": {
+      "type": "bool"
+    },
+    "use_spectra": {
+      "type": "bool"
+    },
+    "use_im": {
+      "type": "bool"
+    },
+    "rt_model": {
+      "type": "str"
+    },
+    "spectra_model": {
+      "type": "str"
+    },
+    "unimod_obo": {
+      "type": "str"
+    }
   },
-  "numpress_slof": {
-   "type": "bool"
+  "psm-integrate": {
+    "decoy_prefix": {
+      "type": "str"
+    },
+    "min_prob": {
+      "type": "float"
+    },
+    "num_threads": {
+      "type": "int"
+    },
+    "output_prefix": {
+      "type": "str"
+    },
+    "length": {
+      "type": "bool"
+    },
+    "sharpnse": {
+      "type": "bool"
+    },
+    "no_fpkm": {
+      "type": "bool"
+    },
+    "no_nrs": {
+      "type": "bool"
+    },
+    "no_nse": {
+      "type": "bool"
+    },
+    "no_nsi": {
+      "type": "bool"
+    },
+    "no_nsm": {
+      "type": "bool"
+    },
+    "no_nsp": {
+      "type": "bool"
+    },
+    "no_nss": {
+      "type": "bool"
+    }
   },
-  "numpress_all": {
-   "type": "bool"
-  },
-  "outfile": {
-   "type": "str"
-  },
-  "contact_info": {
-   "type": "str"
-  },
-  "filelist": {
-   "type": "str"
-  },
-  "config_file": {
-   "type": "str"
-  },
-  "verbose": {
-   "type": "bool"
-  },
-  "single_threaded": {
-   "type": "bool"
-  },
-  "continue_on_error": {
-   "type": "bool"
-  },
-  "merge": {
-   "type": "bool"
-  },
-  "combine_ion_mobility_spectra": {
-   "type": "bool"
-  },
-  "dda_processing": {
-   "type": "bool"
-  },
-  "gzip": {
-   "type": "bool"
-  },
-  "sim_as_spectra": {
-   "type": "bool"
-  },
-  "srm_as_spectra": {
-   "type": "bool"
-  },
-  "ignore_calibration_scans": {
-   "type": "bool"
-  },
-  "accept_zero_length_spectra": {
-   "type": "bool"
-  },
-  "ignore_missing_zero_samples": {
-   "type": "bool"
-  },
-  "ignore_unknown_instrument_error": {
-   "type": "bool"
-  },
-  "strip_location_from_source_files": {
-   "type": "bool"
-  },
-  "strip_version_from_software": {
-   "type": "bool"
-  },
-  "mzmlb_chunk_size": {
-   "type": "int"
-  },
-  "mzmlb_compression_level": {
-   "type": "int"
-  },
-  "run_index_set": {
-   "type": "str"
+  "protein-infer": {
+    "max_ppm_diff": {
+      "type": "int"
+    },
+    "min_prob": {
+      "type": "float"
+    },
+    "output_prefix": {
+      "type": "str"
+    },
+    "no_nsp": {
+      "type": "bool"
+    },
+    "subgroups": {
+      "type": "bool"
+    },
+    "unmapped": {
+      "type": "bool"
+    },
+    "from_psm_integrate": {
+      "type": "bool"
+    }
   }
- },
- "msfragger-closed": {
-  "database_path": {
-   "type": "str",
-   "required": true
-  },
-  "num_threads": {
-   "type": "int",
-   "min": 1
-  },
-  "ram_gb": {
-   "type": "int",
-   "min": 2
-  },
-  "precursor_tolerance_ppm": {
-   "type": "float",
-   "min": 0
-  },
-  "precursor_mass_lower_da": {
-   "type": "float"
-  },
-  "precursor_mass_upper_da": {
-   "type": "float"
-  },
-  "fragment_tolerance_ppm": {
-   "type": "float",
-   "min": 0
-  },
-  "isotope_error": {
-   "type": "str"
-  },
-  "calibrate_mass": {
-   "type": "int",
-   "enum": [
-    0,
-    1,
-    2
-   ]
-  },
-  "mass_diff_to_variable_mod": {
-   "type": "int",
-   "enum": [
-    0,
-    1,
-    2
-   ]
-  },
-  "localize_delta_mass": {
-   "type": "int",
-   "enum": [
-    0,
-    1
-   ]
-  },
-  "mass_offsets": {
-   "type": "str"
-  },
-  "mass_offsets_detailed": {
-   "type": "str"
-  },
-  "labile_search_mode": {
-   "type": "str",
-   "enum": [
-    "off",
-    "labile",
-    "nglycan"
-   ]
-  },
-  "labile_fragment_ion_series": {
-   "type": "str"
-  },
-  "enzyme_name": {
-   "type": "str"
-  },
-  "enzyme_cut": {
-   "type": "str"
-  },
-  "enzyme_nocut": {
-   "type": "str"
-  },
-  "num_enzyme_termini": {
-   "type": "int",
-   "enum": [
-    0,
-    1,
-    2
-   ]
-  },
-  "allowed_missed_cleavage": {
-   "type": "int",
-   "min": 0,
-   "max": 5
-  },
-  "digest_min_length": {
-   "type": "int",
-   "min": 1
-  },
-  "digest_max_length": {
-   "type": "int",
-   "min": 1
-  },
-  "digest_min_mass": {
-   "type": "float"
-  },
-  "digest_max_mass": {
-   "type": "float"
-  },
-  "var_mod_oxidation_M": {
-   "type": "bool"
-  },
-  "var_mod_acetyl_nterm": {
-   "type": "bool"
-  },
-  "variable_mods": {
-   "type": "str"
-  },
-  "fixed_mod_C_carbamidomethyl": {
-   "type": "bool"
-  },
-  "tmt_label_mass": {
-   "type": "float"
-  },
-  "tmt_kside_variable": {
-   "type": "bool"
-  },
-  "max_variable_mods_per_peptide": {
-   "type": "int",
-   "min": 0,
-   "max": 10
-  },
-  "decoy_prefix": {
-   "type": "str"
-  },
-  "output_format": {
-   "type": "str",
-   "enum": [
-    "pepXML",
-    "pepXML_pin",
-    "tsv",
-    "tsv_pin"
-   ]
-  }
- },
- "crystalc": {
-  "ram_gb": {
-   "type": "int",
-   "min": 1
-  },
-  "num_threads": {
-   "type": "int"
-  },
-  "precursor_charge_min": {
-   "type": "int",
-   "min": 1
-  },
-  "precursor_charge_max": {
-   "type": "int",
-   "min": 1
-  },
-  "isotope_number": {
-   "type": "int",
-   "min": 1
-  },
-  "precursor_mass_ppm": {
-   "type": "float",
-   "min": 0
-  },
-  "precursor_isolation_window": {
-   "type": "float",
-   "min": 0
-  },
-  "correct_isotope_error": {
-   "type": "bool"
-  },
-  "raw_file_extension": {
-   "type": "str"
-  },
-  "grppr_jar_path": {
-   "type": "str"
-  }
- },
- "percolator": {
-  "test_fdr": {
-   "type": "float",
-   "min": 0,
-   "max": 1
-  },
-  "train_fdr": {
-   "type": "float",
-   "min": 0,
-   "max": 1
-  },
-  "max_iter": {
-   "type": "int",
-   "min": 1
-  },
-  "num_threads": {
-   "type": "int",
-   "min": 1
-  },
-  "seed": {
-   "type": "int",
-   "min": 0
-  },
-  "subset_max_train": {
-   "type": "int",
-   "min": 0
-  },
-  "only_psms": {
-   "type": "bool"
-  },
-  "post_processing_tdc": {
-   "type": "bool"
-  },
-  "decoy_prefix": {
-   "type": "str"
-  },
-  "picked_protein_fasta": {
-   "type": "str"
-  }
- },
- "percolator-to-pepxml": {
-  "jar_path": {
-   "type": "str"
-  },
-  "data_type": {
-   "type": "enum",
-   "enum": [
-    "DDA",
-    "DIA"
-   ]
-  },
-  "min_prob": {
-   "type": "float",
-   "min": 0,
-   "max": 1
-  },
-  "updated_fasta_path": {
-   "type": "str"
-  }
- },
- "philosopher-database": {
-  "decoy_prefix": {
-   "type": "str"
-  },
-  "add_contam": {
-   "type": "bool"
-  },
-  "contam_prefix": {
-   "type": "bool"
-  },
-  "enzyme": {
-   "type": "str",
-   "enum": [
-    "trypsin",
-    "lys_c",
-    "lys_n",
-    "glu_c",
-    "chymotrypsin"
-   ]
-  },
-  "isoform": {
-   "type": "bool"
-  },
-  "reviewed": {
-   "type": "bool"
-  }
- },
- "peptideprophet": {
-  "decoy_prefix": {
-   "type": "str"
-  },
-  "output_prefix": {
-   "type": "str"
-  },
-  "ppm": {
-   "type": "bool"
-  },
-  "accmass": {
-   "type": "bool"
-  },
-  "nonparam": {
-   "type": "bool"
-  },
-  "decoyprobs": {
-   "type": "bool"
-  },
-  "combine": {
-   "type": "bool"
-  }
- },
- "ptmprophet": {
-  "mods": {
-   "type": "str"
-  },
-  "minprob": {
-   "type": "float",
-   "min": 0,
-   "max": 1
-  },
-  "em": {
-   "type": "int",
-   "enum": [
-    0,
-    1,
-    2,
-    3
-   ]
-  },
-  "keepold": {
-   "type": "bool"
-  },
-  "static": {
-   "type": "bool"
-  },
-  "fragppmtol": {
-   "type": "float",
-   "min": 0
-  },
-  "nions": {
-   "type": "str"
-  },
-  "nostack": {
-   "type": "bool"
-  },
-  "extra_cmdline": {
-   "type": "str"
-  }
- },
- "philosopher-report": {
-  "decoy_prefix": {
-   "type": "str"
-  },
-  "psm_fdr": {
-   "type": "float",
-   "min": 0,
-   "max": 1
-  },
-  "peptide_fdr": {
-   "type": "float",
-   "min": 0,
-   "max": 1
-  },
-  "ion_fdr": {
-   "type": "float",
-   "min": 0,
-   "max": 1
-  },
-  "protein_fdr": {
-   "type": "float",
-   "min": 0,
-   "max": 1
-  },
-  "inference": {
-   "type": "bool"
-  },
-  "razor": {
-   "type": "bool"
-  },
-  "picked": {
-   "type": "bool"
-  },
-  "sequential": {
-   "type": "bool"
-  },
-  "report_decoys": {
-   "type": "bool"
-  },
-  "report_msstats": {
-   "type": "bool"
-  },
-  "remove_contam": {
-   "type": "bool"
-  }
- },
- "ionquant": {
-  "binary_path": {
-   "type": "str"
-  },
-  "ram_gb": {
-   "type": "int",
-   "min": 2
-  },
-  "threads": {
-   "type": "int",
-   "min": 0
-  },
-  "mztol_ppm": {
-   "type": "float",
-   "min": 0
-  },
-  "rttol_min": {
-   "type": "float",
-   "min": 0
-  },
-  "minisotopes": {
-   "type": "int",
-   "enum": [
-    1,
-    2,
-    3
-   ]
-  },
-  "minscans": {
-   "type": "int",
-   "min": 1
-  },
-  "perform_ms1quant": {
-   "type": "bool"
-  },
-  "perform_isoquant": {
-   "type": "bool"
-  },
-  "isotype": {
-   "type": "str",
-   "enum": [
-    "iTRAQ-4",
-    "iTRAQ-8",
-    "TMT-0",
-    "TMT-2",
-    "TMT-6",
-    "TMT-10",
-    "TMT-11",
-    "TMT-16",
-    "TMT-18",
-    "TMT-35"
-   ]
-  },
-  "isolevel": {
-   "type": "int",
-   "enum": [
-    2,
-    3
-   ]
-  },
-  "annotation_file": {
-   "type": "str"
-  },
-  "maxlfq": {
-   "type": "bool"
-  },
-  "mbr": {
-   "type": "bool"
-  },
-  "normalization": {
-   "type": "bool"
-  },
-  "msstats": {
-   "type": "bool"
-  }
- },
- "ptmshepherd": {
-  "ram_gb": {
-   "type": "int",
-   "min": 1
-  },
-  "threads": {
-   "type": "int"
-  },
-  "glyco_mode": {
-   "type": "bool"
-  },
-  "n_glyco": {
-   "type": "bool"
-  },
-  "annotation_file": {
-   "type": "str"
-  },
-  "annotation_tol": {
-   "type": "float",
-   "min": 0
-  },
-  "mass_offsets": {
-   "type": "str"
-  },
-  "isotope_error": {
-   "type": "str"
-  },
-  "peakpicking_promRatio": {
-   "type": "float",
-   "min": 0
-  },
-  "peakpicking_width": {
-   "type": "float",
-   "min": 0
-  },
-  "peakpicking_topN": {
-   "type": "int",
-   "min": 1
-  },
-  "peakpicking_minPsm": {
-   "type": "int",
-   "min": 1
-  },
-  "precursor_tol": {
-   "type": "float",
-   "min": 0
-  },
-  "precursor_mass_units": {
-   "type": "int",
-   "enum": [
-    0,
-    1
-   ]
-  },
-  "varmod_masses": {
-   "type": "str"
-  },
-  "spectra_ppmtol": {
-   "type": "float",
-   "min": 0
-  },
-  "spectra_maxfragcharge": {
-   "type": "int",
-   "min": 1
-  },
-  "iontype_a": {
-   "type": "bool"
-  },
-  "iontype_b": {
-   "type": "bool"
-  },
-  "iontype_c": {
-   "type": "bool"
-  },
-  "iontype_x": {
-   "type": "bool"
-  },
-  "iontype_y": {
-   "type": "bool"
-  },
-  "iontype_z": {
-   "type": "bool"
-  },
-  "compare_betweenRuns": {
-   "type": "bool"
-  },
-  "output_extended": {
-   "type": "bool"
-  },
-  "prep_for_ionquant": {
-   "type": "bool"
-  }
- },
- "tmtintegrator": {
-  "annotation_file": {
-   "type": "str",
-   "required": true
-  },
-  "channel_num": {
-   "type": "int",
-   "enum": [
-    4,
-    8,
-    6,
-    10,
-    11,
-    16,
-    18,
-    35
-   ]
-  },
-  "ref_tag": {
-   "type": "str"
-  },
-  "add_Ref": {
-   "type": "int",
-   "enum": [
-    -2,
-    -1,
-    0,
-    1,
-    2
-   ]
-  },
-  "groupby": {
-   "type": "int",
-   "enum": [
-    -1,
-    0,
-    1,
-    2,
-    3,
-    4,
-    5
-   ]
-  },
-  "prot_norm": {
-   "type": "int",
-   "enum": [
-    -1,
-    0,
-    1,
-    2,
-    3
-   ]
-  },
-  "aggregation_method": {
-   "type": "int",
-   "enum": [
-    0,
-    1
-   ]
-  },
-  "log2transformed": {
-   "type": "bool"
-  },
-  "allow_overlabel": {
-   "type": "bool"
-  },
-  "allow_unlabeled": {
-   "type": "bool"
-  },
-  "best_psm": {
-   "type": "bool"
-  },
-  "outlier_removal": {
-   "type": "bool"
-  },
-  "psm_norm": {
-   "type": "bool"
-  },
-  "ms1_int": {
-   "type": "bool"
-  },
-  "min_pep_prob": {
-   "type": "float",
-   "min": 0,
-   "max": 1
-  },
-  "min_purity": {
-   "type": "float",
-   "min": 0,
-   "max": 1
-  },
-  "min_percent": {
-   "type": "float",
-   "min": 0,
-   "max": 1
-  },
-  "min_site_prob": {
-   "type": "float"
-  },
-  "min_snr": {
-   "type": "float"
-  },
-  "unique_pep": {
-   "type": "bool"
-  },
-  "unique_gene": {
-   "type": "int",
-   "enum": [
-    0,
-    1,
-    2
-   ]
-  },
-  "mod_tag": {
-   "type": "str"
-  },
-  "prot_exclude": {
-   "type": "str"
-  },
-  "ram_gb": {
-   "type": "int",
-   "min": 1
-  }
- },
- "diann": {
-  "library_path": {
-   "type": "str"
-  },
-  "fasta_path": {
-   "type": "str"
-  },
-  "num_threads": {
-   "type": "int",
-   "min": 1
-  },
-  "precursor_qvalue": {
-   "type": "float",
-   "min": 0,
-   "max": 1
-  },
-  "protein_qvalue": {
-   "type": "float",
-   "min": 0,
-   "max": 1
-  },
-  "matrix_spec_qvalue": {
-   "type": "float",
-   "min": 0,
-   "max": 1
-  },
-  "mbr": {
-   "type": "bool"
-  },
-  "matrices": {
-   "type": "bool"
-  },
-  "relaxed_protein_inference": {
-   "type": "bool"
-  },
-  "no_protein_inference": {
-   "type": "bool"
-  },
-  "skip_quant": {
-   "type": "bool"
-  },
-  "extra_cmdline": {
-   "type": "str"
-  }
- },
- "diaumpire": {
-  "ram_gb": {
-   "type": "int",
-   "min": 1
-  },
-  "threads": {
-   "type": "int",
-   "min": 1
-  },
-  "RPmax": {
-   "type": "int",
-   "min": 1
-  },
-  "RFmax": {
-   "type": "int",
-   "min": 1
-  },
-  "CorrThreshold": {
-   "type": "float",
-   "min": 0
-  },
-  "DeltaApex": {
-   "type": "float",
-   "min": 0
-  },
-  "RTOverlap": {
-   "type": "float",
-   "min": 0,
-   "max": 1
-  },
-  "AdjustFragIntensity": {
-   "type": "bool"
-  },
-  "BoostComplementaryIon": {
-   "type": "bool"
-  },
-  "ExportPrecursorPeak": {
-   "type": "bool"
-  },
-  "MS1PPM": {
-   "type": "float",
-   "min": 0
-  },
-  "MS2PPM": {
-   "type": "float",
-   "min": 0
-  },
-  "MS1SN": {
-   "type": "float",
-   "min": 0
-  },
-  "MS2SN": {
-   "type": "float",
-   "min": 0
-  },
-  "MassDefectFilter": {
-   "type": "bool"
-  },
-  "Q1": {
-   "type": "bool"
-  },
-  "Q2": {
-   "type": "bool"
-  },
-  "Q3": {
-   "type": "bool"
-  }
- },
- "diatracer": {
-  "ram_gb": {
-   "type": "int",
-   "min": 1
-  },
-  "threads": {
-   "type": "int",
-   "min": 1
-  },
-  "deltaApexIM": {
-   "type": "float",
-   "min": 0
-  },
-  "deltaApexRT": {
-   "type": "int",
-   "min": 0
-  },
-  "ms1MS2Corr": {
-   "type": "float",
-   "min": 0,
-   "max": 1
-  },
-  "massDefectFilter": {
-   "type": "bool"
-  },
-  "massDefectOffset": {
-   "type": "float",
-   "min": 0
-  },
-  "RFMax": {
-   "type": "int",
-   "min": 1
-  },
-  "writeInter": {
-   "type": "bool"
-  },
-  "bruker_lib_dir": {
-   "type": "str"
-  }
- },
- "easypqp": {
-  "max_delta_unimod": {
-   "type": "float",
-   "min": 0
-  },
-  "max_delta_ppm": {
-   "type": "float",
-   "min": 0
-  },
-  "max_psm_pep": {
-   "type": "float",
-   "min": 0,
-   "max": 1
-  },
-  "fragment_types": {
-   "type": "str_list"
-  },
-  "fragment_charges": {
-   "type": "str_list"
-  },
-  "enable_specific_losses": {
-   "type": "bool"
-  },
-  "enable_unspecific_losses": {
-   "type": "bool"
-  },
-  "rt_lowess_fraction": {
-   "type": "float",
-   "min": 0,
-   "max": 1
-  },
-  "im_lowess_fraction": {
-   "type": "float",
-   "min": 0,
-   "max": 1
-  },
-  "psm_fdr_threshold": {
-   "type": "float",
-   "min": 0,
-   "max": 1
-  },
-  "peptide_fdr_threshold": {
-   "type": "float",
-   "min": 0,
-   "max": 1
-  },
-  "protein_fdr_threshold": {
-   "type": "float",
-   "min": 0,
-   "max": 1
-  },
-  "perform_rt_calibration": {
-   "type": "bool"
-  },
-  "perform_im_calibration": {
-   "type": "bool"
-  },
-  "nofdr": {
-   "type": "bool"
-  },
-  "diannpqp": {
-   "type": "bool"
-  }
- },
- "opair": {
-  "ms1_tol": {
-   "type": "float",
-   "min": 0
-  },
-  "ms2_tol": {
-   "type": "float",
-   "min": 0
-  },
-  "glyco_db": {
-   "type": "str"
-  },
-  "max_glycans": {
-   "type": "int",
-   "min": 1
-  },
-  "min_isotope_error": {
-   "type": "int"
-  },
-  "max_isotope_error": {
-   "type": "int"
-  },
-  "filter_oxonium": {
-   "type": "bool"
-  },
-  "oxonium_filter_file": {
-   "type": "str"
-  },
-  "oxonium_min_intensity": {
-   "type": "float",
-   "min": 0,
-   "max": 1
-  },
-  "threads": {
-   "type": "int",
-   "min": 0
-  },
-  "glycan_residues_file": {
-   "type": "str"
-  },
-  "glycan_mods_file": {
-   "type": "str"
-  },
-  "dotnet_bin": {
-   "type": "str"
-  },
-  "activation1": {
-   "type": "str"
-  },
-  "activation2": {
-   "type": "str"
-  }
- },
- "msbooster": {
-  "ram_gb": {
-   "type": "int"
-  },
-  "num_threads": {
-   "type": "int"
-  },
-  "diann_path": {
-   "type": "str"
-  },
-  "use_rt": {
-   "type": "bool"
-  },
-  "use_spectra": {
-   "type": "bool"
-  },
-  "use_im": {
-   "type": "bool"
-  },
-  "rt_model": {
-   "type": "str"
-  },
-  "spectra_model": {
-   "type": "str"
-  },
-  "unimod_obo": {
-   "type": "str"
-  },
-  "msbooster_jar": {
-   "type": "str"
-  },
-  "batmass_io_jar": {
-   "type": "str"
-  }
- },
- "iprophet": {
-  "decoy_prefix": {
-   "type": "str"
-  },
-  "min_prob": {
-   "type": "float"
-  },
-  "num_threads": {
-   "type": "int"
-  },
-  "output_prefix": {
-   "type": "str"
-  },
-  "length": {
-   "type": "bool"
-  },
-  "sharpnse": {
-   "type": "bool"
-  },
-  "no_fpkm": {
-   "type": "bool"
-  },
-  "no_nrs": {
-   "type": "bool"
-  },
-  "no_nse": {
-   "type": "bool"
-  },
-  "no_nsi": {
-   "type": "bool"
-  },
-  "no_nsm": {
-   "type": "bool"
-  },
-  "no_nsp": {
-   "type": "bool"
-  },
-  "no_nss": {
-   "type": "bool"
-  }
- },
- "proteinprophet": {
-  "max_ppm_diff": {
-   "type": "int"
-  },
-  "min_prob": {
-   "type": "float"
-  },
-  "output_prefix": {
-   "type": "str"
-  },
-  "iprophet": {
-   "type": "bool"
-  },
-  "no_nsp": {
-   "type": "bool"
-  },
-  "subgroups": {
-   "type": "bool"
-  },
-  "unmapped": {
-   "type": "bool"
-  }
- }
 }

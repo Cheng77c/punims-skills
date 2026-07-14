@@ -1,698 +1,698 @@
 {
- "bottomup-closed": {
-  "convert": "msconvert",
-  "search": "msfragger-closed",
-  "rescore": "percolator"
- },
- "bottomup-lfq": {
-  "convert": "msconvert",
-  "search": "msfragger-closed",
-  "report": "philosopher-report",
-  "quant": "ionquant"
- },
- "fp-basic-search": {
-  "convert": "msconvert",
-  "database": "philosopher-database",
-  "search": "msfragger-closed",
-  "rescore": "percolator",
-  "to_pepxml": "percolator-to-pepxml",
-  "report": "philosopher-report",
-  "quant": "ionquant"
- },
- "fp-chemprot-abpp-diatop": {
-  "convert": "msconvert",
-  "diann_quant": "diann"
- },
- "fp-chemprot-abpp-iadtb-diapasef": {
-  "diann_quant": "diann"
- },
- "fp-chemprot-abpp-iadtb-tmt16": {
-  "convert": "msconvert",
-  "database": "philosopher-database",
-  "search": "msfragger-closed",
-  "rescore": "percolator",
-  "to_pepxml": "percolator-to-pepxml",
-  "report": "philosopher-report",
-  "quant": "ionquant",
-  "tmtquant": "tmtintegrator"
- },
- "fp-chemprot-abpp-ipiaa": {
-  "convert": "msconvert",
-  "database": "philosopher-database",
-  "search": "msfragger-closed",
-  "rescore": "percolator",
-  "to_pepxml": "percolator-to-pepxml",
-  "report": "philosopher-report",
-  "quant": "ionquant"
- },
- "fp-chemprot-abpp-isodtb": {
-  "convert": "msconvert",
-  "database": "philosopher-database",
-  "search": "msfragger-closed",
-  "rescore": "percolator",
-  "to_pepxml": "percolator-to-pepxml",
-  "report": "philosopher-report",
-  "quant": "ionquant"
- },
- "fp-chemprot-abpp-isotop": {
-  "convert": "msconvert",
-  "database": "philosopher-database",
-  "search": "msfragger-closed",
-  "rescore": "percolator",
-  "to_pepxml": "percolator-to-pepxml",
-  "report": "philosopher-report",
-  "quant": "ionquant"
- },
- "fp-chemprot-pal": {
-  "convert": "msconvert",
-  "database": "philosopher-database",
-  "search": "msfragger-closed",
-  "rescore": "percolator",
-  "to_pepxml": "percolator-to-pepxml",
-  "report": "philosopher-report",
-  "quant": "ionquant",
-  "ptm_summary": "ptmshepherd"
- },
- "fp-citrullination": {
-  "convert": "msconvert",
-  "database": "philosopher-database",
-  "search": "msfragger-closed",
-  "rescore": "percolator",
-  "to_pepxml": "percolator-to-pepxml",
-  "report": "philosopher-report",
-  "quant": "ionquant"
- },
- "fp-dia-dia-umpire-speclib-quant": {
-  "convert": "msconvert",
-  "diann_quant": "diann"
- },
- "fp-dia-speclib-quant": {
-  "convert": "msconvert",
-  "diann_quant": "diann"
- },
- "fp-dia-speclib-quant-diapasef": {
-  "diann_quant": "diann"
- },
- "fp-dia-speclib-quant-phospho": {
-  "convert": "msconvert",
-  "diann_quant": "diann"
- },
- "fp-dia-speclib-quant-phospho-diapasef": {
-  "diann_quant": "diann"
- },
- "fp-dia-speclib-quant-ubiq": {
-  "convert": "msconvert",
-  "diann_quant": "diann"
- },
- "fp-diagnostic-ion-mining": {
-  "convert": "msconvert",
-  "database": "philosopher-database",
-  "search": "msfragger-closed",
-  "cleanup": "crystalc",
-  "validate": "peptideprophet",
-  "report": "philosopher-report",
-  "ptm_summary": "ptmshepherd"
- },
- "fp-fpop": {
-  "convert": "msconvert",
-  "database": "philosopher-database",
-  "search": "msfragger-closed",
-  "validate": "peptideprophet",
-  "report": "philosopher-report",
-  "quant": "ionquant"
- },
- "fp-glyco-n-dia": {
-  "convert": "msconvert",
-  "diann_quant": "diann"
- },
- "fp-glyco-n-hcd": {
-  "convert": "msconvert",
-  "database": "philosopher-database",
-  "search": "msfragger-closed",
-  "validate": "peptideprophet",
-  "report": "philosopher-report",
-  "quant": "ionquant"
- },
- "fp-glyco-n-hybrid": {
-  "convert": "msconvert",
-  "database": "philosopher-database",
-  "search": "msfragger-closed",
-  "validate": "peptideprophet",
-  "report": "philosopher-report",
-  "quant": "ionquant"
- },
- "fp-glyco-n-lfq": {
-  "convert": "msconvert",
-  "database": "philosopher-database",
-  "search": "msfragger-closed",
-  "validate": "peptideprophet",
-  "report": "philosopher-report",
-  "quant": "ionquant"
- },
- "fp-glyco-n-open-hcd": {
-  "convert": "msconvert",
-  "database": "philosopher-database",
-  "search": "msfragger-closed",
-  "cleanup": "crystalc",
-  "validate": "peptideprophet",
-  "report": "philosopher-report",
-  "quant": "ionquant",
-  "ptm_summary": "ptmshepherd"
- },
- "fp-glyco-n-open-hybrid": {
-  "convert": "msconvert",
-  "database": "philosopher-database",
-  "search": "msfragger-closed",
-  "cleanup": "crystalc",
-  "validate": "peptideprophet",
-  "report": "philosopher-report",
-  "quant": "ionquant",
-  "ptm_summary": "ptmshepherd"
- },
- "fp-glyco-n-tmt": {
-  "convert": "msconvert",
-  "database": "philosopher-database",
-  "search": "msfragger-closed",
-  "validate": "peptideprophet",
-  "report": "philosopher-report",
-  "quant": "ionquant",
-  "ptm_summary": "ptmshepherd",
-  "tmtquant": "tmtintegrator"
- },
- "fp-glyco-o-dia-hcd": {
-  "convert": "msconvert",
-  "diann_quant": "diann"
- },
- "fp-glyco-o-dia-opair": {
-  "convert": "msconvert",
-  "database": "philosopher-database",
-  "search": "msfragger-closed",
-  "validate": "peptideprophet",
-  "report": "philosopher-report",
-  "build_library": "easypqp",
-  "diann_quant": "diann",
-  "oglyc_localize": "opair"
- },
- "fp-glyco-o-hcd": {
-  "convert": "msconvert",
-  "database": "philosopher-database",
-  "search": "msfragger-closed",
-  "validate": "peptideprophet",
-  "report": "philosopher-report",
-  "quant": "ionquant"
- },
- "fp-glyco-o-hybrid": {
-  "convert": "msconvert",
-  "database": "philosopher-database",
-  "search": "msfragger-closed",
-  "validate": "peptideprophet",
-  "report": "philosopher-report",
-  "quant": "ionquant",
-  "oglyc_localize": "opair"
- },
- "fp-glyco-o-open-hcd": {
-  "convert": "msconvert",
-  "database": "philosopher-database",
-  "search": "msfragger-closed",
-  "cleanup": "crystalc",
-  "validate": "peptideprophet",
-  "report": "philosopher-report",
-  "quant": "ionquant",
-  "ptm_summary": "ptmshepherd"
- },
- "fp-glyco-o-open-hybrid": {
-  "convert": "msconvert",
-  "database": "philosopher-database",
-  "search": "msfragger-closed",
-  "cleanup": "crystalc",
-  "validate": "peptideprophet",
-  "report": "philosopher-report",
-  "quant": "ionquant",
-  "ptm_summary": "ptmshepherd"
- },
- "fp-glyco-o-pair": {
-  "convert": "msconvert",
-  "database": "philosopher-database",
-  "search": "msfragger-closed",
-  "validate": "peptideprophet",
-  "report": "philosopher-report",
-  "quant": "ionquant",
-  "oglyc_localize": "opair"
- },
- "fp-itraq4": {
-  "convert": "msconvert",
-  "database": "philosopher-database",
-  "search": "msfragger-closed",
-  "rescore": "percolator",
-  "to_pepxml": "percolator-to-pepxml",
-  "report": "philosopher-report",
-  "quant": "ionquant",
-  "tmtquant": "tmtintegrator"
- },
- "fp-itraq4-phospho": {
-  "convert": "msconvert",
-  "database": "philosopher-database",
-  "search": "msfragger-closed",
-  "rescore": "percolator",
-  "to_pepxml": "percolator-to-pepxml",
-  "localize": "ptmprophet",
-  "report": "philosopher-report",
-  "quant": "ionquant",
-  "tmtquant": "tmtintegrator"
- },
- "fp-labile-adp-ribosylation": {
-  "convert": "msconvert",
-  "database": "philosopher-database",
-  "search": "msfragger-closed",
-  "validate": "peptideprophet",
-  "localize": "ptmprophet",
-  "report": "philosopher-report",
-  "quant": "ionquant"
- },
- "fp-labile-phospho": {
-  "convert": "msconvert",
-  "database": "philosopher-database",
-  "search": "msfragger-closed",
-  "validate": "peptideprophet",
-  "localize": "ptmprophet",
-  "report": "philosopher-report",
-  "quant": "ionquant"
- },
- "fp-lfq-mbr": {
-  "convert": "msconvert",
-  "database": "philosopher-database",
-  "search": "msfragger-closed",
-  "rescore": "percolator",
-  "to_pepxml": "percolator-to-pepxml",
-  "report": "philosopher-report",
-  "quant": "ionquant"
- },
- "fp-lfq-phospho": {
-  "convert": "msconvert",
-  "database": "philosopher-database",
-  "search": "msfragger-closed",
-  "rescore": "percolator",
-  "to_pepxml": "percolator-to-pepxml",
-  "localize": "ptmprophet",
-  "report": "philosopher-report",
-  "quant": "ionquant"
- },
- "fp-lfq-ubiquitin": {
-  "convert": "msconvert",
-  "database": "philosopher-database",
-  "search": "msfragger-closed",
-  "rescore": "percolator",
-  "to_pepxml": "percolator-to-pepxml",
-  "localize": "ptmprophet",
-  "report": "philosopher-report",
-  "quant": "ionquant"
- },
- "fp-mass-offset-commonptms": {
-  "convert": "msconvert",
-  "database": "philosopher-database",
-  "search": "msfragger-closed",
-  "rescore": "percolator",
-  "to_pepxml": "percolator-to-pepxml",
-  "report": "philosopher-report",
-  "ptm_summary": "ptmshepherd"
- },
- "fp-nonspecific-hla": {
-  "convert": "msconvert",
-  "database": "philosopher-database",
-  "search": "msfragger-closed",
-  "rescore": "percolator",
-  "to_pepxml": "percolator-to-pepxml",
-  "report": "philosopher-report",
-  "quant": "ionquant"
- },
- "fp-nonspecific-hla-c57": {
-  "convert": "msconvert",
-  "database": "philosopher-database",
-  "search": "msfragger-closed",
-  "rescore": "percolator",
-  "to_pepxml": "percolator-to-pepxml",
-  "report": "philosopher-report",
-  "quant": "ionquant"
- },
- "fp-nonspecific-hla-customdb-groupfdr": {
-  "convert": "msconvert",
-  "database": "philosopher-database",
-  "search": "msfragger-closed",
-  "rescore": "percolator",
-  "to_pepxml": "percolator-to-pepxml",
-  "report": "philosopher-report",
-  "quant": "ionquant"
- },
- "fp-nonspecific-hla-dia": {
-  "convert": "msconvert",
-  "diann_quant": "diann"
- },
- "fp-nonspecific-hla-dia-astral": {
-  "convert": "msconvert",
-  "diann_quant": "diann"
- },
- "fp-nonspecific-hla-diapasef": {
-  "diann_quant": "diann"
- },
- "fp-nonspecific-hla-glyco": {
-  "convert": "msconvert",
-  "database": "philosopher-database",
-  "search": "msfragger-closed",
-  "validate": "peptideprophet",
-  "report": "philosopher-report",
-  "ptm_summary": "ptmshepherd"
- },
- "fp-nonspecific-hla-phospho": {
-  "convert": "msconvert",
-  "database": "philosopher-database",
-  "search": "msfragger-closed",
-  "rescore": "percolator",
-  "to_pepxml": "percolator-to-pepxml",
-  "localize": "ptmprophet",
-  "report": "philosopher-report",
-  "quant": "ionquant"
- },
- "fp-nonspecific-hla-tmt10": {
-  "convert": "msconvert",
-  "database": "philosopher-database",
-  "search": "msfragger-closed",
-  "rescore": "percolator",
-  "to_pepxml": "percolator-to-pepxml",
-  "report": "philosopher-report",
-  "quant": "ionquant",
-  "tmtquant": "tmtintegrator"
- },
- "fp-nonspecific-peptidome": {
-  "convert": "msconvert",
-  "database": "philosopher-database",
-  "search": "msfragger-closed",
-  "rescore": "percolator",
-  "to_pepxml": "percolator-to-pepxml",
-  "report": "philosopher-report",
-  "quant": "ionquant"
- },
- "fp-open": {
-  "convert": "msconvert",
-  "database": "philosopher-database",
-  "search": "msfragger-closed",
-  "cleanup": "crystalc",
-  "validate": "peptideprophet",
-  "report": "philosopher-report",
-  "ptm_summary": "ptmshepherd"
- },
- "fp-open-quickscan": {
-  "convert": "msconvert",
-  "database": "philosopher-database",
-  "search": "msfragger-closed",
-  "cleanup": "crystalc",
-  "validate": "peptideprophet",
-  "report": "philosopher-report",
-  "ptm_summary": "ptmshepherd"
- },
- "fp-silac3": {
-  "convert": "msconvert",
-  "database": "philosopher-database",
-  "search": "msfragger-closed",
-  "rescore": "percolator",
-  "to_pepxml": "percolator-to-pepxml",
-  "report": "philosopher-report",
-  "quant": "ionquant"
- },
- "fp-silac3-phospho": {
-  "convert": "msconvert",
-  "database": "philosopher-database",
-  "search": "msfragger-closed",
-  "rescore": "percolator",
-  "to_pepxml": "percolator-to-pepxml",
-  "report": "philosopher-report",
-  "quant": "ionquant"
- },
- "fp-stellar-dda": {
-  "convert": "msconvert",
-  "database": "philosopher-database",
-  "search": "msfragger-closed",
-  "rescore": "percolator",
-  "to_pepxml": "percolator-to-pepxml",
-  "report": "philosopher-report",
-  "quant": "ionquant"
- },
- "fp-stellar-gpfdia": {
-  "convert": "msconvert",
-  "database": "philosopher-database",
-  "search": "msfragger-closed",
-  "rescore": "percolator",
-  "to_pepxml": "percolator-to-pepxml",
-  "report": "philosopher-report",
-  "quant": "ionquant"
- },
- "fp-tmt10": {
-  "convert": "msconvert",
-  "database": "philosopher-database",
-  "search": "msfragger-closed",
-  "rescore": "percolator",
-  "to_pepxml": "percolator-to-pepxml",
-  "report": "philosopher-report",
-  "quant": "ionquant",
-  "tmtquant": "tmtintegrator"
- },
- "fp-tmt10-acetyl": {
-  "convert": "msconvert",
-  "database": "philosopher-database",
-  "search": "msfragger-closed",
-  "rescore": "percolator",
-  "to_pepxml": "percolator-to-pepxml",
-  "localize": "ptmprophet",
-  "report": "philosopher-report",
-  "quant": "ionquant",
-  "tmtquant": "tmtintegrator"
- },
- "fp-tmt10-acetyl-noloc": {
-  "convert": "msconvert",
-  "database": "philosopher-database",
-  "search": "msfragger-closed",
-  "rescore": "percolator",
-  "to_pepxml": "percolator-to-pepxml",
-  "report": "philosopher-report",
-  "quant": "ionquant",
-  "tmtquant": "tmtintegrator"
- },
- "fp-tmt10-bridge": {
-  "convert": "msconvert",
-  "database": "philosopher-database",
-  "search": "msfragger-closed",
-  "rescore": "percolator",
-  "to_pepxml": "percolator-to-pepxml",
-  "report": "philosopher-report",
-  "quant": "ionquant",
-  "tmtquant": "tmtintegrator"
- },
- "fp-tmt10-ms3": {
-  "convert": "msconvert",
-  "database": "philosopher-database",
-  "search": "msfragger-closed",
-  "rescore": "percolator",
-  "to_pepxml": "percolator-to-pepxml",
-  "report": "philosopher-report",
-  "quant": "ionquant",
-  "tmtquant": "tmtintegrator"
- },
- "fp-tmt10-ms3-phospho": {
-  "convert": "msconvert",
-  "database": "philosopher-database",
-  "search": "msfragger-closed",
-  "rescore": "percolator",
-  "to_pepxml": "percolator-to-pepxml",
-  "localize": "ptmprophet",
-  "report": "philosopher-report",
-  "quant": "ionquant",
-  "tmtquant": "tmtintegrator"
- },
- "fp-tmt10-open": {
-  "convert": "msconvert",
-  "database": "philosopher-database",
-  "search": "msfragger-closed",
-  "cleanup": "crystalc",
-  "validate": "peptideprophet",
-  "report": "philosopher-report",
-  "ptm_summary": "ptmshepherd",
-  "quant": "ionquant",
-  "tmtquant": "tmtintegrator"
- },
- "fp-tmt10-phospho": {
-  "convert": "msconvert",
-  "database": "philosopher-database",
-  "search": "msfragger-closed",
-  "rescore": "percolator",
-  "to_pepxml": "percolator-to-pepxml",
-  "localize": "ptmprophet",
-  "report": "philosopher-report",
-  "quant": "ionquant",
-  "tmtquant": "tmtintegrator"
- },
- "fp-tmt10-phospho-bridge": {
-  "convert": "msconvert",
-  "database": "philosopher-database",
-  "search": "msfragger-closed",
-  "rescore": "percolator",
-  "to_pepxml": "percolator-to-pepxml",
-  "localize": "ptmprophet",
-  "report": "philosopher-report",
-  "quant": "ionquant",
-  "tmtquant": "tmtintegrator"
- },
- "fp-tmt10-ubiquitin": {
-  "convert": "msconvert",
-  "database": "philosopher-database",
-  "search": "msfragger-closed",
-  "rescore": "percolator",
-  "to_pepxml": "percolator-to-pepxml",
-  "report": "philosopher-report",
-  "quant": "ionquant",
-  "tmtquant": "tmtintegrator"
- },
- "fp-tmt10-ubiquitination-k-tmt-or-ubiq": {
-  "convert": "msconvert",
-  "database": "philosopher-database",
-  "search": "msfragger-closed",
-  "rescore": "percolator",
-  "to_pepxml": "percolator-to-pepxml",
-  "localize": "ptmprophet",
-  "report": "philosopher-report",
-  "quant": "ionquant",
-  "tmtquant": "tmtintegrator"
- },
- "fp-tmt10-ubiquitination-k-tmt-plus-ubiq": {
-  "convert": "msconvert",
-  "database": "philosopher-database",
-  "search": "msfragger-closed",
-  "rescore": "percolator",
-  "to_pepxml": "percolator-to-pepxml",
-  "localize": "ptmprophet",
-  "report": "philosopher-report",
-  "quant": "ionquant",
-  "tmtquant": "tmtintegrator"
- },
- "fp-tmt16": {
-  "convert": "msconvert",
-  "database": "philosopher-database",
-  "search": "msfragger-closed",
-  "rescore": "percolator",
-  "to_pepxml": "percolator-to-pepxml",
-  "report": "philosopher-report",
-  "quant": "ionquant",
-  "tmtquant": "tmtintegrator"
- },
- "fp-tmt16-acetyl": {
-  "convert": "msconvert",
-  "database": "philosopher-database",
-  "search": "msfragger-closed",
-  "rescore": "percolator",
-  "to_pepxml": "percolator-to-pepxml",
-  "localize": "ptmprophet",
-  "report": "philosopher-report",
-  "quant": "ionquant",
-  "tmtquant": "tmtintegrator"
- },
- "fp-tmt16-acetyl-noloc": {
-  "convert": "msconvert",
-  "database": "philosopher-database",
-  "search": "msfragger-closed",
-  "rescore": "percolator",
-  "to_pepxml": "percolator-to-pepxml",
-  "report": "philosopher-report",
-  "quant": "ionquant",
-  "tmtquant": "tmtintegrator"
- },
- "fp-tmt16-ms3": {
-  "convert": "msconvert",
-  "database": "philosopher-database",
-  "search": "msfragger-closed",
-  "rescore": "percolator",
-  "to_pepxml": "percolator-to-pepxml",
-  "report": "philosopher-report",
-  "quant": "ionquant",
-  "tmtquant": "tmtintegrator"
- },
- "fp-tmt16-phospho": {
-  "convert": "msconvert",
-  "database": "philosopher-database",
-  "search": "msfragger-closed",
-  "rescore": "percolator",
-  "to_pepxml": "percolator-to-pepxml",
-  "localize": "ptmprophet",
-  "report": "philosopher-report",
-  "quant": "ionquant",
-  "tmtquant": "tmtintegrator"
- },
- "fp-tmt16-ubiquitination-k-tmt-or-ubiq": {
-  "convert": "msconvert",
-  "database": "philosopher-database",
-  "search": "msfragger-closed",
-  "rescore": "percolator",
-  "to_pepxml": "percolator-to-pepxml",
-  "localize": "ptmprophet",
-  "report": "philosopher-report",
-  "quant": "ionquant",
-  "tmtquant": "tmtintegrator"
- },
- "fp-tmt16-ubiquitination-k-tmt-plus-ubiq": {
-  "convert": "msconvert",
-  "database": "philosopher-database",
-  "search": "msfragger-closed",
-  "rescore": "percolator",
-  "to_pepxml": "percolator-to-pepxml",
-  "localize": "ptmprophet",
-  "report": "philosopher-report",
-  "quant": "ionquant",
-  "tmtquant": "tmtintegrator"
- },
- "fp-tmt18-astral": {
-  "convert": "msconvert",
-  "database": "philosopher-database",
-  "search": "msfragger-closed",
-  "rescore": "percolator",
-  "to_pepxml": "percolator-to-pepxml",
-  "report": "philosopher-report",
-  "quant": "ionquant",
-  "tmtquant": "tmtintegrator"
- },
- "fp-tmt18-phospho": {
-  "convert": "msconvert",
-  "database": "philosopher-database",
-  "search": "msfragger-closed",
-  "rescore": "percolator",
-  "to_pepxml": "percolator-to-pepxml",
-  "localize": "ptmprophet",
-  "report": "philosopher-report",
-  "quant": "ionquant",
-  "tmtquant": "tmtintegrator"
- },
- "fp-tmt35": {
-  "convert": "msconvert",
-  "database": "philosopher-database",
-  "search": "msfragger-closed",
-  "rescore": "percolator",
-  "to_pepxml": "percolator-to-pepxml",
-  "report": "philosopher-report",
-  "quant": "ionquant",
-  "tmtquant": "tmtintegrator"
- },
- "fp-wwa": {
-  "convert": "msconvert",
-  "database": "philosopher-database",
-  "search": "msfragger-closed",
-  "rescore": "percolator",
-  "to_pepxml": "percolator-to-pepxml",
-  "report": "philosopher-report",
-  "quant": "ionquant"
- },
- "fp-xrnax-massoffset": {
-  "convert": "msconvert",
-  "database": "philosopher-database",
-  "search": "msfragger-closed",
-  "cleanup": "crystalc",
-  "validate": "peptideprophet",
-  "report": "philosopher-report",
-  "ptm_summary": "ptmshepherd"
- }
+  "bottomup-closed": {
+    "convert": "msconvert",
+    "search": "search-closed",
+    "rescore": "rescore"
+  },
+  "bottomup-lfq": {
+    "convert": "msconvert",
+    "search": "search-closed",
+    "report": "report",
+    "quant": "quant"
+  },
+  "basic-search": {
+    "convert": "msconvert",
+    "database": "database",
+    "search": "search-closed",
+    "rescore": "rescore",
+    "to_pepxml": "rescore-export",
+    "report": "report",
+    "quant": "quant"
+  },
+  "chemprot-abpp-diatop": {
+    "convert": "msconvert",
+    "dia_quant": "dia-search"
+  },
+  "chemprot-abpp-iadtb-diapasef": {
+    "dia_quant": "dia-search"
+  },
+  "chemprot-abpp-iadtb-tmt16": {
+    "convert": "msconvert",
+    "database": "database",
+    "search": "search-closed",
+    "rescore": "rescore",
+    "to_pepxml": "rescore-export",
+    "report": "report",
+    "quant": "quant",
+    "tmtquant": "quant-isobaric"
+  },
+  "chemprot-abpp-ipiaa": {
+    "convert": "msconvert",
+    "database": "database",
+    "search": "search-closed",
+    "rescore": "rescore",
+    "to_pepxml": "rescore-export",
+    "report": "report",
+    "quant": "quant"
+  },
+  "chemprot-abpp-isodtb": {
+    "convert": "msconvert",
+    "database": "database",
+    "search": "search-closed",
+    "rescore": "rescore",
+    "to_pepxml": "rescore-export",
+    "report": "report",
+    "quant": "quant"
+  },
+  "chemprot-abpp-isotop": {
+    "convert": "msconvert",
+    "database": "database",
+    "search": "search-closed",
+    "rescore": "rescore",
+    "to_pepxml": "rescore-export",
+    "report": "report",
+    "quant": "quant"
+  },
+  "chemprot-pal": {
+    "convert": "msconvert",
+    "database": "database",
+    "search": "search-closed",
+    "rescore": "rescore",
+    "to_pepxml": "rescore-export",
+    "report": "report",
+    "quant": "quant",
+    "ptm_summary": "ptm-profile"
+  },
+  "citrullination": {
+    "convert": "msconvert",
+    "database": "database",
+    "search": "search-closed",
+    "rescore": "rescore",
+    "to_pepxml": "rescore-export",
+    "report": "report",
+    "quant": "quant"
+  },
+  "dia-pseudo-speclib-quant": {
+    "convert": "msconvert",
+    "dia_quant": "dia-search"
+  },
+  "dia-speclib-quant": {
+    "convert": "msconvert",
+    "dia_quant": "dia-search"
+  },
+  "dia-speclib-quant-diapasef": {
+    "dia_quant": "dia-search"
+  },
+  "dia-speclib-quant-phospho": {
+    "convert": "msconvert",
+    "dia_quant": "dia-search"
+  },
+  "dia-speclib-quant-phospho-diapasef": {
+    "dia_quant": "dia-search"
+  },
+  "dia-speclib-quant-ubiq": {
+    "convert": "msconvert",
+    "dia_quant": "dia-search"
+  },
+  "diagnostic-ion-mining": {
+    "convert": "msconvert",
+    "database": "database",
+    "search": "search-closed",
+    "cleanup": "precursor-refine",
+    "validate": "validate-psm",
+    "report": "report",
+    "ptm_summary": "ptm-profile"
+  },
+  "fpop": {
+    "convert": "msconvert",
+    "database": "database",
+    "search": "search-closed",
+    "validate": "validate-psm",
+    "report": "report",
+    "quant": "quant"
+  },
+  "glyco-n-dia": {
+    "convert": "msconvert",
+    "dia_quant": "dia-search"
+  },
+  "glyco-n-hcd": {
+    "convert": "msconvert",
+    "database": "database",
+    "search": "search-closed",
+    "validate": "validate-psm",
+    "report": "report",
+    "quant": "quant"
+  },
+  "glyco-n-hybrid": {
+    "convert": "msconvert",
+    "database": "database",
+    "search": "search-closed",
+    "validate": "validate-psm",
+    "report": "report",
+    "quant": "quant"
+  },
+  "glyco-n-lfq": {
+    "convert": "msconvert",
+    "database": "database",
+    "search": "search-closed",
+    "validate": "validate-psm",
+    "report": "report",
+    "quant": "quant"
+  },
+  "glyco-n-open-hcd": {
+    "convert": "msconvert",
+    "database": "database",
+    "search": "search-closed",
+    "cleanup": "precursor-refine",
+    "validate": "validate-psm",
+    "report": "report",
+    "quant": "quant",
+    "ptm_summary": "ptm-profile"
+  },
+  "glyco-n-open-hybrid": {
+    "convert": "msconvert",
+    "database": "database",
+    "search": "search-closed",
+    "cleanup": "precursor-refine",
+    "validate": "validate-psm",
+    "report": "report",
+    "quant": "quant",
+    "ptm_summary": "ptm-profile"
+  },
+  "glyco-n-tmt": {
+    "convert": "msconvert",
+    "database": "database",
+    "search": "search-closed",
+    "validate": "validate-psm",
+    "report": "report",
+    "quant": "quant",
+    "ptm_summary": "ptm-profile",
+    "tmtquant": "quant-isobaric"
+  },
+  "glyco-o-dia-hcd": {
+    "convert": "msconvert",
+    "dia_quant": "dia-search"
+  },
+  "glyco-o-dia-localize": {
+    "convert": "msconvert",
+    "database": "database",
+    "search": "search-closed",
+    "validate": "validate-psm",
+    "report": "report",
+    "build_library": "speclib-build",
+    "dia_quant": "dia-search",
+    "oglyc_localize": "glyco-localize"
+  },
+  "glyco-o-hcd": {
+    "convert": "msconvert",
+    "database": "database",
+    "search": "search-closed",
+    "validate": "validate-psm",
+    "report": "report",
+    "quant": "quant"
+  },
+  "glyco-o-hybrid": {
+    "convert": "msconvert",
+    "database": "database",
+    "search": "search-closed",
+    "validate": "validate-psm",
+    "report": "report",
+    "quant": "quant",
+    "oglyc_localize": "glyco-localize"
+  },
+  "glyco-o-open-hcd": {
+    "convert": "msconvert",
+    "database": "database",
+    "search": "search-closed",
+    "cleanup": "precursor-refine",
+    "validate": "validate-psm",
+    "report": "report",
+    "quant": "quant",
+    "ptm_summary": "ptm-profile"
+  },
+  "glyco-o-open-hybrid": {
+    "convert": "msconvert",
+    "database": "database",
+    "search": "search-closed",
+    "cleanup": "precursor-refine",
+    "validate": "validate-psm",
+    "report": "report",
+    "quant": "quant",
+    "ptm_summary": "ptm-profile"
+  },
+  "glyco-o-pair": {
+    "convert": "msconvert",
+    "database": "database",
+    "search": "search-closed",
+    "validate": "validate-psm",
+    "report": "report",
+    "quant": "quant",
+    "oglyc_localize": "glyco-localize"
+  },
+  "itraq4": {
+    "convert": "msconvert",
+    "database": "database",
+    "search": "search-closed",
+    "rescore": "rescore",
+    "to_pepxml": "rescore-export",
+    "report": "report",
+    "quant": "quant",
+    "tmtquant": "quant-isobaric"
+  },
+  "itraq4-phospho": {
+    "convert": "msconvert",
+    "database": "database",
+    "search": "search-closed",
+    "rescore": "rescore",
+    "to_pepxml": "rescore-export",
+    "localize": "ptm-localize",
+    "report": "report",
+    "quant": "quant",
+    "tmtquant": "quant-isobaric"
+  },
+  "labile-adp-ribosylation": {
+    "convert": "msconvert",
+    "database": "database",
+    "search": "search-closed",
+    "validate": "validate-psm",
+    "localize": "ptm-localize",
+    "report": "report",
+    "quant": "quant"
+  },
+  "labile-phospho": {
+    "convert": "msconvert",
+    "database": "database",
+    "search": "search-closed",
+    "validate": "validate-psm",
+    "localize": "ptm-localize",
+    "report": "report",
+    "quant": "quant"
+  },
+  "lfq-mbr": {
+    "convert": "msconvert",
+    "database": "database",
+    "search": "search-closed",
+    "rescore": "rescore",
+    "to_pepxml": "rescore-export",
+    "report": "report",
+    "quant": "quant"
+  },
+  "lfq-phospho": {
+    "convert": "msconvert",
+    "database": "database",
+    "search": "search-closed",
+    "rescore": "rescore",
+    "to_pepxml": "rescore-export",
+    "localize": "ptm-localize",
+    "report": "report",
+    "quant": "quant"
+  },
+  "lfq-ubiquitin": {
+    "convert": "msconvert",
+    "database": "database",
+    "search": "search-closed",
+    "rescore": "rescore",
+    "to_pepxml": "rescore-export",
+    "localize": "ptm-localize",
+    "report": "report",
+    "quant": "quant"
+  },
+  "mass-offset-commonptms": {
+    "convert": "msconvert",
+    "database": "database",
+    "search": "search-closed",
+    "rescore": "rescore",
+    "to_pepxml": "rescore-export",
+    "report": "report",
+    "ptm_summary": "ptm-profile"
+  },
+  "nonspecific-hla": {
+    "convert": "msconvert",
+    "database": "database",
+    "search": "search-closed",
+    "rescore": "rescore",
+    "to_pepxml": "rescore-export",
+    "report": "report",
+    "quant": "quant"
+  },
+  "nonspecific-hla-c57": {
+    "convert": "msconvert",
+    "database": "database",
+    "search": "search-closed",
+    "rescore": "rescore",
+    "to_pepxml": "rescore-export",
+    "report": "report",
+    "quant": "quant"
+  },
+  "nonspecific-hla-customdb-groupfdr": {
+    "convert": "msconvert",
+    "database": "database",
+    "search": "search-closed",
+    "rescore": "rescore",
+    "to_pepxml": "rescore-export",
+    "report": "report",
+    "quant": "quant"
+  },
+  "nonspecific-hla-dia": {
+    "convert": "msconvert",
+    "dia_quant": "dia-search"
+  },
+  "nonspecific-hla-dia-astral": {
+    "convert": "msconvert",
+    "dia_quant": "dia-search"
+  },
+  "nonspecific-hla-diapasef": {
+    "dia_quant": "dia-search"
+  },
+  "nonspecific-hla-glyco": {
+    "convert": "msconvert",
+    "database": "database",
+    "search": "search-closed",
+    "validate": "validate-psm",
+    "report": "report",
+    "ptm_summary": "ptm-profile"
+  },
+  "nonspecific-hla-phospho": {
+    "convert": "msconvert",
+    "database": "database",
+    "search": "search-closed",
+    "rescore": "rescore",
+    "to_pepxml": "rescore-export",
+    "localize": "ptm-localize",
+    "report": "report",
+    "quant": "quant"
+  },
+  "nonspecific-hla-tmt10": {
+    "convert": "msconvert",
+    "database": "database",
+    "search": "search-closed",
+    "rescore": "rescore",
+    "to_pepxml": "rescore-export",
+    "report": "report",
+    "quant": "quant",
+    "tmtquant": "quant-isobaric"
+  },
+  "nonspecific-peptidome": {
+    "convert": "msconvert",
+    "database": "database",
+    "search": "search-closed",
+    "rescore": "rescore",
+    "to_pepxml": "rescore-export",
+    "report": "report",
+    "quant": "quant"
+  },
+  "open": {
+    "convert": "msconvert",
+    "database": "database",
+    "search": "search-closed",
+    "cleanup": "precursor-refine",
+    "validate": "validate-psm",
+    "report": "report",
+    "ptm_summary": "ptm-profile"
+  },
+  "open-quickscan": {
+    "convert": "msconvert",
+    "database": "database",
+    "search": "search-closed",
+    "cleanup": "precursor-refine",
+    "validate": "validate-psm",
+    "report": "report",
+    "ptm_summary": "ptm-profile"
+  },
+  "silac3": {
+    "convert": "msconvert",
+    "database": "database",
+    "search": "search-closed",
+    "rescore": "rescore",
+    "to_pepxml": "rescore-export",
+    "report": "report",
+    "quant": "quant"
+  },
+  "silac3-phospho": {
+    "convert": "msconvert",
+    "database": "database",
+    "search": "search-closed",
+    "rescore": "rescore",
+    "to_pepxml": "rescore-export",
+    "report": "report",
+    "quant": "quant"
+  },
+  "stellar-dda": {
+    "convert": "msconvert",
+    "database": "database",
+    "search": "search-closed",
+    "rescore": "rescore",
+    "to_pepxml": "rescore-export",
+    "report": "report",
+    "quant": "quant"
+  },
+  "stellar-gpfdia": {
+    "convert": "msconvert",
+    "database": "database",
+    "search": "search-closed",
+    "rescore": "rescore",
+    "to_pepxml": "rescore-export",
+    "report": "report",
+    "quant": "quant"
+  },
+  "tmt10": {
+    "convert": "msconvert",
+    "database": "database",
+    "search": "search-closed",
+    "rescore": "rescore",
+    "to_pepxml": "rescore-export",
+    "report": "report",
+    "quant": "quant",
+    "tmtquant": "quant-isobaric"
+  },
+  "tmt10-acetyl": {
+    "convert": "msconvert",
+    "database": "database",
+    "search": "search-closed",
+    "rescore": "rescore",
+    "to_pepxml": "rescore-export",
+    "localize": "ptm-localize",
+    "report": "report",
+    "quant": "quant",
+    "tmtquant": "quant-isobaric"
+  },
+  "tmt10-acetyl-noloc": {
+    "convert": "msconvert",
+    "database": "database",
+    "search": "search-closed",
+    "rescore": "rescore",
+    "to_pepxml": "rescore-export",
+    "report": "report",
+    "quant": "quant",
+    "tmtquant": "quant-isobaric"
+  },
+  "tmt10-bridge": {
+    "convert": "msconvert",
+    "database": "database",
+    "search": "search-closed",
+    "rescore": "rescore",
+    "to_pepxml": "rescore-export",
+    "report": "report",
+    "quant": "quant",
+    "tmtquant": "quant-isobaric"
+  },
+  "tmt10-ms3": {
+    "convert": "msconvert",
+    "database": "database",
+    "search": "search-closed",
+    "rescore": "rescore",
+    "to_pepxml": "rescore-export",
+    "report": "report",
+    "quant": "quant",
+    "tmtquant": "quant-isobaric"
+  },
+  "tmt10-ms3-phospho": {
+    "convert": "msconvert",
+    "database": "database",
+    "search": "search-closed",
+    "rescore": "rescore",
+    "to_pepxml": "rescore-export",
+    "localize": "ptm-localize",
+    "report": "report",
+    "quant": "quant",
+    "tmtquant": "quant-isobaric"
+  },
+  "tmt10-open": {
+    "convert": "msconvert",
+    "database": "database",
+    "search": "search-closed",
+    "cleanup": "precursor-refine",
+    "validate": "validate-psm",
+    "report": "report",
+    "ptm_summary": "ptm-profile",
+    "quant": "quant",
+    "tmtquant": "quant-isobaric"
+  },
+  "tmt10-phospho": {
+    "convert": "msconvert",
+    "database": "database",
+    "search": "search-closed",
+    "rescore": "rescore",
+    "to_pepxml": "rescore-export",
+    "localize": "ptm-localize",
+    "report": "report",
+    "quant": "quant",
+    "tmtquant": "quant-isobaric"
+  },
+  "tmt10-phospho-bridge": {
+    "convert": "msconvert",
+    "database": "database",
+    "search": "search-closed",
+    "rescore": "rescore",
+    "to_pepxml": "rescore-export",
+    "localize": "ptm-localize",
+    "report": "report",
+    "quant": "quant",
+    "tmtquant": "quant-isobaric"
+  },
+  "tmt10-ubiquitin": {
+    "convert": "msconvert",
+    "database": "database",
+    "search": "search-closed",
+    "rescore": "rescore",
+    "to_pepxml": "rescore-export",
+    "report": "report",
+    "quant": "quant",
+    "tmtquant": "quant-isobaric"
+  },
+  "tmt10-ubiquitination-k-tmt-or-ubiq": {
+    "convert": "msconvert",
+    "database": "database",
+    "search": "search-closed",
+    "rescore": "rescore",
+    "to_pepxml": "rescore-export",
+    "localize": "ptm-localize",
+    "report": "report",
+    "quant": "quant",
+    "tmtquant": "quant-isobaric"
+  },
+  "tmt10-ubiquitination-k-tmt-plus-ubiq": {
+    "convert": "msconvert",
+    "database": "database",
+    "search": "search-closed",
+    "rescore": "rescore",
+    "to_pepxml": "rescore-export",
+    "localize": "ptm-localize",
+    "report": "report",
+    "quant": "quant",
+    "tmtquant": "quant-isobaric"
+  },
+  "tmt16": {
+    "convert": "msconvert",
+    "database": "database",
+    "search": "search-closed",
+    "rescore": "rescore",
+    "to_pepxml": "rescore-export",
+    "report": "report",
+    "quant": "quant",
+    "tmtquant": "quant-isobaric"
+  },
+  "tmt16-acetyl": {
+    "convert": "msconvert",
+    "database": "database",
+    "search": "search-closed",
+    "rescore": "rescore",
+    "to_pepxml": "rescore-export",
+    "localize": "ptm-localize",
+    "report": "report",
+    "quant": "quant",
+    "tmtquant": "quant-isobaric"
+  },
+  "tmt16-acetyl-noloc": {
+    "convert": "msconvert",
+    "database": "database",
+    "search": "search-closed",
+    "rescore": "rescore",
+    "to_pepxml": "rescore-export",
+    "report": "report",
+    "quant": "quant",
+    "tmtquant": "quant-isobaric"
+  },
+  "tmt16-ms3": {
+    "convert": "msconvert",
+    "database": "database",
+    "search": "search-closed",
+    "rescore": "rescore",
+    "to_pepxml": "rescore-export",
+    "report": "report",
+    "quant": "quant",
+    "tmtquant": "quant-isobaric"
+  },
+  "tmt16-phospho": {
+    "convert": "msconvert",
+    "database": "database",
+    "search": "search-closed",
+    "rescore": "rescore",
+    "to_pepxml": "rescore-export",
+    "localize": "ptm-localize",
+    "report": "report",
+    "quant": "quant",
+    "tmtquant": "quant-isobaric"
+  },
+  "tmt16-ubiquitination-k-tmt-or-ubiq": {
+    "convert": "msconvert",
+    "database": "database",
+    "search": "search-closed",
+    "rescore": "rescore",
+    "to_pepxml": "rescore-export",
+    "localize": "ptm-localize",
+    "report": "report",
+    "quant": "quant",
+    "tmtquant": "quant-isobaric"
+  },
+  "tmt16-ubiquitination-k-tmt-plus-ubiq": {
+    "convert": "msconvert",
+    "database": "database",
+    "search": "search-closed",
+    "rescore": "rescore",
+    "to_pepxml": "rescore-export",
+    "localize": "ptm-localize",
+    "report": "report",
+    "quant": "quant",
+    "tmtquant": "quant-isobaric"
+  },
+  "tmt18-astral": {
+    "convert": "msconvert",
+    "database": "database",
+    "search": "search-closed",
+    "rescore": "rescore",
+    "to_pepxml": "rescore-export",
+    "report": "report",
+    "quant": "quant",
+    "tmtquant": "quant-isobaric"
+  },
+  "tmt18-phospho": {
+    "convert": "msconvert",
+    "database": "database",
+    "search": "search-closed",
+    "rescore": "rescore",
+    "to_pepxml": "rescore-export",
+    "localize": "ptm-localize",
+    "report": "report",
+    "quant": "quant",
+    "tmtquant": "quant-isobaric"
+  },
+  "tmt35": {
+    "convert": "msconvert",
+    "database": "database",
+    "search": "search-closed",
+    "rescore": "rescore",
+    "to_pepxml": "rescore-export",
+    "report": "report",
+    "quant": "quant",
+    "tmtquant": "quant-isobaric"
+  },
+  "wwa": {
+    "convert": "msconvert",
+    "database": "database",
+    "search": "search-closed",
+    "rescore": "rescore",
+    "to_pepxml": "rescore-export",
+    "report": "report",
+    "quant": "quant"
+  },
+  "xrnax-massoffset": {
+    "convert": "msconvert",
+    "database": "database",
+    "search": "search-closed",
+    "cleanup": "precursor-refine",
+    "validate": "validate-psm",
+    "report": "report",
+    "ptm_summary": "ptm-profile"
+  }
 }

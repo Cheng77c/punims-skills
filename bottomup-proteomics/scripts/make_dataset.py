@@ -114,7 +114,7 @@ def main():
     src = Path(a.file)
     if not src.exists():
         sys.exit(f"file not found: {src}")
-    # fasta 绝不做成 dataset:dataset 是只读挂载,MSFragger 要在 fasta 旁建
+    # fasta 绝不做成 dataset:dataset 是只读挂载,搜索步要在 fasta 旁建
     # 索引(.idx),只读会失败(LOG ERROR: ...could not be created)。
     # fasta 小,走本地路径随 -p 上传(可写)。dataset 只给大谱图(.raw/.mzML)。
     if src.suffix.lower() in (".fasta", ".fa", ".faa"):

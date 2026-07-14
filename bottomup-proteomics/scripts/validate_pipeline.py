@@ -11,15 +11,12 @@ import json
 import os
 import sys
 
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-import tool_names          # noqa: E402  公开名 ⇄ 内部名(与镜像同一套映射)
-
 _BU_TOOLS = {
-    "msconvert", "msfragger-closed", "crystalc", "percolator",
-    "percolator-to-pepxml", "philosopher-database", "peptideprophet",
-    "ptmprophet", "philosopher-report", "ionquant", "ptmshepherd",
-    "tmtintegrator", "diann", "diaumpire", "diatracer", "easypqp",
-    "opair", "msbooster", "iprophet", "proteinprophet",
+    "msconvert", "search-closed", "precursor-refine", "rescore",
+    "rescore-export", "database", "validate-psm",
+    "ptm-localize", "report", "quant", "ptm-profile",
+    "quant-isobaric", "dia-search", "dia-pseudo", "dia-features", "speclib-build",
+    "glyco-localize", "predict-rescore", "psm-integrate", "protein-infer",
 }
 _FASTA_EXTS = (".fas", ".fasta", ".fa")
 _MAX_LOCAL_MB = 100
@@ -120,7 +117,7 @@ def _check_overrides(cfg: dict, steps: list, errs: list) -> None:
 
 def _check_required(cfg: dict, steps: list, errs: list) -> None:
     """必填参数缺失;执行器可注入的(database_path←db步/fasta_path、annotation_file←annotation_path)豁免。"""
-    has_db = any(s.get("tool") == "philosopher-database" for s in steps)
+    has_db = any(s.get("tool") == "database" for s in steps)
     has_fasta = bool(cfg.get("fasta_path"))
     has_annot = bool(cfg.get("annotation_path"))
     overrides = cfg.get("overrides") or {}
@@ -140,18 +137,19 @@ def _check_required(cfg: dict, steps: list, errs: list) -> None:
             errs.append(f"步 {s.get('step_id')}({tool}) 缺必填参数 '{name}'")
 
 
-_SPECTRA_PRODUCERS = {"msconvert", "diaumpire", "diatracer"}   # 产 mzML 的步
+_SPECTRA_PRODUCERS = {"msconvert", "dia-pseudo", "dia-features"}   # 产 mzML 的步
 # 硬要求 mzML 输入的工具(缺谱图会在运行时 raise InputError)。谱图(raw_files)只送达
 # 无入边的根节点;非根的这些工具必须有一个产 mzML 的父(msconvert 等),否则被饿死。
-_SPECTRA_CONSUMERS = {"msfragger-closed", "crystalc", "ionquant",
-                      "ptmshepherd", "msbooster", "opair", "easypqp"}
+_SPECTRA_CONSUMERS = {"search-closed", "precursor-refine", "quant",
+                      "ptm-profile", "predict-rescore", "glyco-localize", "speclib-build"}
 
 
 def _check_spectra_consumers(steps: list, edges: list, errs: list) -> None:
     """吃 mzML 的工具:谱图来自 raw_files,只喂无入边的根节点。
-    - msfragger 通常作谱图根节点(别画 db→msfragger 边——库经 database_path 自动注入)。
-    - crystalc/ionquant/ptmshepherd/msbooster/opair/easypqp 既要谱图又要上游产物(非根),
-      必须有一个产 mzML 的父(msconvert/diaumpire/diatracer),否则运行时 'requires mzML'。
+    - search-closed 通常作谱图根节点(别画 database→search-closed 边——库经 database_path 自动注入)。
+    - precursor-refine/quant/ptm-profile/predict-rescore/glyco-localize/speclib-build
+      既要谱图又要上游产物(非根),必须有一个产 mzML 的父(msconvert/dia-pseudo/dia-features),
+      否则运行时 'requires mzML'。
     这是手写 DAG 最常见的坑;能用官方 template_id 就别手写。"""
     tool_by_id = {s.get("step_id"): s.get("tool") for s in steps}
     for s in steps:
@@ -162,31 +160,16 @@ def _check_spectra_consumers(steps: list, edges: list, errs: list) -> None:
         parents = [e.get("src") for e in (edges or []) if e.get("dst") == sid]
         if parents and not any(tool_by_id.get(p) in _SPECTRA_PRODUCERS for p in parents):
             pt = ", ".join(f"{p}({tool_by_id.get(p)})" for p in parents)
-            fix = (f"去掉指向 {sid} 的边让它成为谱图根节点(仅 msfragger 可这样),"
-                   if tool == "msfragger-closed"
+            fix = (f"去掉指向 {sid} 的边让它成为谱图根节点(仅 search-closed 可这样),"
+                   if tool == "search-closed"
                    else "加一条 msconvert→本步 的边供谱图,")
             errs.append(
                 f"步 {sid}({tool})有入边但没有谱图来源(父节点:{pt});它硬要求 mzML 输入,"
                 f"而 raw_files 只送达无入边的根节点。修复:{fix}或改用官方 template_id。")
 
 
-def _normalize_names(cfg: dict) -> None:
-    """把公开名/公开模板 id 归一成内部名 —— 与镜像执行器入口同一套映射。
-
-    param_schema.json / template_tools.json 是从镜像 specs.py 导出的,键是内部名;
-    归一之后,下面所有校验(参数名、必填、overrides)照旧生效,不必重新导出这两张表。
-    """
-    for s in (cfg.get("steps") or []):
-        if s.get("tool"):
-            s["tool"] = tool_names.to_internal(s["tool"])
-    tid = cfg.get("template_id")
-    if tid and tid not in _TPL_TOOLS and f"fp-{tid}" in _TPL_TOOLS:
-        cfg["template_id"] = f"fp-{tid}"
-
-
 def validate_config(cfg: dict) -> list[str]:
     errs: list[str] = []
-    _normalize_names(cfg)
     # 顶层字段名(raw_file/fastapath 拼错会被静默忽略 → 作业找不到输入才失败)
     for k in cfg:
         if k not in _TOP_KEYS:

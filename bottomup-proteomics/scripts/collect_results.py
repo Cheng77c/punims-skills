@@ -26,7 +26,7 @@ def _count_data_rows(f: Path) -> int:
 
 
 def _metrics_from_out(out_dir: Path) -> dict:
-    """从下载产物实算 BU 指标(psm/peptide/protein 行数 + diann report),与 bu_cli._bu_metrics 一致;
+    """从下载产物实算 BU 指标(psm/peptide/protein 行数 + DIA report),与 bu_cli._bu_metrics 一致;
     放 collect 兜底,旧镜像 summary 的 metrics 偏薄时也能得指标。"""
     m: dict = {}
     for name, key in (("psm.tsv", "psm_rows"), ("peptide.tsv", "peptide_rows"),
@@ -36,7 +36,7 @@ def _metrics_from_out(out_dir: Path) -> dict:
             m[key] = _count_data_rows(f)
     rep = next(iter(out_dir.rglob("report.tsv")), None)
     if rep:
-        m["diann_precursor_rows"] = _count_data_rows(rep)
+        m["dia_precursor_rows"] = _count_data_rows(rep)
     return m
 
 
