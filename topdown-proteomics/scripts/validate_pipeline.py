@@ -10,11 +10,35 @@
 """
 from __future__ import annotations
 import argparse
+import difflib
 import json
 import sys
 from pathlib import Path
 
 TOOLS = ("msconvert", "topfd", "flashdeconv", "toppic", "pbfgen", "promex", "mspathfindert")
+
+# 各工具的合法参数名(从执行器的参数定义导出)。用来拦「参数名是编的」——
+# 这类错误光看 pipeline.json 一切正常,校验也放行,直到作业跑到那一步才 ParamError,
+# 白烧几分钟算力。已经翻过车:toppic 步被塞了 cutoff_type / max_shift_number /
+# precursor_error_tolerance 四个不存在的参数名,msconvert 和 topfd 都跑完了才炸。
+_HERE = Path(__file__).resolve().parent
+
+
+def _load_schema():
+    """读不到就硬失败 —— 返回 {} 会让未知参数检查静默退化成 no-op。"""
+    try:
+        with open(_HERE / "param_schema.json", encoding="utf-8") as f:
+            return json.load(f)
+    except Exception as e:
+        sys.exit(json.dumps({"ok": False, "errors": [{
+            "step": None, "tool": None, "field": "param_schema.json",
+            "problem": f"参数 schema 缺失或损坏: {e}",
+            "fix": "skill 安装不完整,重新拉取 scripts/param_schema.json。"
+                   "不要跳过校验直接提交(会烧一个参数没校验过的作业)。"}]},
+            ensure_ascii=False))
+
+
+_PARAM_SCHEMA = _load_schema()
 _ACT = ("FILE", "CID", "ETD", "HCD", "UVPD")
 _NTERM = ("NONE", "NME", "NME_ACETYLATION", "M_ACETYLATION")
 _CUTOFF = ("EVALUE", "FDR")
@@ -118,6 +142,22 @@ def _check_inputs(cfg, errors):
             break
 
 
+def _check_param_names(i, tool, params, errors):
+    """参数名必须真实存在。编出来的名字在这里拦下,而不是让作业跑到一半再 ParamError。"""
+    schema = _PARAM_SCHEMA.get(tool)
+    if not schema:
+        return
+    for name in params:
+        if name in schema:
+            continue
+        near = difflib.get_close_matches(name, list(schema), n=2, cutoff=0.4)
+        errors.append(_err(
+            i, tool, name, f"{tool} 没有名为 {name!r} 的参数",
+            allowed=sorted(schema),
+            fix=(f"改成 {' 或 '.join(near)}" if near
+                 else f"参数名以 references/parameters.md 为准,不要凭印象写")))
+
+
 def validate(cfg: dict) -> dict:
     """纯逻辑校验(不碰文件系统),返回 {ok, errors}。一次返回全部错误。"""
     errors: list[dict] = []
@@ -130,6 +170,7 @@ def validate(cfg: dict) -> dict:
             errors.append(_err(i, tool, "tool", f"未知工具 {tool!r}",
                                allowed=list(TOOLS), fix="用合法工具名"))
             continue
+        _check_param_names(i, tool, dict(s.get("params") or {}), errors)
         check = _PARAM_CHECKS.get(tool)
         if check:
             check(i, tool, dict(s.get("params") or {}), errors)

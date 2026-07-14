@@ -1,0 +1,547 @@
+{
+ "msconvert": {
+  "output_format": {
+   "type": "enum"
+  },
+  "precision": {
+   "type": "int"
+  },
+  "zlib": {
+   "type": "bool"
+  },
+  "filters": {
+   "type": "str_list"
+  },
+  "chromatogram_filters": {
+   "type": "str_list"
+  },
+  "extension": {
+   "type": "str"
+  },
+  "mz_precision": {
+   "type": "int"
+  },
+  "inten_precision": {
+   "type": "int"
+  },
+  "mz_truncation": {
+   "type": "int"
+  },
+  "inten_truncation": {
+   "type": "int"
+  },
+  "mz_delta": {
+   "type": "bool"
+  },
+  "inten_delta": {
+   "type": "bool"
+  },
+  "mz_linear": {
+   "type": "bool"
+  },
+  "inten_linear": {
+   "type": "bool"
+  },
+  "noindex": {
+   "type": "bool"
+  },
+  "numpress_linear": {
+   "type": "bool"
+  },
+  "numpress_linear_abs_tol": {
+   "type": "float"
+  },
+  "numpress_pic": {
+   "type": "bool"
+  },
+  "numpress_slof": {
+   "type": "bool"
+  },
+  "numpress_all": {
+   "type": "bool"
+  },
+  "outfile": {
+   "type": "str"
+  },
+  "contact_info": {
+   "type": "str"
+  },
+  "filelist": {
+   "type": "str"
+  },
+  "config_file": {
+   "type": "str"
+  },
+  "verbose": {
+   "type": "bool"
+  },
+  "single_threaded": {
+   "type": "bool"
+  },
+  "continue_on_error": {
+   "type": "bool"
+  },
+  "merge": {
+   "type": "bool"
+  },
+  "combine_ion_mobility_spectra": {
+   "type": "bool"
+  },
+  "dda_processing": {
+   "type": "bool"
+  },
+  "gzip": {
+   "type": "bool"
+  },
+  "sim_as_spectra": {
+   "type": "bool"
+  },
+  "srm_as_spectra": {
+   "type": "bool"
+  },
+  "ignore_calibration_scans": {
+   "type": "bool"
+  },
+  "accept_zero_length_spectra": {
+   "type": "bool"
+  },
+  "ignore_missing_zero_samples": {
+   "type": "bool"
+  },
+  "ignore_unknown_instrument_error": {
+   "type": "bool"
+  },
+  "strip_location_from_source_files": {
+   "type": "bool"
+  },
+  "strip_version_from_software": {
+   "type": "bool"
+  },
+  "mzmlb_chunk_size": {
+   "type": "int"
+  },
+  "mzmlb_compression_level": {
+   "type": "int"
+  },
+  "run_index_set": {
+   "type": "str"
+  }
+ },
+ "topfd": {
+  "activation": {
+   "type": "enum"
+  },
+  "max_charge": {
+   "type": "int"
+  },
+  "max_mass": {
+   "type": "float"
+  },
+  "mz_error": {
+   "type": "float"
+  },
+  "ms_one_sn_ratio": {
+   "type": "float"
+  },
+  "ms_two_sn_ratio": {
+   "type": "float"
+  },
+  "precursor_window": {
+   "type": "float"
+  },
+  "thread_number": {
+   "type": "int"
+  },
+  "use_msdeconv": {
+   "type": "bool"
+  },
+  "env_cnn_cutoff": {
+   "type": "float"
+  },
+  "ecscore_cutoff": {
+   "type": "float"
+  },
+  "min_scan_number": {
+   "type": "int"
+  },
+  "split_intensity_ratio": {
+   "type": "float"
+  },
+  "missing_level_one": {
+   "type": "bool"
+  },
+  "single_scan_noise": {
+   "type": "bool"
+  },
+  "disable_additional_feature_search": {
+   "type": "bool"
+  },
+  "disable_frag_num_filtering": {
+   "type": "bool"
+  },
+  "skip_html_folder": {
+   "type": "bool"
+  }
+ },
+ "toppic": {
+  "activation": {
+   "type": "enum"
+  },
+  "fixed_mod": {
+   "type": "str"
+  },
+  "n_terminal_form": {
+   "type": "str"
+  },
+  "proteoform_type": {
+   "type": "str"
+  },
+  "thread_number": {
+   "type": "int"
+  },
+  "mass_error_tolerance": {
+   "type": "float"
+  },
+  "num_shift": {
+   "type": "int"
+  },
+  "min_shift": {
+   "type": "int"
+  },
+  "max_shift": {
+   "type": "int"
+  },
+  "variable_ptm_num": {
+   "type": "int"
+  },
+  "variable_ptm_file_name": {
+   "type": "str"
+  },
+  "proteoform_error_tolerance": {
+   "type": "float"
+  },
+  "spectrum_cutoff_type": {
+   "type": "enum"
+  },
+  "spectrum_cutoff_value": {
+   "type": "float"
+  },
+  "proteoform_cutoff_type": {
+   "type": "enum"
+  },
+  "proteoform_cutoff_value": {
+   "type": "float"
+  },
+  "num_combined_spectra": {
+   "type": "int"
+  },
+  "mod_file_name": {
+   "type": "str"
+  },
+  "miscore_threshold": {
+   "type": "float"
+  },
+  "decoy": {
+   "type": "bool"
+  },
+  "approximate_spectra": {
+   "type": "bool"
+  },
+  "lookup_table": {
+   "type": "bool"
+  },
+  "no_topfd_feature": {
+   "type": "bool"
+  },
+  "skip_html_folder": {
+   "type": "bool"
+  },
+  "keep_temp_files": {
+   "type": "bool"
+  },
+  "keep_decoy_ids": {
+   "type": "bool"
+  },
+  "combined_file_name": {
+   "type": "str"
+  },
+  "msalign_preflight_blocks": {
+   "type": "int"
+  }
+ },
+ "flashdeconv": {
+  "write_msalign1": {
+   "type": "bool"
+  },
+  "write_msalign2": {
+   "type": "bool"
+  },
+  "write_feature1": {
+   "type": "bool"
+  },
+  "write_feature2": {
+   "type": "bool"
+  },
+  "write_spec1": {
+   "type": "bool"
+  },
+  "write_spec2": {
+   "type": "bool"
+  },
+  "write_deconv_mzml": {
+   "type": "bool"
+  },
+  "write_annotated_mzml": {
+   "type": "bool"
+  },
+  "write_quant_tsv": {
+   "type": "bool"
+  },
+  "keep_empty_out": {
+   "type": "bool"
+  },
+  "write_detail": {
+   "type": "bool"
+  },
+  "mzml_mass_charge": {
+   "type": "int"
+  },
+  "min_mz": {
+   "type": "float"
+  },
+  "max_mz": {
+   "type": "float"
+  },
+  "min_rt": {
+   "type": "float"
+  },
+  "max_rt": {
+   "type": "float"
+  },
+  "max_ms_level": {
+   "type": "int"
+  },
+  "threads": {
+   "type": "int"
+  },
+  "debug": {
+   "type": "int"
+  },
+  "log_file": {
+   "type": "str"
+  },
+  "ini_file": {
+   "type": "str"
+  },
+  "no_progress": {
+   "type": "bool"
+  },
+  "force": {
+   "type": "bool"
+  },
+  "fd_ida_log": {
+   "type": "str"
+  },
+  "fd_report_fdr": {
+   "type": "bool"
+  },
+  "fd_allowed_isotope_error": {
+   "type": "int"
+  },
+  "fd_use_rna_averagine": {
+   "type": "bool"
+  },
+  "fd_precursor_ms1_window": {
+   "type": "int"
+  },
+  "fd_isolation_window": {
+   "type": "float"
+  },
+  "fd_merging_method": {
+   "type": "int"
+  },
+  "fd_merging_min_ms_level": {
+   "type": "int"
+  },
+  "fd_merging_max_ms_level": {
+   "type": "int"
+  },
+  "sd_tol": {
+   "type": "str_list"
+  },
+  "sd_min_mass": {
+   "type": "float"
+  },
+  "sd_max_mass": {
+   "type": "float"
+  },
+  "sd_min_charge": {
+   "type": "int"
+  },
+  "sd_max_charge": {
+   "type": "int"
+  },
+  "sd_precursor_charge": {
+   "type": "int"
+  },
+  "sd_precursor_mz": {
+   "type": "float"
+  },
+  "sd_min_cos": {
+   "type": "str_list"
+  },
+  "sd_min_snr": {
+   "type": "str_list"
+  },
+  "ft_mass_error_ppm": {
+   "type": "float"
+  },
+  "ft_ion_mobility_tolerance": {
+   "type": "float"
+  },
+  "ft_quant_method": {
+   "type": "enum"
+  },
+  "ft_min_sample_rate": {
+   "type": "float"
+  },
+  "ft_min_trace_length": {
+   "type": "float"
+  },
+  "ft_max_trace_length": {
+   "type": "float"
+  },
+  "ft_min_cos": {
+   "type": "float"
+  },
+  "iq_type": {
+   "type": "enum"
+  },
+  "iq_isotope_correction": {
+   "type": "enum"
+  },
+  "iq_reporter_mz_tol": {
+   "type": "float"
+  },
+  "iq_only_fully_quantified": {
+   "type": "bool"
+  }
+ },
+ "pbfgen": {
+  "start_scan": {
+   "type": "int"
+  },
+  "end_scan": {
+   "type": "int"
+  },
+  "param_file": {
+   "type": "str"
+  }
+ },
+ "promex": {
+  "min_charge": {
+   "type": "int"
+  },
+  "max_charge": {
+   "type": "int"
+  },
+  "min_mass": {
+   "type": "float"
+  },
+  "max_mass": {
+   "type": "float"
+  },
+  "max_threads": {
+   "type": "int"
+  },
+  "bin_res_ppm": {
+   "type": "int"
+  },
+  "score_threshold": {
+   "type": "float"
+  },
+  "feature_map": {
+   "type": "bool"
+  },
+  "score_extended": {
+   "type": "bool"
+  },
+  "write_csv": {
+   "type": "bool"
+  },
+  "param_file": {
+   "type": "str"
+  }
+ },
+ "mspathfindert": {
+  "ic_mode": {
+   "type": "enum"
+  },
+  "tda": {
+   "type": "int"
+  },
+  "pm_tolerance": {
+   "type": "float"
+  },
+  "frag_tolerance": {
+   "type": "float"
+  },
+  "min_length": {
+   "type": "int"
+  },
+  "max_length": {
+   "type": "int"
+  },
+  "min_mass": {
+   "type": "float"
+  },
+  "max_mass": {
+   "type": "float"
+  },
+  "min_charge": {
+   "type": "int"
+  },
+  "max_charge": {
+   "type": "int"
+  },
+  "min_frag_charge": {
+   "type": "int"
+  },
+  "max_frag_charge": {
+   "type": "int"
+  },
+  "activation": {
+   "type": "enum"
+  },
+  "tag_search": {
+   "type": "bool"
+  },
+  "include_decoys": {
+   "type": "bool"
+  },
+  "num_matches": {
+   "type": "int"
+  },
+  "mem_matches": {
+   "type": "int"
+  },
+  "mod_file": {
+   "type": "str"
+  },
+  "scans_file": {
+   "type": "str"
+  },
+  "overwrite": {
+   "type": "bool"
+  },
+  "flip_scoring": {
+   "type": "bool"
+  },
+  "threads": {
+   "type": "int"
+  },
+  "param_file": {
+   "type": "str"
+  }
+ }
+}

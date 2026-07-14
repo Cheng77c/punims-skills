@@ -241,6 +241,7 @@ python3 scripts/collect_results.py --job-id <JobId> --out /bohr-workspace/td-run
 
 **判断要点:**
 - **dataset 阈值(已硬拦)**:本地输入 > 100MB 时 `validate_pipeline.py` **直接报错并要求改走 make_dataset**(不能 -p)。阈值由校验器强制执行,判断与行动不会脱节。(注:≤100MB 的谱图**默认也走 dataset**,见 §4 默认路由;-p 传谱图仅限用户主动要求。)
+- **参数名(已硬拦)**:参数名一律以 `references/parameters.md` 为准,**不得凭印象写**。`validate_pipeline.py` 会拒绝任何不存在的参数名并给出最接近的合法名。已经翻过车:toppic 步被塞了 `cutoff_type` / `max_shift_number` 等四个编出来的名字,前两步都跑完了才在作业里 ParamError,白烧算力。
 - **decoy**:库是 target-only(无 DECOY_ 前缀序列)→ `toppic_params.decoy=true` / IP 链 `mspathfindert.tda=1`。不确定时启用 decoy(FDR 估计所必需)。
 - **运行时长**:c16_m32 上一条完整链典型 6–15 分钟(toppic 的 unexpected-shift 搜索最慢);按 pollAfterMs 轮询即可,耗时属正常。
 
