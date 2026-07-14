@@ -81,6 +81,11 @@ source /bohr-workspace/.bohr_env   # 每个新 Bash 调用开头都要,确保 AC
 ```
 鉴权要点:bohr CLI 认 `ACCESS_KEY` 环境变量;直接调 REST API 用 HTTP 头 `accessKey: <key>`(**不是** `Authorization: Bearer`)。脚本已按此写。
 
+> ⛔ **`bohr: command not found` = 你还没跑 setup.sh,不是"CLI 需要你自己想办法装"。**
+>   唯一修法是 `bash scripts/setup.sh`(幂等,装的是官方 bohr CLI)。
+>   **绝不 `pip install lbg`、绝不给它建 `bohr` 符号链接、绝不手写 CLI 的认证配置文件、绝不改用别的 CLI。**
+>   (已经翻过车:agent 见 `bohr` 不在就自行 `pip install lbg` + `ln -s` + 手写 `~/.config/lbg/config.yaml`,
+>   一整轮步数全耗在给一个根本不该用的 CLI 做认证上,作业一次都没提交出去。)
 > ⛔ **只许 `bash scripts/setup.sh` 生成 .bohr_env,绝不手写/覆写它**(setup 已兜底读 `BOHR_ACCESS_KEY`)。
 > - `ACCESS_KEY` 未注入:先完成授权 + 重载 skill,再 `setup.sh`(setup 跑早于授权才会读不到)。
 > - `PROJECT_ID` 未注入:**唯一合法来源 = 本轮对话里用户亲口说的项目 ID**(`export PROJECT_ID=<id>`);没说就 `AskUserInput` 索取。

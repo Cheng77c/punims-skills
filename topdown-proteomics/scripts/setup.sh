@@ -4,7 +4,10 @@
 # 之后每条命令开头 `source /bohr-workspace/.bohr_env`。
 set -e
 
-if ! command -v bohr >/dev/null 2>&1 && [ ! -x "$HOME/.bohrium/bohr" ]; then
+# 判据只认规范路径 $HOME/.bohrium/bohr,不认"PATH 上有个叫 bohr 的东西"。
+# 已经翻过车:agent 自己 ln -s lbg ~/.local/bin/bohr 之后,`command -v bohr` 就成立了,
+# setup.sh 于是跳过安装,真 CLI 一直没装上,而 sandbox 跨轮不重置,这个假 bohr 会一直骗下去。
+if [ ! -x "$HOME/.bohrium/bohr" ]; then
   touch "$HOME/.bashrc" 2>/dev/null || true   # 官方装脚本会 grep/sed .bashrc,缺文件(root 家目录常无)会报噪声
   /bin/bash -c "$(curl -fsSL https://dp-public.oss-cn-beijing.aliyuncs.com/bohrctl/1.0.0/install_bohr_linux_curl.sh)"
 fi
