@@ -26,6 +26,39 @@ _IMAGE_FILE = Path(__file__).resolve().parent.parent / "image.txt"
 DEFAULT_IMAGE = _IMAGE_FILE.read_text().strip() if _IMAGE_FILE.exists() else ""
 # PROJECT_ID 无默认:项目相关,必须由 env/configField 注入(同 ACCESS_KEY),否则误投错项目。
 
+# 数据集挂载根:/bohr/<数据集名>/v<版本>。用来从 inputs 的 /bohr 文件路径反推挂载根。
+_BOHR_MOUNT_RE = re.compile(r"^(/bohr/[^/]+/v[0-9]+)(?:/.*)?$")
+
+
+def _derive_dataset_paths(inputs: dict, explicit: list):
+    """从 inputs 里的 /bohr/<ds>/v<N>/... 路径**自动推导** dataset_path 挂载根。
+
+    存在的理由:agent 常把用户给的 /bohr 数据集文件路径填进 inputs,却忘了给 submit 传
+    --dataset-path。结果作业运行时该 dataset 根本没挂载,msconvert 报「... does not exist」
+    (白烧一个作业才发现)。这里自动补上:每个 /bohr 输入都推出它的挂载根并挂上,agent 传不传
+    --dataset-path 都不再漏挂。显式 --dataset-path 与推导结果合并去重。
+
+    返回 (mounts, errors)。/bohr 路径格式不对(推不出挂载根)→ 进 errors,让 agent 自纠。
+    """
+    mounts = list(dict.fromkeys(explicit))   # 保序去重
+    errors = []
+    for k, v in (inputs or {}).items():
+        if not v or not str(v).startswith("/bohr/"):
+            continue
+        m = _BOHR_MOUNT_RE.match(str(v))
+        if not m:
+            errors.append({
+                "field": f"inputs.{k}", "value": v,
+                "problem": "这是 /bohr 路径但推不出数据集挂载根(应形如 /bohr/<数据集名>/v1/<文件>)",
+                "fix": "用 `dataset_manager.py files --id <ID>` 拿确切 mount_path 填进 inputs,"
+                       "别自己拼 /bohr 路径;拿不到就 AskUserInput 向用户要,不要猜。",
+            })
+            continue
+        root = m.group(1)
+        if root not in mounts:
+            mounts.append(root)
+    return mounts, errors
+
 
 def _submit(workdir: str) -> str:
     # bohr 直接跑(不用 script 包装;ACCESS_KEY 经 env 继承——调用前须 source .bohr_env)
@@ -95,6 +128,15 @@ def main():
                 shutil.copy(src, dst)
             inputs[k] = src.name
     pipeline["inputs"] = inputs
+
+    # 自动推导 dataset_path:inputs 里的 /bohr 文件路径 → 挂载根,与显式 --dataset-path 合并。
+    # 推不出挂载根(路径格式不对)就带明确原因返回,让 agent 自纠,不提交注定失败的作业。
+    mounts, dperr = _derive_dataset_paths(inputs, a.dataset_path)
+    if dperr:
+        print(json.dumps({"ok": False, "stage": "dataset_path", "errors": dperr},
+                         ensure_ascii=False))
+        return 1
+
     (wd / "pipeline.json").write_text(json.dumps(pipeline, ensure_ascii=False, indent=2))
 
     job = {
@@ -110,8 +152,8 @@ def main():
         "max_run_time": 120,
         "image_address": image,
     }
-    if a.dataset_path:
-        job["dataset_path"] = a.dataset_path
+    if mounts:
+        job["dataset_path"] = mounts
     (wd / "job.json").write_text(json.dumps(job, ensure_ascii=False, indent=2))
 
     jid = _submit(str(wd))

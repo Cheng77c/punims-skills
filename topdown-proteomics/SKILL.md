@@ -100,7 +100,7 @@ source /bohr-workspace/.bohr_env   # 每个新 Bash 调用开头都要,确保 AC
 - 用户上传到工作区:`ListUploadedFiles` 确认。
 - 数据在**项目共享盘 / 个人盘**:**谱图**一律用 `dataset_manager.py create-from-disk --project-id <pid> --disk-path share/<路径> --json` —— 它**内部先查重**(已传过就零传输直接返回),未命中才自动建集;沙箱、CLI 安装、后台上传、真实挂载路径全部封装好,**不要自己拼这套流程**。拿到 `/bohr/<名>/v1/<文件>` 填入 pipeline 的 inputs。**绝不许靠 dataset 标题判断有没有传过**(换个目录/换个人跑名字就对不上,必然重传几百 MB)。**FASTA 不转 dataset,只下载它**进任务目录走 `-p`(见第 4 步)。
 - 已是 **dataset**(自建或网页端上传):
-  - **用户已给出完整 `/bohr/<名>/v1/<文件>` 挂载路径 → 直接填进 inputs,不要再去列/查数据集**(最常见,也最省事)。
+  - **用户已给出完整 `/bohr/<名>/v1/<文件>` 挂载路径 → 直接填进 inputs,不要再去列/查数据集**(最常见,也最省事)。submit 会自动从该路径挂载数据集,无需手动传 --dataset-path。
   - 需要按项目列数据集时,**一律用 `dataset_manager.py list --project-id <pid>`**(可加 `--title <关键词>` 过滤),**绝不 `bohr dataset list` 也绝不手写 curl 查 `/v2/ds`** —— 那个 CLI 有 JSON 解析 bug,你一旦改用 curl 就会把 access key 内联进命令、被平台脱敏成 `[REDACTED]`、制造假的认证失败。
   - 不知内部文件名/路径时,用 `dataset_manager.py files --id <ID>` 拿确切 `/bohr/...` 路径——别猜、也别反问用户。
   - ⛔ **绝不靠"列数据集看它属于哪个项目"来反查 project_id** —— project_id 只能来自用户亲口说的 / 平台注入的;从数据集列表倒推可能把作业投进别人的项目。
@@ -177,7 +177,8 @@ source /bohr-workspace/.bohr_env
 python3 scripts/make_dataset.py --file <谱图路径.raw> --name <数据集名>   # 仅谱图;FASTA 勿用
 # 建前自动查重:命中同名+同大小文件则返回 {"reused": true, ...} 复用已有集,不重复创建
 # 返回真实挂载路径(含随机后缀与 upload 层);填入 pipeline.json 的 inputs.spectrum,
-# 第 5 步 submit 时附带 --dataset-path /bohr/<名>-<后缀>/v1(reused 时用返回的 mount)
+# submit 会**自动**从 pipeline inputs 里的 /bohr 路径推导并挂载数据集,一般无需手动传 --dataset-path。
+# (漏挂正是「作业跑起来报 xxx does not exist」的根因,现已自动兜底。)特殊情况仍可显式 --dataset-path 追加。
 ```
 
 ### 5. 提交 job
