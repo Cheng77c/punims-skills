@@ -18,23 +18,31 @@ IMG_DEFAULT="$(cat "$HERE/../image.txt" 2>/dev/null | tr -d '[:space:]')"
 
 mkdir -p /bohr-workspace
 ENVF=/bohr-workspace/.bohr_env
-# ★ 幂等保值:先载入已有 .bohr_env 把上次写好的值放回 shell,这样本次平台若没注入,
-#   下面的 ${VAR:-...} 会保留旧值,而不是用空值把好值冲掉(重复 setup 不再清空 key/项目)。
-[ -f "$ENVF" ] && . "$ENVF" 2>/dev/null || true
+# ★ 幂等:只从旧 .bohr_env 抢救 PROJECT_ID(平台不注入它),**绝不 source 整个旧文件**。
+#   曾经这里 `. "$ENVF"` 把旧文件整个载回来 —— 旧文件里的 key 可能是已轮换的坏值,
+#   会把平台本 shell 新注入的 BOHR_ACCESS_KEY 冲掉,造成"用户给了新 key 仍旧失败"。
+#   平台每个 shell 注入的 BOHR_ACCESS_KEY 是 key 的**唯一权威**,不从磁盘旧值恢复。
+OLD_PID=""
+[ -f "$ENVF" ] && OLD_PID="$(sed -n 's/^export PROJECT_ID="\(.*\)"$/\1/p' "$ENVF" 2>/dev/null | tail -1)"
+PROJECT_ID="${PROJECT_ID:-$OLD_PID}"
 # 例外:IMAGE_ADDRESS 不保值。它的单一源是 image.txt——若沿用 .bohr_env 缓存的旧 tag,
 # 会盖过 image.txt 更新(改了版本号却仍提交旧镜像)。每次以 image.txt 为准;临时换镜像在
 # submit 前命令级 `IMAGE_ADDRESS=… python3 submit_pipeline.py`,不持久化到 .bohr_env。
 IMAGE_ADDRESS="$IMG_DEFAULT"
-# ACCESS_KEY(bohr CLI 读)与 BOHR_ACCESS_KEY(脚本/curl 读)同源同值:一次解析、两名都写。
-# source .bohr_env 后两个名都带 key,agent 不必再手动 export ACCESS_KEY="$BOHR_ACCESS_KEY"
-# (P2 摆弄断 key 的根因就是 .bohr_env 只写了 ACCESS_KEY、没写 BOHR_ACCESS_KEY)。
-AK="${ACCESS_KEY:-${BOHR_ACCESS_KEY:-}}"
+# key 处理:.bohr_env 里写**引用不写值**。
+# 平台每个 shell 都注入 BOHR_ACCESS_KEY(实测);bohr CLI 只认 ACCESS_KEY 这个名字。
+# 所以这里写两行 `${A:-$B}` 的**字面引用**(用 \$ 转义,写入时不展开),source 时才从
+# 平台注入的 live 环境解析出真值 —— key 的明文值从不落进磁盘文件。
+# 这修掉了旧版把 `export ACCESS_KEY="<明文32位>"` 写进 .bohr_env 的问题:那既是密钥落盘,
+# 又踩平台脱敏盲区(明文进了文件却没被 redact)。改后两个名字在 source 后仍都带值,
+# agent 不必手动桥接,bohr CLI 也照认。
+AK="${BOHR_ACCESS_KEY:-${ACCESS_KEY:-}}"   # 自检以平台注入的 BOHR_ACCESS_KEY 为准;不写进文件
 cat > "$ENVF" <<EOF
 export PATH="\$HOME/.bohrium:\$PATH"
 export OPENAPI_HOST=https://open.bohrium.com
 export TIEFBLUE_HOST=https://tiefblue.dp.tech
-export ACCESS_KEY="${AK}"
-export BOHR_ACCESS_KEY="${AK}"
+export ACCESS_KEY="\${BOHR_ACCESS_KEY:-\$ACCESS_KEY}"
+export BOHR_ACCESS_KEY="\${BOHR_ACCESS_KEY:-\$ACCESS_KEY}"
 export PROJECT_ID="${PROJECT_ID:-}"
 export IMAGE_ADDRESS="${IMAGE_ADDRESS:-$IMG_DEFAULT}"
 export MACHINE_TYPE="${MACHINE_TYPE:-c16_m32_cpu}"

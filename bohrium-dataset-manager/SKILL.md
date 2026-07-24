@@ -75,11 +75,12 @@ export ACCESS_KEY="$BOHR_ACCESS_KEY"   # ★ bohr CLI 认这个变量;不设会 
 ## 列出数据集
 
 ```bash
-export ACCESS_KEY="$BOHR_ACCESS_KEY"    # ★ bohr CLI 认 ACCESS_KEY(见「认证配置」)
-bohr dataset list -p YOUR_PROJECT_ID --json      # 按项目过滤(JSON)
-bohr dataset list -p YOUR_PROJECT_ID -t "my-dataset" --json   # 按标题搜索(title 跨项目重名,-p+-t 合用)
+# ★ 列数据集用本脚本的 list 子命令,不要用 bohr CLI —— key 从环境读,不进命令文本。
+python3 dataset_manager.py list --project-id YOUR_PROJECT_ID --json          # 按项目
+python3 dataset_manager.py list --project-id YOUR_PROJECT_ID --title my-set   # 按标题过滤
 ```
-> ⚠️ **务必带 `--json`**:不带 `--json` 时 bohr CLI 走交互式分页,在无终端环境会报 `Error: open /dev/tty: no such device or address`。
+> ⛔ **不要手写 `bohr dataset list` 或 `curl .../v2/ds`**:那个 bohr CLI 有 JSON 解析 bug(`RespErr.error unmarshal`),你一旦改用 curl 就会把 access key 内联进命令、被平台脱敏成 `[REDACTED]`、制造假的 `Invalid AccessKey`。`list` 子命令走 `api()`,key 只在进程内。
+> ⛔ **绝不靠列数据集反查 project_id** —— project_id 只来自用户 / 平台注入,不能从"数据集属于哪个项目"倒推。
 
 **JSON 输出字段：**
 
@@ -97,7 +98,7 @@ bohr dataset list -p YOUR_PROJECT_ID -t "my-dataset" --json   # 按标题搜索(
 
 ## 列出数据集内文件（拿确切挂载路径）
 
-`bohr dataset list` 只给数据集**本身**（id/title/挂载根 `/bohr/<名>/v1`），**不给内部文件名**。要在任务里引用某个具体文件（如 `raw_files`/`inputs`），必须知道数据集**内部的确切文件名**——**用这个能力查,绝不猜文件名、也绝不反问用户**：
+`dataset_manager.py list --project-id <pid>` 只给数据集**本身**（id/title/挂载根 `/bohr/<名>/v1`），**不给内部文件名**。要在任务里引用某个具体文件（如 `raw_files`/`inputs`），必须知道数据集**内部的确切文件名**——**用这个能力查,绝不猜文件名、也绝不反问用户**：
 
 **先按名字拿到数字 ID**(用户通常只给数据集**名**,而 `files`/`download`/`detail` 都要数字 `--id`):
 ```bash
@@ -443,7 +444,7 @@ r = requests.get(f"{BASE}/project", headers=HEADERS)
 | 问题 | 原因 | 解决 |
 |------|------|------|
 | 上传中断 | 网络不稳定 | 重新运行同一命令，输入 `y` 续传 |
-| 数据集路径找不到 | 挂载路径错误 | 用 `bohr dataset list --json` 查看 `path` 字段 |
+| 数据集路径找不到 | 挂载路径错误 | 用 `dataset_manager.py list --project-id <pid> --json` 查看 `path` 字段（不要手写 bohr dataset list / curl）|
 | Job 中无法访问数据集 | 未在 job.json 中配置 | 添加 `"dataset_path": ["/bohr/xxx/v1"]` |
 | `/ds/list` 返回错误 | 路由被 `/:id` 捕获 | 使用 `GET /ds/`（根路径）获取列表 |
 | 创建缺少 identifier 报错 | `identifier` 是必填字段 | 添加 `identifier` 字段（英文+数字） |
@@ -454,8 +455,8 @@ r = requests.get(f"{BASE}/project", headers=HEADERS)
 | （sandbox 建集）exec 60s 超时 | 前台默认 60s | 大文件上传必须 `--background` |
 | （sandbox 建集）`panic: unsupported protocol scheme ""` | 沙箱内 `TIEFBLUE_HOST` 未设 | `export TIEFBLUE_HOST=https://tiefblue.dp.tech` |
 | （sandbox 建集）`lbg: error: invalid choice: 'sdbx'` | 装了稳定版 lbg | `pip install --pre --upgrade lbg` |
-| `code:2000` / Unauthorized（**但 key 已设置**） | 网关鉴权偶发抖动，非真失效 | **原样重试 1–2 次**即可；别急着找用户要 key |
-| `bohr dataset ...` 报 `AccessKey Invalid!` 或**空 `Error:`（exit 0）** | 只设了 `BOHR_ACCESS_KEY`;bohr CLI 认 `ACCESS_KEY` | `export ACCESS_KEY="$BOHR_ACCESS_KEY"` 再跑(见「认证配置」) |
+| `code:2000` / Unauthorized（**但 key 已设置**） | **头号真因:你把 key 明文写进了命令/文件，被平台脱敏成 `[REDACTED]` 发了出去**（看日志有无 `[REDACTED]`）；排除后才是网关偶发抖动 | 认证操作一律走脚本（`list`/`files`/`create-from-disk`/`fetch_file.py`），别手写带 key 的命令；确系抖动再原样重试 1–2 次；**别急着找用户要 key** |
+| `bohr dataset ...` 报 `AccessKey Invalid!` 或**空 `Error:`（exit 0）** | 只设了 `BOHR_ACCESS_KEY`;bohr CLI 认 `ACCESS_KEY` | 跑 `bash scripts/setup.sh` 后 `source /bohr-workspace/.bohr_env`（会把 ACCESS_KEY 从平台 BOHR_ACCESS_KEY 派生好，无需手动桥接）|
 | `bohr dataset list` 报 `open /dev/tty: no such device or address` | 不带 `--json` 走交互式分页,无终端环境报错 | 一律加 `--json` |
 | `dataset_manager.py` 报 `set BOHR_ACCESS_KEY (or ACCESS_KEY)` | 两个变量都没设 | 任一即可;脚本已兼容 `ACCESS_KEY`(BU/TD 的 `.bohr_env` 设的就是它) |
 | `files` 只返回一个 `upload/` 目录项 | 旧版脚本不递归 | 已修:`files`/`download` 会递归下钻,直接用返回的 `mount_path` |

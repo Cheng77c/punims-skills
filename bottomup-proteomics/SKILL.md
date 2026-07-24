@@ -127,7 +127,8 @@ sandbox 每次 Bash 是独立 shell,环境变量不跨调用持久化。**第一
 bash scripts/setup.sh              # 装 bohr CLI + 写 /bohr-workspace/.bohr_env(只需一次)
 source /bohr-workspace/.bohr_env   # 每个新 Bash 调用开头都要,确保 ACCESS_KEY/PROJECT_ID 在
 ```
-鉴权要点:bohr CLI 认 `ACCESS_KEY` 环境变量;直接调 REST API 用 HTTP 头 `accessKey: <key>`(**不是** `Authorization: Bearer`)。脚本已按此写。
+鉴权要点:平台注入的是环境变量 `BOHR_ACCESS_KEY`;`bohr` CLI 只认 `ACCESS_KEY` 这个名字(实测),故 setup.sh 会把值同时落成两份。**脚本已从环境读 key,你不必碰 key。**
+> ⛔ **key 的明文值绝不能进入命令文本/中转变量/写文件/echo** —— 平台会脱敏成 `[REDACTED]`,破坏命令或发出假值。需要认证的操作一律走脚本(`fetch_file.py` / `make_dataset.py` / `submit_pipeline.py` / `poll_job.py`);它们内部从 `os.environ` 读 key。REST 认证头 `accessKey:` 与 `Authorization: Bearer` **两种都可用**(实测),但你不该手写它们。
 
 > ⛔ **`bohr: command not found` = 你还没跑 setup.sh,不是"CLI 需要你自己想办法装"。**
 >   唯一修法是 `bash scripts/setup.sh`(幂等,装的是官方 bohr CLI)。
@@ -146,7 +147,11 @@ source /bohr-workspace/.bohr_env   # 每个新 Bash 调用开头都要,确保 AC
 ### 1. 确认输入文件(先辨识来源)
 - 用户上传到工作区:`ListUploadedFiles` 确认。
 - 数据在**项目共享盘 / 个人盘**:**谱图**一律用 `dataset_manager.py create-from-disk --project-id <pid> --disk-path share/<路径> --json` —— 它**内部先查重**(已传过就零传输直接返回),未命中才自动建集;沙箱、CLI 安装、后台上传、真实挂载路径全部封装好,**不要自己拼这套流程**。拿到 `/bohr/<名>/v1/<文件>` 填入 raw_files[]。**绝不许靠 dataset 标题判断有没有传过**(换个目录/换个人跑名字就对不上,必然重传几百 MB)。**FASTA 不转 dataset,只下载它**进任务目录走 `-p`(见第 4 步)。
-- 已是 **dataset**(自建或网页端上传):`bohr dataset list -p <项目>` 找到,把 `/bohr/<名>/v1/<文件>` 填入 raw_files[];**不知内部文件名/路径时,用 bohrium-dataset-manager 的「列出数据集内文件」(`dataset_manager.py files --id <ID>`)拿确切路径——别猜、也别反问用户**。
+- 已是 **dataset**(自建或网页端上传):
+  - **用户已给出完整 `/bohr/<名>/v1/<文件>` 挂载路径 → 直接填进 raw_files[],不要再去列/查数据集**(最常见,也最省事)。
+  - 需要按项目列数据集时,**一律用 `dataset_manager.py list --project-id <pid>`**(可加 `--title <关键词>` 过滤),**绝不 `bohr dataset list` 也绝不手写 curl 查 `/v2/ds`** —— 那个 CLI 有 JSON 解析 bug,你一旦改用 curl 就会把 access key 内联进命令、被平台脱敏成 `[REDACTED]`、制造假的认证失败。
+  - 不知内部文件名/路径时,用 `dataset_manager.py files --id <ID>` 拿确切 `/bohr/...` 路径——别猜、也别反问用户。
+  - ⛔ **绝不靠"列数据集看它属于哪个项目"来反查 project_id** —— project_id 只能来自用户亲口说的 / 平台注入的;从数据集列表倒推可能把作业投进别人的项目。
 - 一条流水线至少需要 `.raw`/`.mzML` 谱图;`search-closed`/`database` 步还需 `.fasta`。
 - 缺文件就 `AskUserInput`,**不要假设路径**。
 
@@ -254,22 +259,26 @@ python3 scripts/validate_pipeline.py pipeline.json
 |---|---|---|
 | **谱图(`.raw`/`.mzML`,任意大小)——默认建 dataset** | **工作区上传的本地文件**:`make_dataset.py`(已内置查重)。**共享盘/个人盘**:bohrium-dataset-manager 的「从共享盘/个人盘建数据集」sandbox 直转(**服务端直连、严禁先下载**,含查重)。拿 `/bohr/<名>/v1/<文件>` 填 raw_files[] | ❌ 只读 |
 | **FASTA / 参数 / 需可写的小文件** | `-p` 上传目录(submit 自动打包)。共享盘/个人盘上的 fasta **只下载它**进任务目录再 -p | ✅ 可写 |
-| **已有 / 网页端上传的 dataset** | `bohr dataset list` 找到,引用 `/bohr/<名>/v1`(不知文件名用「列出数据集内文件」) | ❌ 只读 |
+| **已有 / 网页端上传的 dataset** | 用户给了 `/bohr/…` 完整路径就直接用;需列举用 `dataset_manager.py list --project-id <pid>`(不知文件名用 `files --id <ID>`) | ❌ 只读 |
 | 谱图,但用户**主动要求"直接上传"** | `-p`(校验器硬拦 >100MB;仅此情形才用 -p 传谱图) | ✅ 可写 |
 
 `submit_pipeline.py` 自动把 `fasta_path`/本地路径放入 `-p` 目录;`/bohr/…` 路径作为 dataset 挂载引用,原样保留。
 
 > **FASTA 必须走 `-p`,不可放 dataset。** 搜索步会于 **FASTA 同目录**写入索引(.idx);dataset 为只读挂载,建索引将失败。FASTA 体积小,放入 `-p` 即可;`make_dataset.py` 也会拒绝 FASTA 文件。
 >
-> **共享盘/个人盘上的 fasta:只下载这一个文件**进任务目录再走 `-p`(**别做成 dataset**)。用已验证的下载形态——**路径作 URL 段**,`projectId`+`userId` 作 query(**不要用 `filePath=` query,后端会回 `path invalid!`**):
+> **共享盘/个人盘上的 fasta:只下载这一个文件**进任务目录再走 `-p`(**别做成 dataset**)。
+> **一律用 `fetch_file.py`,不要手写 curl**:
 > ```bash
 > source /bohr-workspace/.bohr_env
-> API=https://open.bohrium.com/openapi
-> USERID=$(curl -sS "$API/v1/ak/get" -H "Authorization: Bearer $ACCESS_KEY" | python3 -c "import json,sys;print(json.load(sys.stdin)['data']['user_id'])")
-> # 共享盘路径前缀 share/…;个人盘用 personal/…(路径原样拼进 URL 段)
-> curl -L -sS "$API/v1/file/download/share/jubao/<完整路径>/xxx.fasta?projectId=$PROJECT_ID&userId=$USERID" \
->   -H "Authorization: Bearer $ACCESS_KEY" -o /bohr-workspace/bu-runs/<任务>/xxx.fasta
+> # 个人盘:remote 以 personal/ 开头;共享盘:以 share/ 开头。路径原样传,不用拼 URL/取 userId。
+> python3 scripts/fetch_file.py \
+>   --remote personal/<完整路径>/xxx.fasta \
+>   --out /bohr-workspace/bu-runs/<任务>/xxx.fasta
 > ```
+> ⛔ **绝不手写带 access key 的 curl 来下载**(取 userId、拼 download URL 都别自己做)。
+> 平台会把 key 明文脱敏成 `[REDACTED]`:一旦 key 进了命令文本/中转变量/写文件/回显,
+> 轻则破坏命令引号(`unexpected EOF`),重则发出假值报 `Invalid AccessKey` —— 看起来像密钥失效,
+> 其实是你把它内联了。`fetch_file.py` 把 key 全程关在环境变量里,是唯一稳的下载方式。
 
 仅**工作区上传的谱图**用 `make_dataset.py` 建 dataset(共享盘/个人盘谱图走 bohrium-dataset-manager sandbox 直转,不用这个):
 ```bash
@@ -338,7 +347,7 @@ python3 scripts/collect_results.py --job-id <JobId> --out /bohr-workspace/bu-run
 **常见错误:**
 | 现象 | 原因 / 处理 |
 |---|---|
-| `AccessKey Invalid` | 确认 `ACCESS_KEY` 已 export;REST API 用 `accessKey:` 头,不是 `Authorization: Bearer` |
+| `AccessKey Invalid` / `AccessKey is required` | **先判是不是你自己内联了 key**:命令/日志里出现 `[REDACTED]` = 你把 key 明文写进了命令或文件,被平台脱敏后发了出去 —— 这不是 key 失效,换 key 也没用。修法:一切认证操作走脚本(下载 `fetch_file.py`、列数据集 `dataset_manager.py list`、提交 `submit_pipeline.py`、查作业 `poll_job.py`),它们从环境读 key、绝不内联。**只有排除了内联(日志无 `[REDACTED]`、脚本也报鉴权失败)之后**,才考虑其它:①脚本报缺 key → 先 `bash scripts/setup.sh`;②高频并发限流 → 稍等重试;③确系 key 被撤销/过期/权限变更 → 这时才 `AskUserInput` 请用户重取。REST 头 `accessKey:` 与 `Authorization: Bearer` 两种都行(不是失败原因)。 |
 | job `status=-1`(失败) | `collect_results.py` 直接返回 `failed_step` + `error` + `failed_log_tail`;依据真实报错修正 |
 | `no files found matching X` | 输入路径问题;确认文件真存在,或 dataset 路径带 `upload/` 层 |
 | 零 PSM / FDR 崩溃 | `database` 步漏掉,`search-closed` 直接拿 target-only FASTA 导致零 decoy |

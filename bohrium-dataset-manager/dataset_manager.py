@@ -378,6 +378,43 @@ def _find_hit(project_id: int, name: str, size: int):
     return None, scanned
 
 
+def list_datasets(project_id: int, title: str = None, as_json: bool = False):
+    """List every dataset in a project — the wrapped replacement for `bohr dataset list`.
+
+    Why this exists: agents kept falling back to `bohr dataset list` / hand-rolled
+    `curl .../v2/ds?projectId=` to see what datasets exist. Two failure modes came out of
+    that: (1) that bohr CLI build has a broken error parser (`RespErr.error unmarshal`), so
+    on any hiccup the agent switched to curl and INLINED the access key into the command —
+    which the platform redaction rewrites to `[REDACTED]`, producing a fake auth failure;
+    (2) worse, agents used the listing to *reverse-engineer a project_id* from which dataset
+    is visible — a project_id must never be guessed this way. This wraps the same listing
+    behind `api()` (key from env, business-code checked), so neither failure can happen.
+
+    project_id is REQUIRED and must come from the user / platform env — this command reads it,
+    it never derives it.
+    """
+    rows = []
+    for d in _iter_datasets(project_id):
+        t = d.get("title") or ""
+        if title and title.lower() not in t.lower():
+            continue
+        rows.append({"id": d.get("id"), "title": t,
+                     "path": d.get("path"), "status": d.get("status")})
+    if as_json:
+        print(json.dumps({"projectId": project_id, "count": len(rows),
+                          "datasets": rows}, ensure_ascii=False, indent=2))
+    else:
+        print(f"{len(rows)} dataset(s) in project {project_id}"
+              + (f" matching {title!r}" if title else "") + ":")
+        for r in rows:
+            mark = "" if r["status"] == 2 else f"  (status={r['status']}, not usable)"
+            print(f"  id={r['id']}  {r['title']}  ->  {r['path']}{mark}")
+        print("\nNOTE: to reference a file inside one of these, use "
+              "`files --id <ID>` for the exact /bohr/... path. Do NOT infer a project_id "
+              "from this list — a project_id only comes from the user or the platform env.")
+    return rows
+
+
 def find_dataset_for_file(project_id: int, disk_path: str = None,
                           name: str = None, size: int = None, as_json: bool = False):
     """Find an existing dataset already containing this exact file — the dedup primitive.
@@ -640,16 +677,20 @@ def create_from_disk(project_id: int, disk_path: str, name: str = None,
     # file that never finished. Has happened. One log per upload, and only ever read this one.
     log = f"/tmp/upload-{ident}-{size}.log"
     print("[sandbox] uploading in background (this is the slow part)…")
+    # key 走 sdbx exec 的 --env(进程环境),**不拼进脚本文本**。实测:sdbxagent sandbox 里
+    # 三个 key 变量都为空(平台不给 sandbox 注入),所以 bohr dataset create 必须自己带 key;
+    # 但把 `export ACCESS_KEY=<明文>` 写进脚本会让 key 落进命令载荷(Codex round2 #3 BLOCKER)。
+    # --env 由本进程 subprocess 直接传给 lbg,不经 agent 的 Bash 层、不经平台脱敏,脚本零 key。
     script = (
         "export PATH=/root/.bohrium:$PATH\n"
         "export OPENAPI_HOST=https://open.bohrium.com\n"
         "export TIEFBLUE_HOST=https://tiefblue.dp.tech\n"
-        f"export ACCESS_KEY={AK}\n"
         f"echo n | bohr dataset create -n '{ident}' -p '{ident}' -i {project_id} "
         f"-l '{p}' > {log} 2>&1\n"
         f"echo EXIT_CODE=$? >> {log}\n"
     )
-    rc, out, err = _sdbx("exec", "--user", "root", "--background", sid, script, timeout=180)
+    rc, out, err = _sdbx("exec", "--user", "root", "--env", f"ACCESS_KEY={AK}",
+                         "--background", sid, script, timeout=180)
     if rc != 0:
         die(f"could not start the background upload in sandbox {sid}: {(out or err)[:200]}",
             fix="Retry the same command. If it fails again, the sandbox may be unhealthy — "
@@ -824,6 +865,15 @@ def main():
                          help="e.g. 1 or v1 (default: latest)")
     p_files.add_argument("--json", action="store_true")
 
+    p_list = sub.add_parser(
+        "list",
+        help="List datasets in a project (wrapped `bohr dataset list`; key stays in env). "
+             "Use this instead of hand-writing curl / bohr dataset list.",
+    )
+    p_list.add_argument("--project-id", "--project_id", dest="project_id", type=int, required=True)
+    p_list.add_argument("--title", help="optional case-insensitive title filter")
+    p_list.add_argument("--json", action="store_true")
+
     p_find = sub.add_parser(
         "find",
         help="DEDUP: find an existing dataset already holding this file (match on name+size, "
@@ -876,6 +926,8 @@ def main():
         check_permission(args.id)
     elif args.cmd == "files":
         list_files(args.id, args.version, args.json)
+    elif args.cmd == "list":
+        list_datasets(args.project_id, args.title, args.json)
     elif args.cmd == "find":
         find_dataset_for_file(args.project_id, args.disk_path, args.name, args.size, args.json)
     elif args.cmd == "create-from-disk":
