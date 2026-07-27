@@ -75,9 +75,13 @@ def api(method: str, url: str, **kw):
                 "subcommand), never retry, and do not invent remediation steps.",
             code=1)
     if r.status_code == 404:
-        die(f"no such Bohrium endpoint: {url} (404)",
-            fix="This URL does not exist. Use only the subcommands of this script "
-                "(`dataset_manager.py --help`).",
+        # 两种成因,别混:收口到 api() 之后,**写错 dataset id** 也会走这条分支,
+        # 而旧文案只讲"端点不存在",会让 agent 去怀疑脚本而不是自己的 id。
+        die(f"not found (404): {url}",
+            fix="Two causes. (a) The dataset/version id does not exist or you cannot access it "
+                "— re-check it with `list --project-id <pid>`. (b) The URL is not a real "
+                "endpoint (only possible if the call was hand-crafted). If you got here from a "
+                "subcommand of this script, it is (a).",
             never="Do NOT hand-craft REST calls or invent endpoints — /v1/dataset, "
                   "/v2/dataset/list and /openapi/cli/install are all 404s that have "
                   "burned us before.",
@@ -106,12 +110,8 @@ def api(method: str, url: str, **kw):
 
 def check_quota(project_id: int):
     """Check dataset quota for a project."""
-    r = requests.get(
-        f"{BASE}/quota/check",
-        headers=HEADERS,
-        params={"projectId": project_id},
-    )
-    data = r.json().get("data", {})
+    data = api("GET", f"{BASE}/quota/check",
+               params={"projectId": project_id}).get("data", {})
     limit = data.get("limit", "?")
     used = data.get("used", "?")
     available = data.get("result", "?")
@@ -123,13 +123,14 @@ def check_quota(project_id: int):
 
 def get_detail(dataset_id: int):
     """Get dataset details."""
-    r = requests.get(f"{BASE}/{dataset_id}", headers=HEADERS)
-    data = r.json().get("data", {})
+    data = api("GET", f"{BASE}/{dataset_id}").get("data", {})
     # /v2/ds/{id} 详情端点不含 status,从列表端点(唯一带 status 的)按 id 兜底补上,
     # 使 detail 成为一站式(path+status),agent 不必再手搓 /v2/ds/?projectId= REST。
     status = data.get("status")
     if status is None and data.get("projectId"):
         try:
+            # 这一处**故意**不走 api():上面的 detail 调用已经验过鉴权,此处仅为补 status,
+            # 拿不到就不显示,不该让整个 detail 因为一个可选字段而 die。
             items = requests.get(f"{BASE}/?projectId={data['projectId']}&page=1&pageSize=100",
                                  headers=HEADERS).json().get("data", {}).get("items", []) or []
             hit = next((i for i in items if i.get("id") == data.get("id")), None)
@@ -148,8 +149,7 @@ def get_detail(dataset_id: int):
 
 def list_versions(dataset_id: int):
     """List all versions of a dataset."""
-    r = requests.get(f"{BASE}/{dataset_id}/version", headers=HEADERS)
-    data = r.json().get("data", {})
+    data = api("GET", f"{BASE}/{dataset_id}/version").get("data", {})
     items = data if isinstance(data, list) else data.get("items", [])
 
     print(f"Versions for dataset {dataset_id}:\n")
@@ -168,24 +168,18 @@ def list_versions(dataset_id: int):
 
 def create_version(dataset_id: int, desc: str):
     """Create a new version of an existing dataset."""
-    r = requests.post(
-        f"{BASE}/{dataset_id}/version",
-        headers=HEADERS_JSON,
-        json={"versionDesc": desc},
-    )
-    result = r.json()
-    if result.get("code") == 0:
-        print(f"New version created for dataset {dataset_id}")
-        print(f"Description: {desc}")
-        print("Note: Version preparation may take a few minutes for large datasets.")
-    else:
-        print(f"Failed: {result}")
+    # api() 在 401/5xx/业务码非 0 时直接 die,所以走到下一行就是真的成功了。
+    # 旧版把失败打成 `Failed: {...}` 然后 exit 0 —— 又一个假绿灯。
+    api("POST", f"{BASE}/{dataset_id}/version", headers=HEADERS_JSON,
+        json={"versionDesc": desc})
+    print(f"New version created for dataset {dataset_id}")
+    print(f"Description: {desc}")
+    print("Note: Version preparation may take a few minutes for large datasets.")
 
 
 def check_permission(dataset_id: int):
     """Check dataset permissions."""
-    r = requests.get(f"{BASE}/{dataset_id}/permission", headers=HEADERS)
-    data = r.json().get("data", {})
+    data = api("GET", f"{BASE}/{dataset_id}/permission").get("data", {})
     print(f"Permissions for dataset {dataset_id}:")
     print(json.dumps(data, indent=2, ensure_ascii=False))
 
@@ -199,11 +193,13 @@ def _iterate_all(host, token, prefix, _depth=0, _max_depth=20):
     """
     out, next_token = [], ""
     while True:
-        data = requests.post(
-            f"{host}/api/iterate",
-            headers={"Authorization": f"Bearer {token}", "Content-Type": "application/json"},
-            json={"maxObjects": 200, "prefix": prefix, "nextToken": next_token},
-        ).json().get("data", {})
+        # tiefblue 用派生 token 而非 AK,但失败形态一样(401 body 是合法 JSON →
+        # 空 objects → 被当成"数据集是空的")。headers 显式传，api() 不会覆盖。
+        data = api("POST", f"{host}/api/iterate",
+                   headers={"Authorization": f"Bearer {token}",
+                            "Content-Type": "application/json"},
+                   json={"maxObjects": 200, "prefix": prefix,
+                         "nextToken": next_token}).get("data", {})
         for o in (data.get("objects") or []):
             p = o.get("path", "")
             if p.rstrip("/") == prefix.rstrip("/"):
@@ -227,14 +223,14 @@ def list_files(dataset_id: int, version: str = None, as_json: bool = False, quie
     input/token -> tiefblue JWT; tiefblue /api/iterate -> objects. Use this instead of
     guessing filenames or asking the user which file a dataset contains.
     """
-    detail = requests.get(f"{BASE}/{dataset_id}", headers=HEADERS).json().get("data", {})
+    detail = api("GET", f"{BASE}/{dataset_id}").get("data", {})
     project_id = detail.get("projectId")
     mount_root = detail.get("path", "")  # e.g. /bohr/<name>-<suffix>/v1
     if not project_id or not mount_root:
         print(f"Failed to get dataset {dataset_id} detail (check id / permission).")
         return
 
-    vr = requests.get(f"{BASE}/{dataset_id}/version", headers=HEADERS).json().get("data", [])
+    vr = api("GET", f"{BASE}/{dataset_id}/version").get("data", [])
     versions = vr if isinstance(vr, list) else vr.get("items", [])
     if not versions:
         print(f"No versions for dataset {dataset_id}.")
@@ -251,10 +247,8 @@ def list_files(dataset_id: int, version: str = None, as_json: bool = False, quie
         print("Version has no tiefbluePath.")
         return
 
-    tk = requests.get(
-        f"{BASE}/input/token", headers=HEADERS,
-        params={"projectId": project_id, "path": tb_path},
-    ).json().get("data", {})
+    tk = api("GET", f"{BASE}/input/token",
+             params={"projectId": project_id, "path": tb_path}).get("data", {})
     token = tk.get("token", "")
     host = tk.get("host") or "https://tiefblue.dp.tech"
     if not token:
@@ -774,12 +768,12 @@ def create_from_disk(project_id: int, disk_path: str, name: str = None,
 
 def _resolve_version_token(dataset_id: int, version: str = None):
     """Return (detail, tb_path, token, host) for a dataset version. None on failure."""
-    detail = requests.get(f"{BASE}/{dataset_id}", headers=HEADERS).json().get("data", {})
+    detail = api("GET", f"{BASE}/{dataset_id}").get("data", {})
     project_id = detail.get("projectId")
     if not project_id:
         print(f"Failed to get dataset {dataset_id} detail (check id / permission).")
         return None
-    vr = requests.get(f"{BASE}/{dataset_id}/version", headers=HEADERS).json().get("data", [])
+    vr = api("GET", f"{BASE}/{dataset_id}/version").get("data", [])
     versions = vr if isinstance(vr, list) else vr.get("items", [])
     if not versions:
         print(f"No versions for dataset {dataset_id}.")
@@ -795,10 +789,8 @@ def _resolve_version_token(dataset_id: int, version: str = None):
     if not tb_path:
         print("Version has no tiefbluePath.")
         return None
-    tk = requests.get(
-        f"{BASE}/input/token", headers=HEADERS,
-        params={"projectId": project_id, "path": tb_path},
-    ).json().get("data", {})
+    tk = api("GET", f"{BASE}/input/token",
+             params={"projectId": project_id, "path": tb_path}).get("data", {})
     token = tk.get("token", "")
     host = tk.get("host") or "https://tiefblue.dp.tech"
     if not token:
@@ -847,8 +839,14 @@ def download_file(dataset_id: int, filename: str, out: str = None, version: str 
         stream=True, allow_redirects=True,
     )
     if r.status_code != 200:
-        print(f"Download failed: HTTP {r.status_code} {r.text[:200]}")
-        return
+        # 旧版 print + return → exit 0,调用方以为下成功了。二进制流不能走 api()
+        # (它只返回 JSON),但失败同样必须硬失败。
+        die(f"download failed: HTTP {r.status_code} on {host}/api/download/{obj}: "
+            f"{r.text[:200]}",
+            fix="401/403 = the derived tiefblue token expired — re-run the command so it is "
+                "re-issued. Other codes: verify the file path printed by `files`.",
+            never="Do not fall back to guessing an object path or scraping a presigned URL.",
+            code=8)
     size = 0
     with open(out, "wb") as f:
         for chunk in r.iter_content(chunk_size=1024 * 1024):
