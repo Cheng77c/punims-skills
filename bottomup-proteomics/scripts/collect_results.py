@@ -6,6 +6,7 @@ job 节点隔离、写不回共享盘,故结果只能 download。
 failed_logs),引擎中间格式与日志不写进去,故整个 out/ 都可直接交给用户。
 """
 import argparse
+import os
 import json
 import sys
 import shutil

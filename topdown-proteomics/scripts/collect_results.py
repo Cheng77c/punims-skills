@@ -5,6 +5,7 @@ job 节点隔离、写不回共享盘,故结果只能 download。小 summary + �
 大中间产物(mzML)须 pipeline.json `collect` 指定后才在 out/ 里、随之下载。
 """
 import argparse
+import os
 import json
 import sys
 import re
