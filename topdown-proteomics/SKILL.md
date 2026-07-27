@@ -47,7 +47,7 @@ l1: >
   你只需提供 spectrum / fasta / 参数;镜像与作业配置由脚本处理。
 - 重二进制都在镜像里跑(经 Bohrium 作业),**不要在 sandbox 里直接跑 msconvert/TopPIC**。
 
-如果 `IMAGE_ADDRESS`/`PROJECT_ID` 未配置,**不要猜或找替代镜像**——用 `AskUserInput` 让用户补配置或提示去启用 `bohrium-job` skill。**`ACCESS_KEY` 是例外:绝不向用户索取** —— 平台会把表单里的密钥脱敏成 `[REDACTED]`(拿不到真值),还会留下一条日后覆盖有效密钥的陈旧记录。它由平台注入,缺失或失效都是平台侧授权问题,提示用户去平台处理后**新开会话**。
+如果 `IMAGE_ADDRESS`/`PROJECT_ID` 未配置,**不要猜或找替代镜像**——用 `AskUserInput` 让用户补配置或提示去启用 `bohrium-job` skill。**`ACCESS_KEY` 是例外:绝不向用户索取** —— 平台会把表单里的密钥脱敏成 `[REDACTED]`(拿不到真值),还会留下一条日后覆盖有效密钥的陈旧记录。它由平台注入,**缺失或失效都是平台侧问题,不在本 skill 的处理范围** —— 如实告知用户后结束本轮。
 
 ### 🚫 五条铁律(违反=必错)
 0. **开工第一件事:加载 `bohrium-dataset-manager` skill。** 谱图的查重与建集全靠它的
@@ -268,7 +268,7 @@ python3 scripts/collect_results.py --job-id <JobId> --out /bohr-workspace/td-run
 **常见错误:**
 | 现象 | 原因 / 处理 |
 |---|---|
-| `AccessKey Invalid` / `AccessKey is required` / `code:2000` | **终局错误**(响应里带 `retryable:false`),重试和换写法都没用。第一步永远是 `bash scripts/setup.sh` —— 它会真打一次认证,明确告诉你密钥是「通过」还是「被拒」。**被拒 = 平台注入的密钥已失效**(有值、32 位、格式正常但认证不过 —— 2026-07-27 线上事故就是如此),唯一出口是让用户去平台清理该 agent 的密钥凭据记录、重新开启密钥注入,然后**新开会话**。⛔ **绝不 `AskUserInput` 向用户索取 key** —— 平台会把表单值脱敏成 `[REDACTED]`,你永远拿不到真值,而且会在平台凭据库留下一条日后覆盖有效密钥的陈旧记录(**这正是事故的自我强化环**)。⛔ 也不要 `bohr auth login`(该子命令不存在)。注:命令里出现 `[REDACTED]` 说明脱敏发生过,但**没出现不能证明没发生** —— 平台脱敏是概率性的,同一写法时好时坏。 |
+| `AccessKey Invalid` / `AccessKey is required` / `code:2000` | **终局错误**(响应里带 `retryable:false`),重试和换写法都没用。第一步永远是 `bash scripts/setup.sh` —— 它会真打一次认证,明确告诉你密钥是「通过」还是「被拒」。**被拒 = 平台注入的密钥已失效**(有值、32 位、格式正常但认证不过 —— 2026-07-27 线上事故就是如此)。**这是平台侧的密钥注入问题,不在本 skill 的处理范围** —— 如实告知用户「当前平台注入的密钥已失效」后**结束本轮**,不要尝试自行修复,也不要替平台猜处置步骤。⛔ **绝不 `AskUserInput` 向用户索取 key** —— 平台会把表单值脱敏成 `[REDACTED]`,你永远拿不到真值,而且会在平台凭据库留下一条日后覆盖有效密钥的陈旧记录(**这正是事故的自我强化环**)。⛔ 也不要 `bohr auth login`(该子命令不存在)。注:命令里出现 `[REDACTED]` 说明脱敏发生过,但**没出现不能证明没发生** —— 平台脱敏是概率性的,同一写法时好时坏。 |
 | `ParamError ... validation failed` | pipeline.json 写了不存在的字段;只用 `references/parameters.md` 列的键,不要臆造(如 `msconvert_only`) |
 | `no files found matching X` | 输入路径问题——脚本已把本地输入绝对化;确认文件真存在、或 dataset 路径对 |
 | job `status=-1`(失败) | `collect_results.py` 直接返回 `failed_step` + `error` + **`failed_log_tail`(工具真实报错)** + `missing_inputs`;依据真实报错修正,勿自行臆测 |

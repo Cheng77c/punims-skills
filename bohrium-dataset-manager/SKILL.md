@@ -455,7 +455,7 @@ r = requests.get(f"{BASE}/project", headers=HEADERS)
 | （sandbox 建集）exec 60s 超时 | 前台默认 60s | 大文件上传必须 `--background` |
 | （sandbox 建集）`panic: unsupported protocol scheme ""` | 沙箱内 `TIEFBLUE_HOST` 未设 | `export TIEFBLUE_HOST=https://tiefblue.dp.tech` |
 | （sandbox 建集）`lbg: error: invalid choice: 'sdbx'` | 装了稳定版 lbg | `pip install --pre --upgrade lbg` |
-| `code:2000` / Unauthorized（**但 key 已设置**） | **终局错误**（响应带 `retryable:false`）。头号真因:**平台注入的密钥已失效** —— 有值、32 位、格式正常但认证不过（2026-07-27 线上事故）。次因才是把 key 的**明文值**写进了命令被脱敏；注意脱敏是**概率性**的，日志里没有 `[REDACTED]` **不能**证明没发生 | 认证操作走脚本（`list`/`files`/`create-from-disk`/`fetch_file.py`）；⛔ **绝不找用户要 key** —— 表单值会被脱敏成 `[REDACTED]`，且会在平台凭据库留下一条日后覆盖有效密钥的陈旧记录；唯一出口:让用户去平台清理该 agent 的密钥凭据记录 + 重新开启密钥注入 + **新开会话** |
+| `code:2000` / Unauthorized（**但 key 已设置**） | **终局错误**（响应带 `retryable:false`）。头号真因:**平台注入的密钥已失效** —— 有值、32 位、格式正常但认证不过（2026-07-27 线上事故）。次因才是把 key 的**明文值**写进了命令被脱敏；注意脱敏是**概率性**的，日志里没有 `[REDACTED]` **不能**证明没发生 | 认证操作走脚本（`list`/`files`/`create-from-disk`/`fetch_file.py`）；⛔ **绝不找用户要 key** —— 表单值会被脱敏成 `[REDACTED]`，且会在平台凭据库留下一条日后覆盖有效密钥的陈旧记录；**这是平台侧的密钥注入问题,不在本 skill 的处理范围** —— 如实告知用户「当前平台注入的密钥已失效」后结束本轮，不要替平台猜处置步骤 |
 | `bohr dataset ...` 报 `AccessKey Invalid!` 或**空 `Error:`（exit 0）** | 只设了 `BOHR_ACCESS_KEY`;bohr CLI 认 `ACCESS_KEY` | 跑 `bash scripts/setup.sh` 后 `source /bohr-workspace/.bohr_env`（会把 ACCESS_KEY 从平台 BOHR_ACCESS_KEY 派生好，无需手动桥接）|
 | `bohr dataset list` 报 `open /dev/tty: no such device or address` | 不带 `--json` 走交互式分页,无终端环境报错 | 一律加 `--json` |
 | `dataset_manager.py` 报 `set BOHR_ACCESS_KEY (or ACCESS_KEY)` | 两个变量都没设 | 任一即可;脚本已兼容 `ACCESS_KEY`(BU/TD 的 `.bohr_env` 设的就是它) |

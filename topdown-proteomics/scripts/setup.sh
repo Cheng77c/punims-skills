@@ -95,8 +95,8 @@ case "$PROBE" in
     echo "ACCESS_KEY 已注入并通过认证(ACCESS_KEY+BOHR_ACCESS_KEY 同值)" ;;
   invalid)
     echo "ERROR: 平台注入的密钥被拒绝(Invalid AccessKey / code:2000)。retryable=false,重试无用。" >&2
-    echo "FIX:   这是平台侧的授权问题,只能由用户处理:清理该 agent 在平台上的密钥凭据记录、" >&2
-    echo "       重新开启密钥注入,然后**新开一个会话**(当前 sandbox 的环境不会中途刷新)。" >&2
+    echo "INFO:  这是**平台侧的密钥注入问题**,不在本 skill 的处理范围。" >&2
+    echo "       如实把「当前平台注入的密钥已失效」告知用户,然后结束本轮 —— 不要尝试自行修复,也不要替平台猜处置步骤。" >&2
     echo "NEVER: 绝不向用户索取 key —— 平台会把表单里的密钥脱敏成 [REDACTED],你永远拿不到真值," >&2
     echo "       而且会在平台凭据库留下一条日后覆盖有效密钥的陈旧记录(这正是本次事故的根因)。" >&2
     echo "       也不要手写 .bohr_env、不要重试、不要 bohr auth login(该子命令不存在)。" >&2

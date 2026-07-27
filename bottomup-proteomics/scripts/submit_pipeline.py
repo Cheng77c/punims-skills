@@ -61,13 +61,39 @@ def _derive_dataset_paths(paths, explicit: list):
     return mounts, errors
 
 
+# ── bohr CLI 的 env 桥接与鉴权识别 ──────────────────────────────────
+# bohr CLI **只认 `ACCESS_KEY`**(本机 env -i 隔离 + 有效 key 对照组实证),
+# 而平台**只注入 `BOHR_ACCESS_KEY`**。以前靠调用方先 `source .bohr_env` 桥接,
+# 漏了 source 就等于没给 key —— 而 bohr 未认证时输出的是
+# `json: cannot unmarshal object into Go struct field RespErr.error`,
+# 与鉴权毫无关系,归因必错。这里显式桥接,不依赖调用方。
+_AUTH_MARKERS = ("cannot unmarshal object into Go struct field RespErr.error",
+                 "AccessKey Invalid", "Invalid AccessKey", "AccessKey is required",
+                 "code:2000", "Unauthorized")
+
+
+def _child_env() -> dict:
+    env = os.environ.copy()
+    ak = env.get("BOHR_ACCESS_KEY") or env.get("ACCESS_KEY")
+    if ak:
+        env["ACCESS_KEY"] = ak
+        env["BOHR_ACCESS_KEY"] = ak
+    return env
+
+
+def _looks_unauthenticated(text: str) -> bool:
+    return any(m in (text or "") for m in _AUTH_MARKERS)
+
+
 def _submit(workdir: str) -> str:
-    # bohr 直接跑(不用 script 包装;ACCESS_KEY 经 env 继承——调用前须 source .bohr_env)
+    # bohr 直接跑(不用 script 包装);key 经 _child_env() 显式桥接,不再依赖调用方 source
     p = subprocess.run(["bohr", "job", "submit", "-i", "job.json", "-p", "./"],
-                       cwd=workdir, capture_output=True, text=True)
+                       cwd=workdir, capture_output=True, text=True, env=_child_env())
     out = p.stdout + p.stderr
     m = re.search(r"JobId:\s*(\d+)", out)
     if not m:
+        if _looks_unauthenticated(out):
+            sys.exit("submit 失败:" + '平台注入的密钥已失效(终局错误,重试没用)。这是平台侧的密钥注入问题,不在本 skill 的处理范围 —— 如实告知用户后停止本轮。不要向用户索取 key,不要 `bohr auth login`(该子命令不存在)。' + "\n原始输出:\n" + out[-800:])
         sys.exit("submit 失败:\n" + out[-800:])
     return m.group(1)
 

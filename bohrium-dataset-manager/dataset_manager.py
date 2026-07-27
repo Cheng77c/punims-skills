@@ -69,10 +69,10 @@ def api(method: str, url: str, **kw):
             f"not retryable",
             fix="Run the proteomics skill's setup.sh (it probes the key and says plainly whether "
                 "it passed), then `source /bohr-workspace/.bohr_env`. If the key is rejected, it "
-                "is a platform-side authorization problem: tell the user to clear this agent's "
-                "stored key credentials on the platform, re-enable key injection, and START A NEW "
-                "SESSION. Never ask the user to type a key, never run `bohr auth login` "
-                "(no such subcommand), never retry.",
+                "is a platform-side key-injection problem and is OUT OF SCOPE for this skill: report "
+                "'the platform-injected key is no longer valid' to the user verbatim and stop. "
+                "Never ask the user to type a key, never run `bohr auth login` (no such "
+                "subcommand), never retry, and do not invent remediation steps.",
             code=1)
     if r.status_code == 404:
         die(f"no such Bohrium endpoint: {url} (404)",
@@ -584,6 +584,18 @@ def _sandbox_ready(project_id: int, reuse: bool = True):
         # missing env var and a wrong lbg version both got misdiagnosed as "the gateway is
         # down". Anything we can name, we name, and we stop.
         for marker, what, fix in (
+            # 鉴权失败是终局错误(retryable:false)。重试 3 轮只会失败 3 次,每轮还可能拉起
+            # 一个新 sandbox(慢且花钱),最后被报成"网关故障" —— 把 agent 引向"平台不稳,
+            # 再等等",而真因是密钥无效,等多久都不会好。2026-07-27 事故的同款误导。
+            ("Invalid AccessKey", "the access key was rejected by the platform",
+             "This is terminal (retryable:false) and a platform-side key-injection problem, out of "
+             "scope for this skill: report it to the user verbatim and stop. Never ask the user "
+             "to type a key; never run `bohr auth login` (no such subcommand); do not invent "
+             "remediation steps."),
+            ("AccessKey Invalid", "the access key was rejected by the platform",
+             "Same as above: terminal auth failure, not a platform outage."),
+            ("code:2000", "the access key was rejected by the platform (code:2000)",
+             "Same as above: terminal auth failure, not a platform outage."),
             ("SdbxConfigError", "the sandbox CLI has no access key",
              "Export BOHRIUM_ACCESS_KEY (the prerelease lbg reads that spelling, not "
              "ACCESS_KEY / BOHR_ACCESS_KEY), or re-run `source /bohr-workspace/.bohr_env`."),

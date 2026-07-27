@@ -39,6 +39,30 @@ def _api() -> str:
     return os.environ.get("OPENAPI_HOST", "https://open.bohrium.com").rstrip("/")
 
 
+# ── 鉴权失败的统一口径 ────────────────────────────────────────────────
+# 平台 401 的 body 是**合法 JSON**(`{"code":2000,"message":"Invalid AccessKey",
+# "error":{"retryable":false}}`)。不读 body 就会把"密钥失效"误判成别的东西 ——
+# 2026-07-27 事故里它一路被当成网络问题、路径问题、作业不存在。
+_AUTH_NEXT = ("平台注入的密钥已失效。这是**终局错误**(响应里带 retryable:false),重试、换写法、"
+              "换认证头都没用。**这是平台侧的密钥注入问题,不在本 skill 的处理范围** —— "
+              "如实把这一条告知用户,然后停止本轮,不要尝试自行修复、也不要替平台猜处置步骤。")
+_AUTH_NEVER = ("不要向用户索取 key,不要手写 .bohr_env,不要 `bohr auth login`(该子命令不存在),"
+               "不要重试,不要改用别的端点或认证头。")
+
+
+def _biz(e):
+    """从 HTTPError 的 body 里取业务码与消息(body 已被读走,调用方别再 read)。"""
+    try:
+        j = json.loads(e.read().decode("utf-8", "replace"))
+        return j.get("code"), j.get("message")
+    except Exception:  # noqa: BLE001
+        return None, None
+
+
+def _is_auth(http_code, biz_code) -> bool:
+    return http_code in (401, 403) or biz_code == 2000
+
+
 def _key() -> str:
     # 平台注入的是 BOHR_ACCESS_KEY;setup.sh 会把它也写一份 ACCESS_KEY。两个都认。
     # key 只在这里从环境读一次,绝不打印、绝不写回任何输出。
@@ -58,8 +82,12 @@ def _user_id(ak: str) -> int:
     try:
         data = json.load(urllib.request.urlopen(req, timeout=20))
     except urllib.error.HTTPError as e:
-        _fail(f"取 user_id 失败:HTTP {e.code}。",
-              next_="多半是授权/网络问题;确认平台已注入有效密钥。",
+        code, msg = _biz(e)
+        if _is_auth(e.code, code):
+            _fail(f"密钥被拒:HTTP {e.code} code={code} {msg or ''}".strip(),
+                  next_=_AUTH_NEXT, forbidden=_AUTH_NEVER)
+        _fail(f"取 user_id 失败:HTTP {e.code} code={code}。",
+              next_="非鉴权错(网关/网络抖动),原样重试一次;仍失败就把原文报给用户并停。",
               forbidden="别把 key 写进命令来'试' —— 会被平台脱敏成 [REDACTED],制造假的认证失败。")
     except Exception as e:  # noqa: BLE001
         _fail(f"取 user_id 失败:{e}")
@@ -105,6 +133,10 @@ def main():
         with urllib.request.urlopen(req, timeout=120) as resp:
             body = resp.read()
     except urllib.error.HTTPError as e:
+        code, msg = _biz(e)
+        if _is_auth(e.code, code):
+            _fail(f"下载被拒:HTTP {e.code} code={code} {msg or ''}  路径={remote}".strip(),
+                  next_=_AUTH_NEXT, forbidden=_AUTH_NEVER)
         _fail(f"下载失败:HTTP {e.code}  路径={remote}",
               next_="核对盘内路径是否真实存在(个人盘 personal/…、共享盘 share/…)。")
     except Exception as e:  # noqa: BLE001
@@ -116,6 +148,10 @@ def main():
     if head[:1] in (b"{", b"[") and b'"code"' in body[:200]:
         try:
             j = json.loads(body.decode("utf-8", "replace"))
+            if j.get("code") == 2000:
+                _fail(f"下载返回的是鉴权错误 JSON 不是文件:code=2000 "
+                      f"message={j.get('message')}",
+                      next_=_AUTH_NEXT, forbidden=_AUTH_NEVER)
             _fail(f"下载返回的是错误 JSON 不是文件:code={j.get('code')} "
                   f"message={j.get('message')}",
                   next_="路径不存在或无权限;核对 --remote。",

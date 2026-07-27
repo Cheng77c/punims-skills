@@ -36,11 +36,35 @@ def _metrics_from_out(out_dir: Path) -> dict:
     return m
 
 
+# ── bohr CLI 的 env 桥接与鉴权识别 ──────────────────────────────────
+# bohr CLI **只认 `ACCESS_KEY`**(本机 env -i 隔离 + 有效 key 对照组实证),
+# 而平台**只注入 `BOHR_ACCESS_KEY`**。以前靠调用方先 `source .bohr_env` 桥接,
+# 漏了 source 就等于没给 key —— 而 bohr 未认证时输出的是
+# `json: cannot unmarshal object into Go struct field RespErr.error`,
+# 与鉴权毫无关系,归因必错。这里显式桥接,不依赖调用方。
+_AUTH_MARKERS = ("cannot unmarshal object into Go struct field RespErr.error",
+                 "AccessKey Invalid", "Invalid AccessKey", "AccessKey is required",
+                 "code:2000", "Unauthorized")
+
+
+def _child_env() -> dict:
+    env = os.environ.copy()
+    ak = env.get("BOHR_ACCESS_KEY") or env.get("ACCESS_KEY")
+    if ak:
+        env["ACCESS_KEY"] = ak
+        env["BOHR_ACCESS_KEY"] = ak
+    return env
+
+
+def _looks_unauthenticated(text: str) -> bool:
+    return any(m in (text or "") for m in _AUTH_MARKERS)
+
+
 def _bohr_download(job_id: str, dl_dir: str) -> str:
     Path(dl_dir).mkdir(parents=True, exist_ok=True)
     # bohr 直接跑(ACCESS_KEY 经 env 继承——调用前须 source .bohr_env);返回输出供出错时诊断
     p = subprocess.run(["bohr", "job", "download", "-j", job_id, "-o", dl_dir],
-                       capture_output=True, text=True)
+                       capture_output=True, text=True, env=_child_env())
     return (p.stdout or "") + (p.stderr or "")
 
 
@@ -61,6 +85,13 @@ def collect(job_id: str, dl_dir: str, expected_version: int = EXPECTED_CONTRACT_
     # 校验没拿到结果就重试一次;仍失败则报 bohr 真实输出,而非笼统"没找到 summary"——
     # 否则 agent 会被迫手动 download/解压,搞出 dl/、out/out/ 等混乱。
     log = downloader(job_id, dl_dir) or ""
+    # 鉴权失败是终局错误:重试只会再失败一次,还把真因埋进第二段日志里。只重试非鉴权的空产出。
+    if not _has_result(dl) and _looks_unauthenticated(log):
+        return {"ok": False, "jobId": job_id, "status": "auth_failed",
+                "error": "bohr job download 未认证 —— 这不是「结果为空」,是密钥无效或已失效。",
+                "next": '平台注入的密钥已失效(终局错误,重试没用)。这是平台侧的密钥注入问题,不在本 skill 的处理范围 —— 如实告知用户后停止本轮。不要向用户索取 key,不要 `bohr auth login`(该子命令不存在)。',
+                "forbidden": "不要重试,不要向用户索取 key,不要手动 bohr job download 绕过。",
+                "bohrOutput": log[-500:]}
     if not _has_result(dl):
         log += "\n--- 重试 download ---\n" + (downloader(job_id, dl_dir) or "")
     if not _has_result(dl):
