@@ -58,6 +58,28 @@ class DedupError(Exception):
     """
 
 
+def _api_json(url, H, what, **kw):
+    """GET + 严格校验:非 2xx 或业务码非 0 一律 raise DedupError。
+
+    ★ 为什么必须查状态码:401 的响应体是**合法 JSON**,
+      `.json().get("data", {}).get("items", [])` 会安静地得到空列表 —— 于是
+      「密钥失效」被读成「这份文件没传过」,调用方接着把几 GB 数据重传一遍。
+      2026-07-27 事故复盘出的坑,正是本模块 docstring 里
+      「我不知道绝不能伪装成没问题」要防的那件事。
+    """
+    r = requests.get(url, headers=H, timeout=20, **kw)
+    if r.status_code in (401, 403):
+        raise DedupError(
+            f"{what}: 密钥被拒(HTTP {r.status_code})。这是**终局错误**,不是「没查到」——"
+            f"先 `bash scripts/setup.sh` 核实密钥有效性,**不要继续新建**(会重传)。")
+    if r.status_code >= 400:
+        raise DedupError(f"{what}: HTTP {r.status_code}")
+    d = r.json()
+    if isinstance(d, dict) and d.get("code") not in (0, None):
+        raise DedupError(f"{what}: 业务码 {d.get('code')} {d.get('message', '')}".strip())
+    return d
+
+
 def _find_existing(project, ak, basename, size):
     """扫项目已有数据集,找 basename + size 都一致的文件。
 
@@ -65,8 +87,10 @@ def _find_existing(project, ak, basename, size):
     """
     H = {"Authorization": f"Bearer {ak}"}
     try:
-        items = requests.get(f"{DS_API}/v2/ds/?projectId={project}&page=1&pageSize=50",
-                             headers=H, timeout=20).json().get("data", {}).get("items", [])
+        items = _api_json(f"{DS_API}/v2/ds/?projectId={project}&page=1&pageSize=50",
+                          H, f"拉取项目 {project} 的数据集列表").get("data", {}).get("items", [])
+    except DedupError:
+        raise
     except Exception as e:
         raise DedupError(f"拉取项目 {project} 的数据集列表失败: {e}")
 
@@ -74,7 +98,9 @@ def _find_existing(project, ak, basename, size):
     for it in items:
         did, mount = it.get("id"), it.get("path", "")
         try:
-            vr = requests.get(f"{DS_API}/v2/ds/{did}/version", headers=H, timeout=20).json().get("data", [])
+            vr = _api_json(f"{DS_API}/v2/ds/{did}/version", H, f"取数据集 {did} 的版本").get("data", [])
+        except DedupError:
+            raise                      # 鉴权失败必须当场停,不能降级成"这个数据集跳过"
         except Exception as e:
             skipped.append(f"{did}(version: {e})"); continue
         vers = vr if isinstance(vr, list) else vr.get("items", [])
@@ -84,8 +110,10 @@ def _find_existing(project, ak, basename, size):
         if not tb:
             continue
         try:
-            tk = requests.get(f"{DS_API}/v2/ds/input/token", headers=H,
-                             params={"projectId": project, "path": tb}, timeout=20).json().get("data", {})
+            tk = _api_json(f"{DS_API}/v2/ds/input/token", H, f"取数据集 {did} 的访问凭据",
+                           params={"projectId": project, "path": tb}).get("data", {})
+        except DedupError:
+            raise
         except Exception as e:
             skipped.append(f"{did}(token: {e})"); continue
         token, host = tk.get("token"), tk.get("host") or "https://tiefblue.dp.tech"

@@ -79,7 +79,7 @@ export ACCESS_KEY="$BOHR_ACCESS_KEY"   # ★ bohr CLI 认这个变量;不设会 
 python3 dataset_manager.py list --project-id YOUR_PROJECT_ID --json          # 按项目
 python3 dataset_manager.py list --project-id YOUR_PROJECT_ID --title my-set   # 按标题过滤
 ```
-> ⛔ **不要手写 `bohr dataset list` 或 `curl .../v2/ds`**:那个 bohr CLI 有 JSON 解析 bug(`RespErr.error unmarshal`),你一旦改用 curl 就会把 access key 内联进命令、被平台脱敏成 `[REDACTED]`、制造假的 `Invalid AccessKey`。`list` 子命令走 `api()`,key 只在进程内。
+> ⛔ **不要手写 `bohr dataset list` 或 `curl .../v2/ds`**:`bohr dataset list` 在**未认证时**输出 `json: cannot unmarshal object into Go struct field RespErr.error` —— 实测用「完全不给 key」做对照组输出逐字相同,**这是鉴权失败的表现,不是 CLI 的 JSON bug**。`list` 子命令走 `api()`,key 只在进程内,且能把 401 报成人话。
 > ⛔ **绝不靠列数据集反查 project_id** —— project_id 只来自用户 / 平台注入,不能从"数据集属于哪个项目"倒推。
 
 **JSON 输出字段：**
@@ -455,7 +455,7 @@ r = requests.get(f"{BASE}/project", headers=HEADERS)
 | （sandbox 建集）exec 60s 超时 | 前台默认 60s | 大文件上传必须 `--background` |
 | （sandbox 建集）`panic: unsupported protocol scheme ""` | 沙箱内 `TIEFBLUE_HOST` 未设 | `export TIEFBLUE_HOST=https://tiefblue.dp.tech` |
 | （sandbox 建集）`lbg: error: invalid choice: 'sdbx'` | 装了稳定版 lbg | `pip install --pre --upgrade lbg` |
-| `code:2000` / Unauthorized（**但 key 已设置**） | **头号真因:你把 key 明文写进了命令/文件，被平台脱敏成 `[REDACTED]` 发了出去**（看日志有无 `[REDACTED]`）；排除后才是网关偶发抖动 | 认证操作一律走脚本（`list`/`files`/`create-from-disk`/`fetch_file.py`），别手写带 key 的命令；确系抖动再原样重试 1–2 次；**别急着找用户要 key** |
+| `code:2000` / Unauthorized（**但 key 已设置**） | **终局错误**（响应带 `retryable:false`）。头号真因:**平台注入的密钥已失效** —— 有值、32 位、格式正常但认证不过（2026-07-27 线上事故）。次因才是把 key 的**明文值**写进了命令被脱敏；注意脱敏是**概率性**的，日志里没有 `[REDACTED]` **不能**证明没发生 | 认证操作走脚本（`list`/`files`/`create-from-disk`/`fetch_file.py`）；⛔ **绝不找用户要 key** —— 表单值会被脱敏成 `[REDACTED]`，且会在平台凭据库留下一条日后覆盖有效密钥的陈旧记录；唯一出口:让用户去平台清理该 agent 的密钥凭据记录 + 重新开启密钥注入 + **新开会话** |
 | `bohr dataset ...` 报 `AccessKey Invalid!` 或**空 `Error:`（exit 0）** | 只设了 `BOHR_ACCESS_KEY`;bohr CLI 认 `ACCESS_KEY` | 跑 `bash scripts/setup.sh` 后 `source /bohr-workspace/.bohr_env`（会把 ACCESS_KEY 从平台 BOHR_ACCESS_KEY 派生好，无需手动桥接）|
 | `bohr dataset list` 报 `open /dev/tty: no such device or address` | 不带 `--json` 走交互式分页,无终端环境报错 | 一律加 `--json` |
 | `dataset_manager.py` 报 `set BOHR_ACCESS_KEY (or ACCESS_KEY)` | 两个变量都没设 | 任一即可;脚本已兼容 `ACCESS_KEY`(BU/TD 的 `.bohr_env` 设的就是它) |

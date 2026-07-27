@@ -52,9 +52,7 @@ echo "wrote $ENVF"
 export PATH="$HOME/.bohrium:$PATH"
 bohr version >/dev/null 2>&1 && echo "bohr ready" || echo "WARN: bohr 未就绪"
 command -v python3 >/dev/null 2>&1 || echo "WARN: 需要 python3"
-if [ -n "${AK:-}" ]; then
-  echo "ACCESS_KEY 已注入(ACCESS_KEY+BOHR_ACCESS_KEY 同值)"
-else
+if [ -z "${AK:-}" ]; then
   # 以前这里只 echo WARN 就继续(set -e 拦不住 || 分支),setup 报"成功"、退出码 0。
   # agent 于是一路往下走,直到 submit 才炸,而那时的报错和真因(没授权)已经完全脱钩。
   echo "ERROR: ACCESS_KEY 未注入,没有它后续每一步都会失败。" >&2
@@ -62,4 +60,48 @@ else
   echo "NEVER: 不要手写 .bohr_env,不要猜一个 key 填进去。" >&2
   exit 1
 fi
+
+# ★ 有值 ≠ 有效。2026-07-27 线上事故:平台注入了一把**已被删除**的陈旧 key ——
+#   32 位、格式完全正常,于是旧版这里打印"已注入"+exit 0(假绿灯),真正的失败推迟到
+#   十几步之后的 FASTA 下载,报错与真因彻底脱钩。所以这里必须真打一次认证。
+#   判据刻意收紧:**只有确定性的鉴权失败(401/403 且 body code=2000)才终止**;
+#   网络错误/超时/5xx/429 一律放行并警告 —— 否则一次网络抖动就能把所有会话堵死,
+#   那比假绿灯更糟。最坏情况退回旧行为,不会更差。
+PROBE="$(python3 - <<'PY' 2>/dev/null || echo unknown
+import json, os, urllib.request, urllib.error
+ak = os.environ.get("BOHR_ACCESS_KEY") or os.environ.get("ACCESS_KEY") or ""
+# 网关写死,**不读 OPENAPI_HOST**:bohr 官方安装脚本会往 ~/.bashrc 写旧网关
+# openapi.dp.tech,而 setup.sh 会 source 它 —— 旧网关拒绝新 key,照它探活会把
+# 好 key 判死(本机实测:有效 key + 旧网关 = 401 code:2000)。这里必须与
+# .bohr_env 写入的 OPENAPI_HOST 保持同源。
+host = "https://open.bohrium.com"
+req = urllib.request.Request(f"{host}/openapi/v1/ak/get")
+req.add_header("Authorization", "Bearer " + ak)   # 平台统一范式(见 bohrium-file skill)
+try:
+    d = json.load(urllib.request.urlopen(req, timeout=15))
+    print("invalid" if d.get("code") == 2000 else "ok")
+except urllib.error.HTTPError as e:
+    try:
+        code = json.loads(e.read().decode("utf-8", "replace")).get("code")
+    except Exception:
+        code = None
+    print("invalid" if (e.code in (401, 403) and code == 2000) else "unknown")
+except Exception:
+    print("unknown")
+PY
+)"
+case "$PROBE" in
+  ok)
+    echo "ACCESS_KEY 已注入并通过认证(ACCESS_KEY+BOHR_ACCESS_KEY 同值)" ;;
+  invalid)
+    echo "ERROR: 平台注入的密钥被拒绝(Invalid AccessKey / code:2000)。retryable=false,重试无用。" >&2
+    echo "FIX:   这是平台侧的授权问题,只能由用户处理:清理该 agent 在平台上的密钥凭据记录、" >&2
+    echo "       重新开启密钥注入,然后**新开一个会话**(当前 sandbox 的环境不会中途刷新)。" >&2
+    echo "NEVER: 绝不向用户索取 key —— 平台会把表单里的密钥脱敏成 [REDACTED],你永远拿不到真值," >&2
+    echo "       而且会在平台凭据库留下一条日后覆盖有效密钥的陈旧记录(这正是本次事故的根因)。" >&2
+    echo "       也不要手写 .bohr_env、不要重试、不要 bohr auth login(该子命令不存在)。" >&2
+    exit 1 ;;
+  *)
+    echo "WARN: 密钥有效性未能核实(网络/网关问题),继续。若后续报鉴权失败,先怀疑注入的 key 已失效。" ;;
+esac
 [ -n "${PROJECT_ID:-}" ] && echo "PROJECT_ID=$PROJECT_ID" || echo "WARN: PROJECT_ID 未注入——对话中用户已明确的项目 ID 可直接 export PROJECT_ID=<id> 使用;未知才 AskUserInput 索取;勿凭空编造默认值"

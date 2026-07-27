@@ -48,7 +48,7 @@ l1: >
   你只需提供 raw_files / fasta_path / 参数;镜像与作业配置由脚本处理。
 - 重二进制都在镜像里跑(经 Bohrium 作业),**不要在 sandbox 里直接跑搜索/定量/DIA 引擎**。
 
-如果 `IMAGE_ADDRESS`/`PROJECT_ID`/`ACCESS_KEY` 未配置,**不要猜或找替代镜像**——用 `AskUserInput` 让用户补配置或提示去启用 `bohrium-job` skill。
+如果 `IMAGE_ADDRESS`/`PROJECT_ID` 未配置,**不要猜或找替代镜像**——用 `AskUserInput` 让用户补配置或提示去启用 `bohrium-job` skill。**`ACCESS_KEY` 是例外:绝不向用户索取** —— 平台会把表单里的密钥脱敏成 `[REDACTED]`(拿不到真值),还会留下一条日后覆盖有效密钥的陈旧记录。它由平台注入,缺失或失效都是平台侧授权问题,提示用户去平台处理后**新开会话**。
 
 ### 🚫 十条铁律(违反=必错)
 
@@ -128,7 +128,7 @@ bash scripts/setup.sh              # 装 bohr CLI + 写 /bohr-workspace/.bohr_en
 source /bohr-workspace/.bohr_env   # 每个新 Bash 调用开头都要,确保 ACCESS_KEY/PROJECT_ID 在
 ```
 鉴权要点:平台注入的是环境变量 `BOHR_ACCESS_KEY`;`bohr` CLI 只认 `ACCESS_KEY` 这个名字(实测),故 setup.sh 会把值同时落成两份。**脚本已从环境读 key,你不必碰 key。**
-> ⛔ **key 的明文值绝不能进入命令文本/中转变量/写文件/echo** —— 平台会脱敏成 `[REDACTED]`,破坏命令或发出假值。需要认证的操作一律走脚本(`fetch_file.py` / `make_dataset.py` / `submit_pipeline.py` / `poll_job.py`);它们内部从 `os.environ` 读 key。REST 认证头 `accessKey:` 与 `Authorization: Bearer` **两种都可用**(实测),但你不该手写它们。
+> ⛔ **key 的明文值绝不能进入命令文本/中转变量/写文件/echo** —— 平台会脱敏成 `[REDACTED]`,破坏命令或发出假值。**注意区分**:写 `$BOHR_ACCESS_KEY` 这种**变量引用**是平台各 skill 的通用范式(见平台自带的 `bohrium-file` skill),被禁的是**明文值**。需要认证的操作仍一律走脚本(`fetch_file.py` / `make_dataset.py` / `submit_pipeline.py` / `poll_job.py`)—— 理由不是「平台禁止手写 curl」,而是脚本还做了路径校验、user_id 解析和结构化报错,手写会把这些全丢掉。REST 认证头统一用 `Authorization: Bearer $BOHR_ACCESS_KEY`;**别把 `BOHR_ACCESS_KEY:` 当 header 名** —— 生产入口可能过滤带下划线的 header。
 
 > ⛔ **`bohr: command not found` = 你还没跑 setup.sh,不是"CLI 需要你自己想办法装"。**
 >   唯一修法是 `bash scripts/setup.sh`(幂等,装的是官方 bohr CLI)。
@@ -149,7 +149,7 @@ source /bohr-workspace/.bohr_env   # 每个新 Bash 调用开头都要,确保 AC
 - 数据在**项目共享盘 / 个人盘**:**谱图**一律用 `dataset_manager.py create-from-disk --project-id <pid> --disk-path share/<路径> --json` —— 它**内部先查重**(已传过就零传输直接返回),未命中才自动建集;沙箱、CLI 安装、后台上传、真实挂载路径全部封装好,**不要自己拼这套流程**。拿到 `/bohr/<名>/v1/<文件>` 填入 raw_files[]。**绝不许靠 dataset 标题判断有没有传过**(换个目录/换个人跑名字就对不上,必然重传几百 MB)。**FASTA 不转 dataset,只下载它**进任务目录走 `-p`(见第 4 步)。
 - 已是 **dataset**(自建或网页端上传):
   - **用户已给出完整 `/bohr/<名>/v1/<文件>` 挂载路径 → 直接填进 raw_files[],不要再去列/查数据集**(最常见,也最省事)。submit 会自动从该路径挂载数据集,无需手动传 --dataset-path。
-  - 需要按项目列数据集时,**一律用 `dataset_manager.py list --project-id <pid>`**(可加 `--title <关键词>` 过滤),**绝不 `bohr dataset list` 也绝不手写 curl 查 `/v2/ds`** —— 那个 CLI 有 JSON 解析 bug,你一旦改用 curl 就会把 access key 内联进命令、被平台脱敏成 `[REDACTED]`、制造假的认证失败。
+  - 需要按项目列数据集时,**一律用 `dataset_manager.py list --project-id <pid>`**(可加 `--title <关键词>` 过滤),**绝不 `bohr dataset list` 也绝不手写 curl 查 `/v2/ds`** —— 那个 CLI 在**未认证时**会输出 `json: cannot unmarshal object into Go struct field RespErr.error` —— 实测用「完全不给 key」做对照组,输出逐字相同,**所以这是鉴权失败的表现,不是 CLI 的 JSON bug**。看到它请去查密钥有效性(`bash scripts/setup.sh`),别据此改用 curl 绕道。
   - 不知内部文件名/路径时,用 `dataset_manager.py files --id <ID>` 拿确切 `/bohr/...` 路径——别猜、也别反问用户。
   - ⛔ **绝不靠"列数据集看它属于哪个项目"来反查 project_id** —— project_id 只能来自用户亲口说的 / 平台注入的;从数据集列表倒推可能把作业投进别人的项目。
 - 一条流水线至少需要 `.raw`/`.mzML` 谱图;`search-closed`/`database` 步还需 `.fasta`。
@@ -348,7 +348,7 @@ python3 scripts/collect_results.py --job-id <JobId> --out /bohr-workspace/bu-run
 **常见错误:**
 | 现象 | 原因 / 处理 |
 |---|---|
-| `AccessKey Invalid` / `AccessKey is required` | **先判是不是你自己内联了 key**:命令/日志里出现 `[REDACTED]` = 你把 key 明文写进了命令或文件,被平台脱敏后发了出去 —— 这不是 key 失效,换 key 也没用。修法:一切认证操作走脚本(下载 `fetch_file.py`、列数据集 `dataset_manager.py list`、提交 `submit_pipeline.py`、查作业 `poll_job.py`),它们从环境读 key、绝不内联。**只有排除了内联(日志无 `[REDACTED]`、脚本也报鉴权失败)之后**,才考虑其它:①脚本报缺 key → 先 `bash scripts/setup.sh`;②高频并发限流 → 稍等重试;③确系 key 被撤销/过期/权限变更 → 这时才 `AskUserInput` 请用户重取。REST 头 `accessKey:` 与 `Authorization: Bearer` 两种都行(不是失败原因)。 |
+| `AccessKey Invalid` / `AccessKey is required` / `code:2000` | **终局错误**(响应里带 `retryable:false`),重试和换写法都没用。第一步永远是 `bash scripts/setup.sh` —— 它会真打一次认证,明确告诉你密钥是「通过」还是「被拒」。**被拒 = 平台注入的密钥已失效**(有值、32 位、格式正常但认证不过 —— 2026-07-27 线上事故就是如此),唯一出口是让用户去平台清理该 agent 的密钥凭据记录、重新开启密钥注入,然后**新开会话**。⛔ **绝不 `AskUserInput` 向用户索取 key** —— 平台会把表单值脱敏成 `[REDACTED]`,你永远拿不到真值,而且会在平台凭据库留下一条日后覆盖有效密钥的陈旧记录(**这正是事故的自我强化环**)。⛔ 也不要 `bohr auth login`(该子命令不存在)。注:命令里出现 `[REDACTED]` 说明脱敏发生过,但**没出现不能证明没发生** —— 平台脱敏是概率性的,同一写法时好时坏。 |
 | job `status=-1`(失败) | `collect_results.py` 直接返回 `failed_step` + `error` + `failed_log_tail`;依据真实报错修正 |
 | `no files found matching X` | 输入路径问题;确认文件真存在,或 dataset 路径带 `upload/` 层 |
 | 零 PSM / FDR 崩溃 | `database` 步漏掉,`search-closed` 直接拿 target-only FASTA 导致零 decoy |

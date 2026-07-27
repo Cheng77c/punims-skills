@@ -62,10 +62,17 @@ def api(method: str, url: str, **kw):
             never="Do not fall back to downloading large data into the workspace.", code=8)
 
     if r.status_code in (401, 403):
-        die(f"Bohrium rejected the access key ({r.status_code}) on {url}",
-            fix="Run the skill's setup.sh, then `source /bohr-workspace/.bohr_env`. It sets "
-                "ACCESS_KEY and BOHR_ACCESS_KEY to the same value. If it still fails, ask the "
-                "user for a valid key — do not guess one.",
+        # 终局错误:响应带 retryable:false。不要重试,更不要向用户索取 key ——
+        # 平台会把表单里的密钥脱敏成 [REDACTED](拿不到真值),并在平台凭据库留下一条
+        # 日后覆盖有效注入值的陈旧记录。这正是 2026-07-27 事故的自我强化环。
+        die(f"Bohrium rejected the access key ({r.status_code}) on {url} — this is terminal, "
+            f"not retryable",
+            fix="Run the proteomics skill's setup.sh (it probes the key and says plainly whether "
+                "it passed), then `source /bohr-workspace/.bohr_env`. If the key is rejected, it "
+                "is a platform-side authorization problem: tell the user to clear this agent's "
+                "stored key credentials on the platform, re-enable key injection, and START A NEW "
+                "SESSION. Never ask the user to type a key, never run `bohr auth login` "
+                "(no such subcommand), never retry.",
             code=1)
     if r.status_code == 404:
         die(f"no such Bohrium endpoint: {url} (404)",
