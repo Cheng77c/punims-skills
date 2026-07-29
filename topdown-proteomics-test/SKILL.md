@@ -1,6 +1,6 @@
 ---
 name: topdown-proteomics-test
-version: 1.0.1
+version: 1.0.2
 description: >
   在 Bohrium 算力上跑 top-down 蛋白质组学流水线(msconvert → TopFD/FLASHDeconv → TopPIC)。
   用户提供 .raw/.mzML 谱图 + 蛋白质 FASTA 库,确认参数后提交 Bohrium job,回收 PrSM/proteoform 报告。

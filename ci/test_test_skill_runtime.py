@@ -140,5 +140,28 @@ class TestValidatorSubmitContract(unittest.TestCase):
         self.assertTrue(result["ok"], result["errors"])
 
 
+class TestExecutionPlanBindings(unittest.TestCase):
+    def test_basic_search_does_not_duplicate_explicit_parent_bindings(self):
+        module = load_script("bottomup", "compile_execution_plan.py")
+        scripts = ROOT / "bottomup-proteomics-test" / "scripts"
+        plan = module.compile_bottomup(
+            {
+                "template_id": "basic-search",
+                "raw_files": ["/bohr/fixture/v1/run.mzML"],
+                "fasta_path": "db.fasta",
+            },
+            catalog_path=scripts / "template_catalog.json",
+        )
+        steps = {step["step_id"]: step for step in plan["steps"]}
+        self.assertEqual(
+            [binding["source"] for binding in steps["report"]["bindings"]],
+            ["to_pepxml", "database"],
+        )
+        rewrite_sources = [
+            binding["source"] for binding in steps["to_pepxml"]["bindings"]
+        ]
+        self.assertEqual(len(rewrite_sources), len(set(rewrite_sources)))
+
+
 if __name__ == "__main__":
     unittest.main()

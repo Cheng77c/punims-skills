@@ -294,16 +294,17 @@ def _compile_bottomup_steps(
         consumes_fasta = any(suffix in _FASTA_SUFFIXES for suffix in _input_suffixes(tool))
         if tool != "database" and consumes_fasta:
             db_source = db_step_id or "workflow.fasta"
-            bindings.append(
-                _binding(
-                    "database",
-                    db_source,
-                    _FASTA_SUFFIXES,
-                    input_type="external",
-                    fallback_all=False,
-                    wiring="database_injection",
+            if not any(binding["source"] == db_source for binding in bindings):
+                bindings.append(
+                    _binding(
+                        "database",
+                        db_source,
+                        _FASTA_SUFFIXES,
+                        input_type="external",
+                        fallback_all=False,
+                        wiring="database_injection",
+                    )
                 )
-            )
             if db_step_id and not any(
                 edge["from"] == db_step_id and edge["to"] == step_id for edge in edges
             ):
@@ -358,16 +359,17 @@ def _compile_bottomup_steps(
                 ("dia-features", (".mzml",)),
             ):
                 for source in ancestor_by_tool.get(producer_tool, ()):
-                    bindings.append(
-                        _binding(
-                            "artifact",
-                            source,
-                            suffixes,
-                            fallback_all=False,
-                            wiring="artifact_injection",
-                            required=False,
+                    if not any(binding["source"] == source for binding in bindings):
+                        bindings.append(
+                            _binding(
+                                "artifact",
+                                source,
+                                suffixes,
+                                fallback_all=False,
+                                wiring="artifact_injection",
+                                required=False,
+                            )
                         )
-                    )
                     if not any(
                         edge["from"] == source and edge["to"] == step_id for edge in edges
                     ):

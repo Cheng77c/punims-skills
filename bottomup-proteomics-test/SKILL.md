@@ -1,6 +1,6 @@
 ---
 name: bottomup-proteomics-test
-version: 1.0.1
+version: 1.0.2
 description: >
   在 Bohrium 算力上跑 bottom-up 蛋白质组学流水线(数据库搜索 / 定量 / DIA,内置已验证工作流模板)。
   用户提供 .raw/.mzML 谱图 + FASTA 库,确认参数后提交 Bohrium job,回收 PSM/肽段/蛋白报告及定量结果。
