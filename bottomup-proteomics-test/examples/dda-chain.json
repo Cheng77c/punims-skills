@@ -1,0 +1,13 @@
+{
+  "steps": [
+    {"step_id": "db", "tool": "database"},
+    {"step_id": "search", "tool": "search-closed"},
+    {"step_id": "validate", "tool": "validate-psm"},
+    {"step_id": "report", "tool": "report"}
+  ],
+  "edges": [
+    {"src": "search", "dst": "validate"}, {"src": "validate", "dst": "report"}
+  ],
+  "raw_files": ["EXAMPLE.mzML"],
+  "fasta_path": "EXAMPLE.fasta"
+}

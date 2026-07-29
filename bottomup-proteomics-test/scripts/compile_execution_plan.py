@@ -19,22 +19,22 @@ CATALOG_VERSION = 1
 _HERE = Path(__file__).resolve().parent
 
 _FASTA_SUFFIXES = (".fas", ".fasta", ".fa")
-_SPECTRA_PRODUCERS = {"msconvert", "diaumpire", "diatracer"}
+_SPECTRA_PRODUCERS = {"msconvert", "dia-pseudo", "dia-features"}
 
 # Used only when a generated tool_contracts.json is absent (for example while
 # editing the skill source). Production assets always include that file.
 _FALLBACK_INPUT_SUFFIXES: dict[str, tuple[str, ...]] = {
     "msconvert": (".raw", ".mzml", ".mzxml", ".mgf", ".wiff", ".d"),
-    "msfragger-closed": (".mzml", ".mzxml"),
-    "philosopher-database": _FASTA_SUFFIXES,
-    "philosopher-report": (".pepxml", ".pep.xml", *_FASTA_SUFFIXES),
-    "peptideprophet": (".pepxml", ".pep.xml", *_FASTA_SUFFIXES),
-    "crystalc": (".pepxml", ".pep.xml", *_FASTA_SUFFIXES),
-    "percolator": (".pin",),
-    "percolator-to-pepxml": (".tsv", ".pin", ".pepxml", ".mzml"),
-    "ionquant": (".mzml", ".tsv"),
-    "tmtintegrator": (".tsv",),
-    "diann": (".raw", ".mzml", ".d"),
+    "search-closed": (".mzml", ".mzxml"),
+    "database": _FASTA_SUFFIXES,
+    "report": (".pepxml", ".pep.xml", *_FASTA_SUFFIXES),
+    "validate-psm": (".pepxml", ".pep.xml", *_FASTA_SUFFIXES),
+    "precursor-refine": (".pepxml", ".pep.xml", *_FASTA_SUFFIXES),
+    "rescore": (".pin",),
+    "rescore-export": (".tsv", ".pin", ".pepxml", ".mzml"),
+    "quant": (".mzml", ".tsv"),
+    "quant-isobaric": (".tsv",),
+    "dia-search": (".raw", ".mzml", ".d"),
 }
 
 
@@ -245,7 +245,7 @@ def _compile_bottomup_steps(
         (
             str(step["step_id"])
             for step in raw_steps
-            if step["tool"] == "philosopher-database"
+            if step["tool"] == "database"
         ),
         None,
     )
@@ -264,7 +264,7 @@ def _compile_bottomup_steps(
                 for role, spec in declared_inputs.items()
             ]
         elif not parents:
-            source = "workflow.fasta" if tool == "philosopher-database" else "workflow.raw"
+            source = "workflow.fasta" if tool == "database" else "workflow.raw"
             bindings = [
                 _binding(
                     "input",
@@ -292,7 +292,7 @@ def _compile_bottomup_steps(
             ancestor_by_tool.setdefault(str(step_by_id[ancestor]["tool"]), []).append(ancestor)
 
         consumes_fasta = any(suffix in _FASTA_SUFFIXES for suffix in _input_suffixes(tool))
-        if tool != "philosopher-database" and consumes_fasta:
+        if tool != "database" and consumes_fasta:
             db_source = db_step_id or "workflow.fasta"
             bindings.append(
                 _binding(
@@ -316,7 +316,7 @@ def _compile_bottomup_steps(
                     )
                 )
 
-        if tool != "philosopher-database" and _has_param(tool, "database_path"):
+        if tool != "database" and _has_param(tool, "database_path"):
             if "database_path" not in overrides.get(step_id, {}):
                 param_bindings.append(
                     {
@@ -339,7 +339,7 @@ def _compile_bottomup_steps(
                         )
                     )
 
-        if tool in {"ionquant", "tmtintegrator", "labelquant"} and "annotation_file" not in params:
+        if tool in {"quant", "quant-isobaric", "quant-reporter"} and "annotation_file" not in params:
             param_bindings.append(
                 {
                     "param": "annotation_file",
@@ -350,12 +350,12 @@ def _compile_bottomup_steps(
                 }
             )
 
-        if tool == "percolator-to-pepxml":
+        if tool == "rescore-export":
             for producer_tool, suffixes in (
-                ("msfragger-closed", (".pin", ".pepxml", ".pep.xml")),
+                ("search-closed", (".pin", ".pepxml", ".pep.xml")),
                 ("msconvert", (".mzml",)),
-                ("diaumpire", (".mzml",)),
-                ("diatracer", (".mzml",)),
+                ("dia-pseudo", (".mzml",)),
+                ("dia-features", (".mzml",)),
             ):
                 for source in ancestor_by_tool.get(producer_tool, ()):
                     bindings.append(
@@ -381,14 +381,14 @@ def _compile_bottomup_steps(
                         )
 
         transforms: list[dict[str, Any]] = []
-        if tool == "tmtintegrator":
+        if tool == "quant-isobaric":
             tmt_parents = {
                 edge["from"]
                 for edge in edges
                 if edge["to"] == step_id and not edge.get("synthetic")
             }
             for candidate in raw_steps:
-                if candidate["tool"] != "ionquant":
+                if candidate["tool"] != "quant":
                     continue
                 candidate_id = str(candidate["step_id"])
                 iq_parents = {
@@ -434,7 +434,7 @@ def _compile_bottomup_steps(
 
     _assert_acyclic(set(step_by_id), edges)
     for step_id, raw in step_by_id.items():
-        if raw["tool"] == "abacus":
+        if raw["tool"] == "aggregate-reports":
             parents = {edge["from"] for edge in edges if edge["to"] == step_id}
             if len(parents) < 2:
                 raise ValueError(

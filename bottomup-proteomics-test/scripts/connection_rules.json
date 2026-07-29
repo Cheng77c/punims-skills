@@ -2,147 +2,147 @@
   "schema_version": 1,
   "bottom_up_tools": [
     "msconvert",
-    "msfragger-closed",
-    "crystalc",
-    "percolator",
-    "percolator-to-pepxml",
-    "philosopher-database",
-    "peptideprophet",
-    "ptmprophet",
-    "philosopher-report",
-    "freequant",
-    "labelquant",
-    "abacus",
-    "ionquant",
-    "ptmshepherd",
-    "tmtintegrator",
-    "diann",
-    "diaumpire",
-    "diatracer",
-    "easypqp",
-    "opair",
-    "msbooster",
-    "iprophet",
-    "proteinprophet"
+    "search-closed",
+    "precursor-refine",
+    "rescore",
+    "rescore-export",
+    "database",
+    "validate-psm",
+    "ptm-localize",
+    "report",
+    "quant-lfq",
+    "quant-reporter",
+    "aggregate-reports",
+    "quant",
+    "ptm-profile",
+    "quant-isobaric",
+    "dia-search",
+    "dia-pseudo",
+    "dia-features",
+    "speclib-build",
+    "glyco-localize",
+    "predict-rescore",
+    "psm-integrate",
+    "protein-infer"
   ],
   "rules": {
     "msconvert": [
-      "msfragger-closed",
-      "ionquant",
-      "percolator-to-pepxml",
-      "ptmshepherd",
-      "crystalc",
-      "diann",
-      "opair",
-      "ptmprophet",
-      "easypqp",
-      "freequant",
-      "labelquant",
-      "msbooster",
-      "diaumpire"
+      "search-closed",
+      "quant",
+      "rescore-export",
+      "ptm-profile",
+      "precursor-refine",
+      "dia-search",
+      "glyco-localize",
+      "ptm-localize",
+      "speclib-build",
+      "quant-lfq",
+      "quant-reporter",
+      "predict-rescore",
+      "dia-pseudo"
     ],
-    "msfragger-closed": [
-      "percolator",
-      "percolator-to-pepxml",
-      "peptideprophet",
-      "crystalc",
-      "philosopher-report",
-      "msbooster"
+    "search-closed": [
+      "rescore",
+      "rescore-export",
+      "validate-psm",
+      "precursor-refine",
+      "report",
+      "predict-rescore"
     ],
-    "crystalc": [
-      "peptideprophet"
+    "precursor-refine": [
+      "validate-psm"
     ],
-    "percolator": [
-      "percolator-to-pepxml"
+    "rescore": [
+      "rescore-export"
     ],
-    "percolator-to-pepxml": [
-      "philosopher-report",
-      "ptmprophet",
-      "iprophet",
-      "proteinprophet",
-      "easypqp"
+    "rescore-export": [
+      "report",
+      "ptm-localize",
+      "psm-integrate",
+      "protein-infer",
+      "speclib-build"
     ],
-    "philosopher-database": [
-      "msfragger-closed",
-      "philosopher-report",
-      "peptideprophet",
-      "crystalc"
+    "database": [
+      "search-closed",
+      "report",
+      "validate-psm",
+      "precursor-refine"
     ],
-    "peptideprophet": [
-      "philosopher-report",
-      "ptmprophet",
-      "easypqp",
-      "iprophet",
-      "proteinprophet"
+    "validate-psm": [
+      "report",
+      "ptm-localize",
+      "speclib-build",
+      "psm-integrate",
+      "protein-infer"
     ],
-    "ptmprophet": [
-      "philosopher-report",
-      "easypqp"
+    "ptm-localize": [
+      "report",
+      "speclib-build"
     ],
-    "philosopher-report": [
-      "ionquant",
-      "tmtintegrator",
-      "ptmshepherd",
-      "opair",
-      "easypqp",
-      "freequant",
-      "labelquant",
-      "abacus"
+    "report": [
+      "quant",
+      "quant-isobaric",
+      "ptm-profile",
+      "glyco-localize",
+      "speclib-build",
+      "quant-lfq",
+      "quant-reporter",
+      "aggregate-reports"
     ],
-    "freequant": [
-      "abacus"
+    "quant-lfq": [
+      "aggregate-reports"
     ],
-    "labelquant": [
-      "tmtintegrator",
-      "abacus"
+    "quant-reporter": [
+      "quant-isobaric",
+      "aggregate-reports"
     ],
-    "ionquant": [
-      "tmtintegrator"
+    "quant": [
+      "quant-isobaric"
     ],
-    "ptmshepherd": [
-      "ionquant"
+    "ptm-profile": [
+      "quant"
     ],
-    "diaumpire": [
-      "msfragger-closed",
-      "ionquant",
-      "percolator-to-pepxml",
-      "ptmshepherd",
-      "crystalc",
-      "diann",
-      "opair",
-      "ptmprophet",
-      "easypqp",
-      "freequant",
-      "labelquant",
-      "msbooster"
+    "dia-pseudo": [
+      "search-closed",
+      "quant",
+      "rescore-export",
+      "ptm-profile",
+      "precursor-refine",
+      "dia-search",
+      "glyco-localize",
+      "ptm-localize",
+      "speclib-build",
+      "quant-lfq",
+      "quant-reporter",
+      "predict-rescore"
     ],
-    "diatracer": [
-      "msfragger-closed",
-      "ionquant",
-      "percolator-to-pepxml",
-      "ptmshepherd",
-      "crystalc",
-      "diann",
-      "opair",
-      "ptmprophet",
-      "easypqp",
-      "freequant",
-      "labelquant",
-      "msbooster"
+    "dia-features": [
+      "search-closed",
+      "quant",
+      "rescore-export",
+      "ptm-profile",
+      "precursor-refine",
+      "dia-search",
+      "glyco-localize",
+      "ptm-localize",
+      "speclib-build",
+      "quant-lfq",
+      "quant-reporter",
+      "predict-rescore"
     ],
-    "easypqp": [
-      "diann"
+    "speclib-build": [
+      "dia-search"
     ],
-    "msbooster": [
-      "percolator"
+    "predict-rescore": [
+      "rescore"
     ],
-    "iprophet": [
-      "proteinprophet",
-      "philosopher-report",
-      "abacus"
+    "psm-integrate": [
+      "protein-infer",
+      "report",
+      "aggregate-reports"
     ],
-    "proteinprophet": [
-      "abacus"
+    "protein-infer": [
+      "aggregate-reports"
     ]
   }
 }

@@ -233,11 +233,11 @@
       "description": "Run index set"
     }
   },
-  "msfragger-closed": {
+  "search-closed": {
     "database_path": {
       "type": "str",
       "default": null,
-      "description": "Path to target+decoy FASTA (Philosopher database --custom output)",
+      "description": "Path to target+decoy FASTA (toolkit database --custom output)",
       "required": true,
       "primary": true
     },
@@ -326,7 +326,7 @@
     "mass_offsets_detailed": {
       "type": "str",
       "default": "",
-      "description": "Detailed mass offset list (FragPipe format e.g. `541.0611(aa=DK);203.0794(aa=N)`); overrides mass_offsets when set"
+      "description": "Detailed mass offset list (workflow suite format e.g. `541.0611(aa=DK);203.0794(aa=N)`); overrides mass_offsets when set"
     },
     "labile_search_mode": {
       "type": "str",
@@ -347,7 +347,7 @@
     "enzyme_name": {
       "type": "str",
       "default": "stricttrypsin",
-      "description": "MSFragger enzyme name (e.g. stricttrypsin, trypsin, chymotrypsin)",
+      "description": "search engine enzyme name (e.g. stricttrypsin, trypsin, chymotrypsin)",
       "primary": true
     },
     "enzyme_cut": {
@@ -456,7 +456,7 @@
     "variable_mods": {
       "type": "str",
       "default": "",
-      "description": "Extra variable mods beyond the oxidation/acetyl toggles, in FragPipe params format `<mass> <residues> <max>`, semicolon-separated. e.g. `79.966331 STY 3` (phospho), `114.04293 K 2` (GG/ubiquitin), `42.0106 K 2` (acetyl-K).",
+      "description": "Extra variable mods beyond the oxidation/acetyl toggles, in workflow suite params format `<mass> <residues> <max>`, semicolon-separated. e.g. `79.966331 STY 3` (phospho), `114.04293 K 2` (GG/ubiquitin), `42.0106 K 2` (acetyl-K).",
       "primary": true
     },
     "fixed_mod_C_carbamidomethyl": {
@@ -468,7 +468,7 @@
     "fixed_mods": {
       "type": "str",
       "default": "",
-      "description": "Additional fixed modifications as MSFragger `add_*` entries, semicolon- or newline-separated `key = mass`. e.g. `add_S_serine = 79.96633; add_Nterm_protein = 42.0106`. Covers every residue/terminus beyond the C/K/N-term toggles."
+      "description": "Additional fixed modifications as search engine `add_*` entries, semicolon- or newline-separated `key = mass`. e.g. `add_S_serine = 79.96633; add_Nterm_protein = 42.0106`. Covers every residue/terminus beyond the C/K/N-term toggles."
     },
     "allow_multiple_variable_mods_on_residue": {
       "type": "bool",
@@ -709,7 +709,7 @@
     "precursor_mass_mode": {
       "type": "enum",
       "default": "corrected",
-      "description": "Which precursor mass MSFragger uses (FragPipe uses 'corrected')",
+      "description": "Which precursor mass search engine uses (workflow suite uses 'corrected')",
       "enum": [
         "isolated",
         "selected",
@@ -756,7 +756,7 @@
     "decoy_prefix": {
       "type": "str",
       "default": "rev_",
-      "description": "Decoy sequence prefix (must match Philosopher database)",
+      "description": "Decoy sequence prefix (must match toolkit database)",
       "primary": true
     },
     "output_format": {
@@ -794,7 +794,7 @@
     "write_calibrated_mzml": {
       "type": "int",
       "default": 0,
-      "description": "Write calibrated MS2 scans to mzML (downstream MSBooster/IonQuant can consume them)",
+      "description": "Write calibrated MS2 scans to mzML (downstream rescoring predictor/quantifier can consume them)",
       "enum": [
         0,
         1
@@ -821,10 +821,10 @@
     "extra_params": {
       "type": "str",
       "default": "",
-      "description": "Escape hatch: extra `key = value` lines appended to fragger.params (newline or ';' separated). Overrides a key we already write."
+      "description": "Escape hatch: extra `key = value` lines appended to search.params (newline or ';' separated). Overrides a key we already write."
     }
   },
-  "crystalc": {
+  "precursor-refine": {
     "ram_gb": {
       "type": "int",
       "default": 8,
@@ -884,11 +884,11 @@
     },
     "grppr_jar_path": {
       "type": "str",
-      "default": "/opt/fragpipe-tools/crystal-c/grppr-0.3.23.jar",
-      "description": "Path to grppr jar (CrystalC's required classpath sibling)"
+      "default": null,
+      "description": "Path to grppr jar (precursor refiner's required classpath sibling)"
     }
   },
-  "percolator": {
+  "rescore": {
     "test_fdr": {
       "type": "float",
       "default": 0.01,
@@ -1059,7 +1059,7 @@
     "verbose": {
       "type": "int",
       "default": null,
-      "description": "Output verbosity (--verbose); unset = Percolator default 2",
+      "description": "Output verbosity (--verbose); unset = rescorer default 2",
       "enum": [
         0,
         1,
@@ -1072,14 +1072,14 @@
     "extra_cmdline": {
       "type": "str",
       "default": "",
-      "description": "Escape hatch: extra Percolator flags appended verbatim (e.g. `--search-input concatenated`)"
+      "description": "Escape hatch: extra rescorer flags appended verbatim (e.g. `--search-input concatenated`)"
     }
   },
-  "percolator-to-pepxml": {
+  "rescore-export": {
     "jar_path": {
       "type": "str",
-      "default": "/opt/fragpipe-tools/fragpipe/fragpipe.jar",
-      "description": "Path to fragpipe.jar (the shadow jar that contains PercolatorOutputToPepXML)"
+      "default": null,
+      "description": "Path to workflow suite.jar (the shadow jar that contains rescorerOutputToPepXML)"
     },
     "data_type": {
       "type": "enum",
@@ -1094,7 +1094,7 @@
     "min_prob": {
       "type": "float",
       "default": 0.0,
-      "description": "Minimum Percolator probability to emit (mirrors FragPipe's --min-prob)",
+      "description": "Minimum rescorer probability to emit (mirrors workflow suite's --min-prob)",
       "min": 0,
       "max": 1,
       "primary": true
@@ -1105,11 +1105,11 @@
       "description": "Optional FASTA path rewritten into the output pepXML's <search_database local_path=...> field. Empty leaves it as-is."
     }
   },
-  "philosopher-database": {
+  "database": {
     "decoy_prefix": {
       "type": "str",
       "default": "rev_",
-      "description": "Decoy sequence prefix; must match MSFragger's decoy_prefix",
+      "description": "Decoy sequence prefix; must match search engine's decoy_prefix",
       "primary": true
     },
     "add_contam": {
@@ -1157,11 +1157,11 @@
       "description": "UniProt proteome ID to download instead of using a local FASTA (--id), e.g. `UP000005640`. Requires network access from the sandbox"
     }
   },
-  "peptideprophet": {
+  "validate-psm": {
     "decoy_prefix": {
       "type": "str",
       "default": "rev_",
-      "description": "Decoy sequence tag (--decoy); must match upstream MSFragger / database setting",
+      "description": "Decoy sequence tag (--decoy); must match upstream search engine / database setting",
       "primary": true
     },
     "output_prefix": {
@@ -1199,7 +1199,7 @@
     "min_prob": {
       "type": "float",
       "default": null,
-      "description": "Report only PSMs above this probability (--minprob); unset = PeptideProphet default 0.05",
+      "description": "Report only PSMs above this probability (--minprob); unset = PSM validator default 0.05",
       "min": 0,
       "max": 1,
       "primary": true
@@ -1264,17 +1264,17 @@
       "description": "Disable the enzymatic-termini model (--nontt)"
     }
   },
-  "ptmprophet": {
+  "ptm-localize": {
     "mods": {
       "type": "str",
       "default": "STY:79.966331,M:15.9949,n:42.0106",
-      "description": "Modification sites + masses (PTMProphet positional arg). Format: `<residues>:<mass>` items joined by commas, e.g. `STY:79.966331,M:15.9949,n:42.0106` (n = peptide N-term).",
+      "description": "Modification sites + masses (site localizer positional arg). Format: `<residues>:<mass>` items joined by commas, e.g. `STY:79.966331,M:15.9949,n:42.0106` (n = peptide N-term).",
       "primary": true
     },
     "minprob": {
       "type": "float",
       "default": 0.5,
-      "description": "Minimum PeptideProphet probability for a PSM to be evaluated (MINPROB=)",
+      "description": "Minimum PSM validator probability for a PSM to be evaluated (MINPROB=)",
       "min": 0,
       "max": 1,
       "primary": true
@@ -1294,7 +1294,7 @@
     "keepold": {
       "type": "bool",
       "default": true,
-      "description": "Retain prior PTMProphet results in the pepXML (KEEPOLD)"
+      "description": "Retain prior site localizer results in the pepXML (KEEPOLD)"
     },
     "static": {
       "type": "bool",
@@ -1415,14 +1415,14 @@
     "extra_cmdline": {
       "type": "str",
       "default": "",
-      "description": "Escape hatch: extra flags appended verbatim (e.g. OSCOREMODE, QUANTMODE, MINO=2). NOTE: PTMProphet is order-sensitive — flags that must precede the mods string (NOSTACK-style) have first-class params above; use this for the trailing long tail."
+      "description": "Escape hatch: extra flags appended verbatim (e.g. OSCOREMODE, QUANTMODE, MINO=2). NOTE: site localizer is order-sensitive — flags that must precede the mods string (NOSTACK-style) have first-class params above; use this for the trailing long tail."
     }
   },
-  "philosopher-report": {
+  "report": {
     "decoy_prefix": {
       "type": "str",
       "default": "rev_",
-      "description": "Decoy sequence tag (--tag); must match upstream MSFragger / philosopher-database setting",
+      "description": "Decoy sequence tag (--tag); must match upstream search engine / database setting",
       "primary": true
     },
     "psm_fdr": {
@@ -1460,20 +1460,20 @@
     "inference": {
       "type": "bool",
       "default": true,
-      "description": "Run protein-level inference via ProteinProphet (produces combined.prot.xml, passed to filter as --protxml; mirrors FragPipe). Disable for PSM/peptide-only reports — that also drops filter's --prot / --sequential / --razor, the way FragPipe does when no protXML exists.",
+      "description": "Run protein-level inference via protein inference (produces combined.prot.xml, passed to filter as --protxml; mirrors workflow suite). Disable for PSM/peptide-only reports — that also drops filter's --prot / --sequential / --razor, the way workflow suite does when no protXML exists.",
       "primary": true
     },
     "inference_min_prob": {
       "type": "float",
       "default": null,
-      "description": "Minimum peptide probability ProteinProphet admits (--minprob); unset = Philosopher's 0.05. 29 official workflows ask for 0.5.",
+      "description": "Minimum peptide probability protein inference admits (--minprob); unset = toolkit's 0.05. 29 official workflows ask for 0.5.",
       "min": 0,
       "max": 1
     },
     "inference_max_ppm_diff": {
       "type": "int",
       "default": 2000000,
-      "description": "ProteinProphet's peptide mass window for protein grouping (--maxppmdiff). FragPipe's baseline 2000000 effectively disables it."
+      "description": "protein inference's peptide mass window for protein grouping (--maxppmdiff). workflow suite's baseline 2000000 effectively disables it."
     },
     "razor": {
       "type": "bool",
@@ -1554,7 +1554,7 @@
     "filter_mods": {
       "type": "str",
       "default": "",
-      "description": "Modifications to stratify the FDR filter by (--mods), e.g. `M:15.9949,n:42.0106`. Empty = one pooled population, Philosopher's default."
+      "description": "Modifications to stratify the FDR filter by (--mods), e.g. `M:15.9949,n:42.0106`. Empty = one pooled population, toolkit's default."
     },
     "delta_mass_stratify": {
       "type": "bool",
@@ -1582,7 +1582,7 @@
       "description": "Prefix report filenames with the project/folder name (--prefix)"
     }
   },
-  "freequant": {
+  "quant-lfq": {
     "ptw": {
       "type": "float",
       "default": 0.4,
@@ -1612,20 +1612,20 @@
     "extra_cmdline": {
       "type": "str",
       "default": "",
-      "description": "Escape hatch: extra `philosopher freequant` argv appended verbatim (shell-quoted)"
+      "description": "Escape hatch: extra `toolkit quant-lfq` argv appended verbatim (shell-quoted)"
     }
   },
-  "labelquant": {
+  "quant-reporter": {
     "brand": {
       "type": "str",
       "default": "",
-      "description": "Isobaric labeling brand (--brand): tmt, itraq or sCLIP. Required for a real run; philosopher declares no default",
+      "description": "Isobaric labeling brand (--brand): tmt, itraq or sCLIP. Required for a real run; toolkit declares no default",
       "primary": true
     },
     "plex": {
       "type": "str",
       "default": "",
-      "description": "Number of reporter-ion channels (--plex), e.g. 10/11/16. Required for a real run; philosopher declares no default",
+      "description": "Number of reporter-ion channels (--plex), e.g. 10/11/16. Required for a real run; toolkit declares no default",
       "primary": true
     },
     "annotation_file": {
@@ -1691,20 +1691,20 @@
     "extra_cmdline": {
       "type": "str",
       "default": "",
-      "description": "Escape hatch: extra `philosopher labelquant` argv appended verbatim (shell-quoted)"
+      "description": "Escape hatch: extra `toolkit quant-reporter` argv appended verbatim (shell-quoted)"
     }
   },
-  "abacus": {
+  "aggregate-reports": {
     "protein": {
       "type": "bool",
       "default": true,
-      "description": "Emit the global protein report combined_protein.tsv (--protein); needs combined.prot.xml from proteinprophet",
+      "description": "Emit the global protein report combined_protein.tsv (--protein); needs combined.prot.xml from protein-infer",
       "primary": true
     },
     "peptide": {
       "type": "bool",
       "default": false,
-      "description": "Emit the global peptide report combined_peptide.tsv (--peptide); needs combined.pep.xml from iprophet",
+      "description": "Emit the global peptide report combined_peptide.tsv (--peptide); needs combined.pep.xml from psm-integrate",
       "primary": true
     },
     "decoy_prefix": {
@@ -1732,7 +1732,7 @@
     "razor": {
       "type": "bool",
       "default": false,
-      "description": "Use razor peptides for protein FDR scoring (--razor); match the upstream philosopher-report setting",
+      "description": "Use razor peptides for protein FDR scoring (--razor); match the upstream report setting",
       "primary": true
     },
     "picked": {
@@ -1772,14 +1772,14 @@
     "extra_cmdline": {
       "type": "str",
       "default": "",
-      "description": "Escape hatch: extra `philosopher abacus` argv appended verbatim (shell-quoted)"
+      "description": "Escape hatch: extra `toolkit aggregate-reports` argv appended verbatim (shell-quoted)"
     }
   },
-  "ionquant": {
+  "quant": {
     "binary_path": {
       "type": "str",
-      "default": "/opt/fragpipe-tools/ionquant/IonQuant-1.11.20.jar",
-      "description": "Path to the IonQuant JAR"
+      "default": null,
+      "description": "Path to the quantifier JAR"
     },
     "ram_gb": {
       "type": "int",
@@ -1900,7 +1900,7 @@
     "isotol_ppm": {
       "type": "float",
       "default": null,
-      "description": "MS2 reporter-ion tolerance in ppm (--isotol); unset = IonQuant default 10",
+      "description": "MS2 reporter-ion tolerance in ppm (--isotol); unset = quantifier default 10",
       "min": 0
     },
     "site_reports": {
@@ -1917,7 +1917,7 @@
     "imtol": {
       "type": "float",
       "default": null,
-      "description": "1/K0 tolerance (--imtol); unset = IonQuant default 0.05",
+      "description": "1/K0 tolerance (--imtol); unset = quantifier default 0.05",
       "min": 0
     },
     "mbrrttol": {
@@ -2054,15 +2054,15 @@
     "requantify": {
       "type": "bool",
       "default": null,
-      "description": "Re-quantify ions the search did not identify (--requantify). Unset = IonQuant's default, except with light/medium/heavy labels where it defaults to on"
+      "description": "Re-quantify ions the search did not identify (--requantify). Unset = quantifier's default, except with light/medium/heavy labels where it defaults to on"
     },
     "extra_cmdline": {
       "type": "str",
       "default": "",
-      "description": "Escape hatch: extra IonQuant flags appended verbatim (e.g. `--filelist /path/flags.txt`)"
+      "description": "Escape hatch: extra quantifier flags appended verbatim (e.g. `--filelist /path/flags.txt`)"
     }
   },
-  "ptmshepherd": {
+  "ptm-profile": {
     "ram_gb": {
       "type": "int",
       "default": 16,
@@ -2079,7 +2079,7 @@
     "glyco_mode": {
       "type": "bool",
       "default": false,
-      "description": "Enable glycan-PTM analysis path (emitted as PTM-Shepherd's `run_glyco_mode`)",
+      "description": "Enable glycan-PTM analysis path (emitted as PTM profiler's `run_glyco_mode`)",
       "primary": true
     },
     "n_glyco": {
@@ -2112,7 +2112,7 @@
     "peakpicking_mass_units": {
       "type": "int",
       "default": 0,
-      "description": "Peakpicking mass units: 0 = Da, 1 = ppm. Pairs with `peakpicking_width`; FragPipe's open-search config uses 0 (0.002 Da) and its offset-search config uses 1 (3 ppm)",
+      "description": "Peakpicking mass units: 0 = Da, 1 = ppm. Pairs with `peakpicking_width`; workflow suite's open-search config uses 0 (0.002 Da) and its offset-search config uses 1 (3 ppm)",
       "enum": [
         0,
         1
@@ -2155,12 +2155,12 @@
     "localize_delta_mass": {
       "type": "bool",
       "default": true,
-      "description": "MSFragger already localized delta-mass fragment ions (pair with the search node's localize_delta_mass)"
+      "description": "search engine already localized delta-mass fragment ions (pair with the search node's localize_delta_mass)"
     },
     "use_msfragger_localization": {
       "type": "bool",
       "default": false,
-      "description": "Reuse MSFragger's localization columns instead of re-localizing. Requires a psm.tsv that still carries them (no Percolator / Crystal-C in between)"
+      "description": "Reuse search engine's localization columns instead of re-localizing. Requires a psm.tsv that still carries them (no rescorer / precursor refiner in between)"
     },
     "msfragger_massdiff_to_varmod": {
       "type": "bool",
@@ -2300,12 +2300,12 @@
     "prep_for_ionquant": {
       "type": "bool",
       "default": false,
-      "description": "Prepare PSM table for downstream IonQuant"
+      "description": "Prepare PSM table for downstream quantifier"
     },
     "glycodatabase": {
       "type": "str",
       "default": "",
-      "description": "Glycan database: comma-separated compositions (e.g. `HexNAc(2)Hex(3)`) or a path to a .glyc file; empty = PTM-Shepherd default",
+      "description": "Glycan database: comma-separated compositions (e.g. `HexNAc(2)Hex(3)`) or a path to a .glyc file; empty = PTM profiler default",
       "primary": true
     },
     "glyco_fdr": {
@@ -2388,7 +2388,7 @@
     "put_glycans_to_assigned_mods": {
       "type": "bool",
       "default": true,
-      "description": "Write assigned glycans into the psm.tsv `Assigned Modifications` column (needed by downstream IonQuant/TMT-Integrator)"
+      "description": "Write assigned glycans into the psm.tsv `Assigned Modifications` column (needed by downstream quantifier/isobaric quantifier)"
     },
     "print_full_glyco_params": {
       "type": "bool",
@@ -2467,10 +2467,10 @@
     "extra_params": {
       "type": "str",
       "default": "",
-      "description": "Escape hatch: extra `key = value` lines appended to ptmshepherd_config.txt (newline or ';' separated). Overrides a key we already write."
+      "description": "Escape hatch: extra `key = value` lines appended to ptm-profile_config.txt (newline or ';' separated). Overrides a key we already write."
     }
   },
-  "tmtintegrator": {
+  "quant-isobaric": {
     "annotation_file": {
       "type": "str",
       "default": "",
@@ -2591,7 +2591,7 @@
     "min_pep_prob": {
       "type": "float",
       "default": 0.9,
-      "description": "Minimum PSM probability (in addition to Philosopher FDR)",
+      "description": "Minimum PSM probability (in addition to toolkit FDR)",
       "min": 0,
       "max": 1,
       "primary": true
@@ -2615,7 +2615,7 @@
     "min_site_prob": {
       "type": "float",
       "default": -1.0,
-      "description": "Site-localization confidence (-1 global, 0 search engine, >0 PTMProphet)",
+      "description": "Site-localization confidence (-1 global, 0 search engine, >0 site localizer)",
       "primary": true
     },
     "min_snr": {
@@ -2712,7 +2712,7 @@
     "abn_type": {
       "type": "int",
       "default": null,
-      "description": "Abundance type reported (0 = ratio-derived, 1 = intensity); unset = TMT-Integrator default",
+      "description": "Abundance type reported (0 = ratio-derived, 1 = intensity); unset = isobaric quantifier default",
       "enum": [
         0,
         1
@@ -2730,11 +2730,11 @@
       "description": "Escape hatch: extra `key = value` entries merged into tmt-i_config.yml (newline or ';' separated). Overrides a key we already write."
     }
   },
-  "diann": {
+  "dia-search": {
     "library_path": {
       "type": "str",
       "default": "",
-      "description": "Path to spectral library (.tsv/.speclib). DIA-NN's --lib argument. Optional if upstream easypqp supplies library*.tsv via inputs (hybrid topology).",
+      "description": "Path to spectral library (.tsv/.speclib). DIA engine's --lib argument. Optional if upstream speclib-build supplies library*.tsv via inputs (hybrid topology).",
       "primary": true
     },
     "fasta_path": {
@@ -2769,7 +2769,7 @@
     "matrix_spec_qvalue": {
       "type": "float",
       "default": null,
-      "description": "Run-specific protein spec-q for matrix reporting (--matrix-spec-q); unset = DIA-NN's default (no filter), which is what FragPipe runs with",
+      "description": "Run-specific protein spec-q for matrix reporting (--matrix-spec-q); unset = DIA engine's default (no filter), which is what workflow suite runs with",
       "min": 0,
       "max": 1,
       "primary": true
@@ -2799,7 +2799,7 @@
     "skip_quant": {
       "type": "bool",
       "default": false,
-      "description": "DEPRECATED / no-op: DIA-NN has no '--no-quant' option (it warns 'unrecognised option' and quantifies anyway). Kept so existing graphs still validate. Use `no_quant_files` or `quant_only` instead."
+      "description": "DEPRECATED / no-op: DIA engine has no '--no-quant' option (it warns 'unrecognised option' and quantifies anyway). Kept so existing graphs still validate. Use `no_quant_files` or `quant_only` instead."
     },
     "no_quant_files": {
       "type": "bool",
@@ -2836,7 +2836,7 @@
     "cut": {
       "type": "str",
       "default": "",
-      "description": "In-silico digest rule (--cut), e.g. `K*,R*` for trypsin, `--cut` empty = DIA-NN default"
+      "description": "In-silico digest rule (--cut), e.g. `K*,R*` for trypsin, `--cut` empty = DIA engine default"
     },
     "missed_cleavages": {
       "type": "int",
@@ -2921,7 +2921,7 @@
     "mass_acc": {
       "type": "float",
       "default": null,
-      "description": "MS2 mass accuracy in ppm (--mass-acc); unset = DIA-NN auto-determines",
+      "description": "MS2 mass accuracy in ppm (--mass-acc); unset = DIA engine auto-determines",
       "min": 0,
       "primary": true
     },
@@ -2961,12 +2961,12 @@
     "individual_mass_acc": {
       "type": "bool",
       "default": false,
-      "description": "Determine mass accuracy per run instead of once for the batch (--individual-mass-acc); FragPipe sets it for unrelated runs"
+      "description": "Determine mass accuracy per run instead of once for the batch (--individual-mass-acc); workflow suite sets it for unrelated runs"
     },
     "individual_windows": {
       "type": "bool",
       "default": false,
-      "description": "Determine the scan window per run (--individual-windows); FragPipe sets it for unrelated runs"
+      "description": "Determine the scan window per run (--individual-windows); workflow suite sets it for unrelated runs"
     },
     "no_maxlfq": {
       "type": "bool",
@@ -3009,7 +3009,7 @@
       "description": "Escape hatch: free-form extra args appended verbatim (e.g. `--no-cut-after-mod --individual-mass-acc`)"
     }
   },
-  "diaumpire": {
+  "dia-pseudo": {
     "ram_gb": {
       "type": "int",
       "default": 12,
@@ -3020,7 +3020,7 @@
     "threads": {
       "type": "int",
       "default": 7,
-      "description": "DIA-Umpire worker threads",
+      "description": "DIA pseudo-spectra worker threads",
       "min": 1,
       "primary": true
     },
@@ -3283,10 +3283,10 @@
     "extra_params": {
       "type": "str",
       "default": "",
-      "description": "Escape hatch: extra `key = value` lines appended to diaumpire_se.params (newline or ';' separated). Also how a V_SWATH variable-window table is supplied."
+      "description": "Escape hatch: extra `key = value` lines appended to dia-pseudo_se.params (newline or ';' separated). Also how a V_SWATH variable-window table is supplied."
     }
   },
-  "diatracer": {
+  "dia-features": {
     "ram_gb": {
       "type": "int",
       "default": 16,
@@ -3349,11 +3349,11 @@
     },
     "bruker_lib_dir": {
       "type": "str",
-      "default": "/opt/fragpipe-tools/diatracer/ext/bruker",
+      "default": null,
       "description": "Path to ext/bruker dir containing libtimsdata-*.so (JVM -Dlibs.bruker.dir)"
     }
   },
-  "easypqp": {
+  "speclib-build": {
     "max_delta_unimod": {
       "type": "float",
       "default": 0.02,
@@ -3371,7 +3371,7 @@
     "max_psm_pep": {
       "type": "float",
       "default": null,
-      "description": "Maximum PSM posterior-error probability for inclusion. Unset = easypqp's own default, which differs per subcommand (0.5 for `convert`, 1 for `convertpsm`) — FragPipe passes neither, so a single value here silently over-filtered the glyco-DIA libraries",
+      "description": "Maximum PSM posterior-error probability for inclusion. Unset = speclib-build's own default, which differs per subcommand (0.5 for `convert`, 1 for `convertpsm`) — workflow suite passes neither, so a single value here silently over-filtered the glyco-DIA libraries",
       "min": 0,
       "max": 1,
       "primary": true
@@ -3465,12 +3465,12 @@
     "diannpqp": {
       "type": "bool",
       "default": false,
-      "description": "Emit DIA-NN2-compatible PQP library alongside the TSV"
+      "description": "Emit DIA engine2-compatible PQP library alongside the TSV"
     },
     "unimod_xml": {
       "type": "str",
       "default": "",
-      "description": "UniMod XML used for modification annotation (--unimod); empty = EasyPQP's bundled copy"
+      "description": "UniMod XML used for modification annotation (--unimod); empty = spectral library builder's bundled copy"
     },
     "exclude_range": {
       "type": "str",
@@ -3496,7 +3496,7 @@
     "convert_from_psm": {
       "type": "bool",
       "default": false,
-      "description": "Build the library from psm.tsv via `easypqp convertpsm` instead of pepXML via `easypqp convert`"
+      "description": "Build the library from psm.tsv via `speclib-build convertpsm` instead of pepXML via `speclib-build convert`"
     },
     "decoy_prefix": {
       "type": "str",
@@ -3573,15 +3573,15 @@
     "extra_convert_cmdline": {
       "type": "str",
       "default": "",
-      "description": "Escape hatch: extra flags for each `easypqp convert` call"
+      "description": "Escape hatch: extra flags for each `speclib-build convert` call"
     },
     "extra_library_cmdline": {
       "type": "str",
       "default": "",
-      "description": "Escape hatch: extra flags for the `easypqp library` call"
+      "description": "Escape hatch: extra flags for the `speclib-build library` call"
     }
   },
-  "opair": {
+  "glyco-localize": {
     "ms1_tol": {
       "type": "float",
       "default": 20.0,
@@ -3599,7 +3599,7 @@
     "glyco_db": {
       "type": "str",
       "default": "HexNAc(1),HexNAc(1)Hex(1),HexNAc(1)NeuAc(1),HexNAc(2)Hex(1),HexNAc(1)Hex(1)NeuAc(1),HexNAc(2)Hex(2),HexNAc(2)Hex(1)NeuAc(1),HexNAc(1)Hex(1)NeuAc(2),HexNAc(2)Hex(2)NeuAc(1),HexNAc(2)Hex(2)Fuc(1)NeuAc(1),HexNAc(2)Hex(2)NeuAc(2),HexNAc(2)Hex(2)Fuc(1)NeuAc(2)",
-      "description": "O-glycan composition list (comma-separated, FragPipe Byonic syntax) — CMD -g",
+      "description": "O-glycan composition list (comma-separated, workflow suite Byonic syntax) — CMD -g",
       "primary": true
     },
     "max_glycans": {
@@ -3647,17 +3647,17 @@
     },
     "glycan_residues_file": {
       "type": "str",
-      "default": "/opt/fragpipe-tools/glycan-databases/glycan_residues.txt",
-      "description": "Glycan residue definitions (FragPipe Glycan_Databases) — CMD -x"
+      "default": null,
+      "description": "Glycan residue definitions (workflow suite Glycan_Databases) — CMD -x"
     },
     "glycan_mods_file": {
       "type": "str",
-      "default": "/opt/fragpipe-tools/glycan-databases/glycan_mods.txt",
-      "description": "Glycan modification definitions (FragPipe Glycan_Databases) — CMD -y"
+      "default": null,
+      "description": "Glycan modification definitions (workflow suite Glycan_Databases) — CMD -y"
     },
     "dotnet_bin": {
       "type": "str",
-      "default": "/opt/dotnet/dotnet",
+      "default": null,
       "description": ".NET 6 runtime executable"
     },
     "activation1": {
@@ -3685,10 +3685,10 @@
     "extra_cmdline": {
       "type": "str",
       "default": "",
-      "description": "Escape hatch: extra O-Pair CMD flags appended verbatim"
+      "description": "Escape hatch: extra glyco localizer CMD flags appended verbatim"
     }
   },
-  "msbooster": {
+  "predict-rescore": {
     "ram_gb": {
       "type": "int",
       "default": 16,
@@ -3703,8 +3703,8 @@
     },
     "diann_path": {
       "type": "str",
-      "default": "/opt/fragpipe-tools/fragpipe-24.0/tools/diann/1.8.2_beta_8/linux/diann-1.8.1.8",
-      "description": "Path to local DIA-NN binary"
+      "default": null,
+      "description": "Path to local DIA engine binary"
     },
     "use_rt": {
       "type": "bool",
@@ -3726,40 +3726,40 @@
     },
     "rt_model": {
       "type": "str",
-      "default": "DIA-NN",
+      "default": "DIA engine",
       "description": "RT prediction model (rtModel)",
       "primary": true
     },
     "spectra_model": {
       "type": "str",
-      "default": "DIA-NN",
+      "default": "DIA engine",
       "description": "Spectra prediction model (spectraModel)",
       "primary": true
     },
     "unimod_obo": {
       "type": "str",
-      "default": "/opt/fragpipe-tools/fragpipe-24.0/tools/unimod.obo",
+      "default": null,
       "description": "Path to unimod.obo for modification lookup"
     },
     "msbooster_jar": {
       "type": "str",
-      "default": "/opt/fragpipe-tools/fragpipe-24.0/tools/MSBooster-1.4.14.jar",
-      "description": "Path to MSBooster jar"
+      "default": null,
+      "description": "Path to rescoring predictor jar"
     },
     "batmass_io_jar": {
       "type": "str",
-      "default": "/opt/fragpipe-tools/fragpipe-24.0/tools/batmass-io-1.36.5.jar",
-      "description": "Path to batmass-io jar (required for mzML reading)"
+      "default": null,
+      "description": "Path to spectrum IO jar (required for mzML reading)"
     },
     "im_model": {
       "type": "str",
-      "default": "DIA-NN",
+      "default": "DIA engine",
       "description": "Ion-mobility prediction model (imModel)"
     },
     "use_koina": {
       "type": "bool",
       "default": false,
-      "description": "Use a remote Koina server for predictions instead of the local DIA-NN (useKoina). Requires koina_url and network access from the sandbox"
+      "description": "Use a remote Koina server for predictions instead of the local DIA engine (useKoina). Requires koina_url and network access from the sandbox"
     },
     "koina_url": {
       "type": "str",
@@ -3794,7 +3794,7 @@
     "ppm_tolerance": {
       "type": "float",
       "default": null,
-      "description": "Fragment matching tolerance in ppm (ppmTolerance); unset = MSBooster default 20",
+      "description": "Fragment matching tolerance in ppm (ppmTolerance); unset = rescoring predictor default 20",
       "min": 0
     },
     "use_detect": {
@@ -3805,7 +3805,7 @@
     "features": {
       "type": "str",
       "default": "",
-      "description": "Explicit feature list written into the pin (features), comma-separated. Empty = MSBooster's default feature set"
+      "description": "Explicit feature list written into the pin (features), comma-separated. Empty = rescoring predictor's default feature set"
     },
     "delete_predictions": {
       "type": "bool",
@@ -3815,10 +3815,10 @@
     "extra_params": {
       "type": "str",
       "default": "",
-      "description": "Escape hatch: extra `key = value` lines appended to msbooster_params.txt (newline or ';' separated). Covers the remaining ~100 MSBooster keys"
+      "description": "Escape hatch: extra `key = value` lines appended to predict-rescore_params.txt (newline or ';' separated). Covers the remaining ~100 rescoring predictor keys"
     }
   },
-  "iprophet": {
+  "psm-integrate": {
     "decoy_prefix": {
       "type": "str",
       "default": "rev_",
@@ -3888,11 +3888,11 @@
       "description": "Disable NSS model (--nonss)"
     }
   },
-  "proteinprophet": {
+  "protein-infer": {
     "max_ppm_diff": {
       "type": "int",
       "default": 2000000,
-      "description": "Max peptide mass difference (ppm) for protein grouping (--maxppmdiff). FragPipe baseline uses 2000000 (effectively disabled — group only on sequence)."
+      "description": "Max peptide mass difference (ppm) for protein grouping (--maxppmdiff). workflow suite baseline uses 2000000 (effectively disabled — group only on sequence)."
     },
     "min_prob": {
       "type": "float",
@@ -3903,12 +3903,12 @@
     "output_prefix": {
       "type": "str",
       "default": "combined",
-      "description": "Output filename prefix (--output); produces <prefix>.prot.xml. FragPipe baseline uses 'combined'."
+      "description": "Output filename prefix (--output); produces <prefix>.prot.xml. workflow suite baseline uses 'combined'."
     },
     "iprophet": {
       "type": "bool",
       "default": false,
-      "description": "Tell proteinprophet input is from iProphet (--iprophet)",
+      "description": "Tell protein-infer input is from PSM integrator (--psm-integrate)",
       "primary": true
     },
     "no_nsp": {

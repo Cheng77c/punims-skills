@@ -12,12 +12,12 @@ import os
 import sys
 
 _BU_TOOLS = {
-    "msconvert", "msfragger-closed", "crystalc", "percolator",
-    "percolator-to-pepxml", "philosopher-database", "peptideprophet",
-    "ptmprophet", "philosopher-report", "ionquant", "ptmshepherd",
-    "tmtintegrator", "diann", "diaumpire", "diatracer", "easypqp",
-    "opair", "msbooster", "iprophet", "proteinprophet",
-    "freequant", "labelquant", "abacus",
+    "msconvert", "search-closed", "precursor-refine", "rescore",
+    "rescore-export", "database", "validate-psm", "ptm-localize",
+    "report", "quant", "ptm-profile", "quant-isobaric", "dia-search",
+    "dia-pseudo", "dia-features", "speclib-build", "glyco-localize",
+    "predict-rescore", "psm-integrate", "protein-infer", "quant-lfq",
+    "quant-reporter", "aggregate-reports",
 }
 _FASTA_EXTS = (".fas", ".fasta", ".fa")
 _MAX_LOCAL_MB = 100
@@ -108,7 +108,7 @@ def _check_overrides(cfg: dict, steps: list, errs: list) -> None:
 
 def _check_required(cfg: dict, steps: list, errs: list) -> None:
     """必填参数缺失;执行器可注入的(database_path←db步/fasta_path、annotation_file←annotation_path)豁免。"""
-    has_db = any(s.get("tool") == "philosopher-database" for s in steps)
+    has_db = any(s.get("tool") == "database" for s in steps)
     has_fasta = bool(cfg.get("fasta_path"))
     has_annot = bool(cfg.get("annotation_path"))
     overrides = cfg.get("overrides") or {}
@@ -177,7 +177,7 @@ def validate_config(cfg: dict) -> list[str]:
                 f"{e.get('dst')}({target_tool})"
             )
     for step in steps:
-        if step.get("tool") != "abacus":
+        if step.get("tool") != "aggregate-reports":
             continue
         parent_count = len(
             {
@@ -188,7 +188,8 @@ def validate_config(cfg: dict) -> list[str]:
         )
         if parent_count < 2:
             errs.append(
-                f"步 {step.get('step_id')}(abacus) 至少 2 个上游实验,实际 {parent_count}"
+                f"步 {step.get('step_id')}(aggregate-reports) "
+                f"至少 2 个上游实验,实际 {parent_count}"
             )
     _check_overrides(cfg, steps, errs)
     _check_required(cfg, steps, errs)

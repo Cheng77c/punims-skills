@@ -55,7 +55,7 @@
 | `mzmlb_compression_level` | `int` | `—` | — | mzMLb compression level |
 | `run_index_set` | `str` | `—` | — | Run index set |
 
-## `msfragger-closed`
+## `search-closed`
 
 版本：`4.4`
 
@@ -63,7 +63,7 @@
 
 | 参数 | 类型 | 默认值 | 约束 | 说明 |
 |---|---|---|---|---|
-| `database_path` | `str` | `—` | 必填 | Path to target+decoy FASTA (Philosopher database --custom output) |
+| `database_path` | `str` | `—` | 必填 | Path to target+decoy FASTA (toolkit database --custom output) |
 | `num_threads` | `int` | `8` | ≥ 1 | Worker threads |
 | `ram_gb` | `int` | `16` | ≥ 2 | JVM heap size (-Xmx) in GB. Default 16: full-proteome DBs (human-uniprot) + variable PTM mods (acetyl/ubiq/glyco) build multi-million-peptide indexes that OOM an 8 GB heap. |
 | `precursor_tolerance_ppm` | `float` | `20.0` | ≥ 0 | Precursor mass window (±ppm) for closed search |
@@ -75,10 +75,10 @@
 | `mass_diff_to_variable_mod` | `int` | `0` | 枚举: 0, 1, 2 | Delta mass → variable mod. 0=no; 1=yes+remove; 2=yes+keep. Open/mass-offset searches need 1. |
 | `localize_delta_mass` | `int` | `0` | 枚举: 0, 1 | Mass-shifted fragment ion localization. 0=off, 1=on. Pair with mass_diff_to_variable_mod=1 for open search. |
 | `mass_offsets` | `str` | `0` | — | Slash-separated mass offsets for offset search; '0' = none |
-| `mass_offsets_detailed` | `str` | `` | — | Detailed mass offset list (FragPipe format e.g. `541.0611(aa=DK);203.0794(aa=N)`); overrides mass_offsets when set |
+| `mass_offsets_detailed` | `str` | `` | — | Detailed mass offset list (workflow suite format e.g. `541.0611(aa=DK);203.0794(aa=N)`); overrides mass_offsets when set |
 | `labile_search_mode` | `str` | `off` | 枚举: off, labile, nglycan | Labile-mod search (glyco/labile PTM): 'nglycan' for N-glyco, 'labile' for O-glyco/labile PTMs, 'off' for standard. Pairs with mass_offsets. |
 | `labile_fragment_ion_series` | `str` | `b,y` | — | Fragment ion series retained in labile search (e.g. 'b,y') |
-| `enzyme_name` | `str` | `stricttrypsin` | — | MSFragger enzyme name (e.g. stricttrypsin, trypsin, chymotrypsin) |
+| `enzyme_name` | `str` | `stricttrypsin` | — | search engine enzyme name (e.g. stricttrypsin, trypsin, chymotrypsin) |
 | `enzyme_cut` | `str` | `KR` | — | Residues to cleave after |
 | `enzyme_nocut` | `str` | `` | — | Residues that block cleavage (e.g. 'P' for trypsin) |
 | `num_enzyme_termini` | `int` | `2` | 枚举: 0, 1, 2 | 0=non-specific, 1=semi-tryptic, 2=fully tryptic |
@@ -95,9 +95,9 @@
 | `digest_max_mass` | `float` | `5000.0` | — | Max peptide mass (Da) |
 | `var_mod_oxidation_M` | `bool` | `True` | — | Variable mod: Met oxidation (+15.9949) |
 | `var_mod_acetyl_nterm` | `bool` | `True` | — | Variable mod: protein N-term acetylation (+42.0106) |
-| `variable_mods` | `str` | `` | — | Extra variable mods beyond the oxidation/acetyl toggles, in FragPipe params format `<mass> <residues> <max>`, semicolon-separated. e.g. `79.966331 STY 3` (phospho), `114.04293 K 2` (GG/ubiquitin), `42.0106 K 2` (acetyl-K). |
+| `variable_mods` | `str` | `` | — | Extra variable mods beyond the oxidation/acetyl toggles, in workflow suite params format `<mass> <residues> <max>`, semicolon-separated. e.g. `79.966331 STY 3` (phospho), `114.04293 K 2` (GG/ubiquitin), `42.0106 K 2` (acetyl-K). |
 | `fixed_mod_C_carbamidomethyl` | `bool` | `True` | — | Fixed mod: Cys carbamidomethyl (+57.02146) |
-| `fixed_mods` | `str` | `` | — | Additional fixed modifications as MSFragger `add_*` entries, semicolon- or newline-separated `key = mass`. e.g. `add_S_serine = 79.96633; add_Nterm_protein = 42.0106`. Covers every residue/terminus beyond the C/K/N-term toggles. |
+| `fixed_mods` | `str` | `` | — | Additional fixed modifications as search engine `add_*` entries, semicolon- or newline-separated `key = mass`. e.g. `add_S_serine = 79.96633; add_Nterm_protein = 42.0106`. Covers every residue/terminus beyond the C/K/N-term toggles. |
 | `allow_multiple_variable_mods_on_residue` | `bool` | `False` | — | Allow more than one variable mod on the same residue |
 | `max_variable_mods_combinations` | `int` | `5000` | ≥ 1; ≤ 65534 | Maximum modified forms per peptide |
 | `tmt_label_mass` | `float` | `—` | — | If set, add as fixed mod on K and peptide N-term (e.g. 229.16293 for TMT-6/10/11plex). None = LFQ. |
@@ -133,23 +133,23 @@
 | `min_sequence_matches` | `int` | `2` | ≥ 0 | [nglycan/labile only] Minimum sequence-specific (non-Y) ions for a match |
 | `min_fragments_modelling` | `int` | `2` | ≥ 1 | Minimum matched peaks for a PSM to enter statistical modelling |
 | `delta_mass_exclude_ranges` | `str` | `` | — | Fragment mass ranges excluded from delta-mass localization, e.g. `(-1.5,3.5)`. Empty = derived from localize_delta_mass |
-| `precursor_mass_mode` | `enum` | `corrected` | 枚举: isolated, selected, corrected | Which precursor mass MSFragger uses (FragPipe uses 'corrected') |
+| `precursor_mass_mode` | `enum` | `corrected` | 枚举: isolated, selected, corrected | Which precursor mass search engine uses (workflow suite uses 'corrected') |
 | `group_variable` | `int` | `0` | 枚举: 0, 1, 2 | Group-FDR variable: 0 = no group FDR, 1 = num_enzyme_termini, 2 = PE from the protein header |
 | `use_all_mods_in_first_search` | `int` | `0` | 枚举: 0, 1 | Use all variable modifications in the first search pass |
 | `track_zero_topN` | `int` | `0` | ≥ 0 | Track top N unmodified hits separately (open-search boosting) |
 | `zero_bin_accept_expect` | `float` | `0.0` | ≥ 0 | Rank a zero-bin hit first when its expect value is below this |
 | `zero_bin_mult_expect` | `float` | `1.0` | ≥ 0 | Multiplier applied to zero-bin expect values (<1 boosts them) |
-| `decoy_prefix` | `str` | `rev_` | — | Decoy sequence prefix (must match Philosopher database) |
+| `decoy_prefix` | `str` | `rev_` | — | Decoy sequence prefix (must match toolkit database) |
 | `output_format` | `str` | `pepXML_pin` | 枚举: pepXML, pepXML_pin, tsv, tsv_pin | Output format selector |
 | `output_report_topN` | `int` | `1` | ≥ 1 | Report top N PSMs per spectrum |
 | `output_max_expect` | `float` | `50.0` | ≥ 0 | Suppress a PSM whose top hit has an expect value above this |
 | `report_alternative_proteins` | `int` | `1` | 枚举: 0, 1 | Report alternative proteins for shared peptides |
-| `write_calibrated_mzml` | `int` | `0` | 枚举: 0, 1 | Write calibrated MS2 scans to mzML (downstream MSBooster/IonQuant can consume them) |
+| `write_calibrated_mzml` | `int` | `0` | 枚举: 0, 1 | Write calibrated MS2 scans to mzML (downstream rescoring predictor/quantifier can consume them) |
 | `write_uncalibrated_mzml` | `int` | `1` | 枚举: 0, 1 | Write uncalibrated MS2 scans to MGF (.raw/.d inputs only) |
 | `write_mzbin_all` | `int` | `0` | 枚举: 0, 1 | Write all spectra to mzBIN |
-| `extra_params` | `str` | `` | — | Escape hatch: extra `key = value` lines appended to fragger.params (newline or ';' separated). Overrides a key we already write. |
+| `extra_params` | `str` | `` | — | Escape hatch: extra `key = value` lines appended to search.params (newline or ';' separated). Overrides a key we already write. |
 
-## `crystalc`
+## `precursor-refine`
 
 版本：`1.5.10`
 
@@ -166,9 +166,9 @@
 | `precursor_isolation_window` | `float` | `0.7` | ≥ 0 | Precursor isolation window (m/z) |
 | `correct_isotope_error` | `bool` | `False` | — | Update precursor neutral mass with monoisotopic mass when isotope error detected |
 | `raw_file_extension` | `str` | `mzML` | — | Spectra file extension (mzML / mzXML) |
-| `grppr_jar_path` | `str` | `/opt/fragpipe-tools/crystal-c/grppr-0.3.23.jar` | — | Path to grppr jar (CrystalC's required classpath sibling) |
+| `grppr_jar_path` | `str` | `镜像内置（无需填写）` | — | Path to grppr jar (precursor refiner's required classpath sibling) |
 
-## `percolator`
+## `rescore`
 
 版本：`3.08`
 
@@ -204,23 +204,23 @@
 | `protein_report_duplicates` | `bool` | `False` | — | Report duplicate protein groups (--protein-report-duplicates) |
 | `spectral_counting_fdr` | `float` | `—` | ≥ 0; ≤ 1 | Enable protein spectral counting at this FDR (--spectral-counting-fdr) |
 | `no_terminate` | `bool` | `False` | — | Keep going on recoverable input errors (--no-terminate) |
-| `verbose` | `int` | `—` | 枚举: 0, 1, 2, 3, 4, 5 | Output verbosity (--verbose); unset = Percolator default 2 |
-| `extra_cmdline` | `str` | `` | — | Escape hatch: extra Percolator flags appended verbatim (e.g. `--search-input concatenated`) |
+| `verbose` | `int` | `—` | 枚举: 0, 1, 2, 3, 4, 5 | Output verbosity (--verbose); unset = rescorer default 2 |
+| `extra_cmdline` | `str` | `` | — | Escape hatch: extra rescorer flags appended verbatim (e.g. `--search-input concatenated`) |
 
-## `percolator-to-pepxml`
+## `rescore-export`
 
-版本：`fragpipe-24.1`
+版本：`workflow suite-24.1`
 
 输入：`.pin`, `.pepXML`, `.tsv`, `.mzML`
 
 | 参数 | 类型 | 默认值 | 约束 | 说明 |
 |---|---|---|---|---|
-| `jar_path` | `str` | `/opt/fragpipe-tools/fragpipe/fragpipe.jar` | — | Path to fragpipe.jar (the shadow jar that contains PercolatorOutputToPepXML) |
+| `jar_path` | `str` | `镜像内置（无需填写）` | — | Path to workflow suite.jar (the shadow jar that contains rescorerOutputToPepXML) |
 | `data_type` | `enum` | `DDA` | 枚举: DDA, DIA | Acquisition mode — DDA reads <basename>.pepXML, DIA reads <basename>_rank<N>.pepXML |
-| `min_prob` | `float` | `0.0` | ≥ 0; ≤ 1 | Minimum Percolator probability to emit (mirrors FragPipe's --min-prob) |
+| `min_prob` | `float` | `0.0` | ≥ 0; ≤ 1 | Minimum rescorer probability to emit (mirrors workflow suite's --min-prob) |
 | `updated_fasta_path` | `str` | `` | — | Optional FASTA path rewritten into the output pepXML's <search_database local_path=...> field. Empty leaves it as-is. |
 
-## `philosopher-database`
+## `database`
 
 版本：`5.1.0`
 
@@ -228,7 +228,7 @@
 
 | 参数 | 类型 | 默认值 | 约束 | 说明 |
 |---|---|---|---|---|
-| `decoy_prefix` | `str` | `rev_` | — | Decoy sequence prefix; must match MSFragger's decoy_prefix |
+| `decoy_prefix` | `str` | `rev_` | — | Decoy sequence prefix; must match search engine's decoy_prefix |
 | `add_contam` | `bool` | `True` | — | Append the common-contaminants set (cRAP-style) to the target FASTA |
 | `contam_prefix` | `bool` | `False` | — | Mark contaminant sequences with a prefix tag |
 | `enzyme` | `str` | `trypsin` | 枚举: trypsin, lys_c, lys_n, glu_c, chymotrypsin | Enzyme for in-silico digestion (affects sequence classification only) |
@@ -237,7 +237,7 @@
 | `add_sequences` | `str` | `` | — | Path to an extra UniProt-format FASTA whose sequences are appended (--add), e.g. spike-ins or a mutant panel |
 | `proteome_id` | `str` | `` | — | UniProt proteome ID to download instead of using a local FASTA (--id), e.g. `UP000005640`. Requires network access from the sandbox |
 
-## `peptideprophet`
+## `validate-psm`
 
 版本：`5.1.0`
 
@@ -245,14 +245,14 @@
 
 | 参数 | 类型 | 默认值 | 约束 | 说明 |
 |---|---|---|---|---|
-| `decoy_prefix` | `str` | `rev_` | — | Decoy sequence tag (--decoy); must match upstream MSFragger / database setting |
+| `decoy_prefix` | `str` | `rev_` | — | Decoy sequence tag (--decoy); must match upstream search engine / database setting |
 | `output_prefix` | `str` | `interact-PXD` | — | Prefix for the interact-*.pep.xml output filename (--output) |
 | `ppm` | `bool` | `True` | — | Mass model in ppm units (--ppm) |
 | `accmass` | `bool` | `True` | — | Use accurate-mass binning (--accmass) |
 | `nonparam` | `bool` | `True` | — | Semiparametric mixture model (--nonparam) |
 | `decoyprobs` | `bool` | `True` | — | Compute probabilities for decoy hits too (--decoyprobs) |
 | `combine` | `bool` | `True` | — | Combine all input pepXMLs into one model (--combine) |
-| `min_prob` | `float` | `—` | ≥ 0; ≤ 1 | Report only PSMs above this probability (--minprob); unset = PeptideProphet default 0.05 |
+| `min_prob` | `float` | `—` | ≥ 0; ≤ 1 | Report only PSMs above this probability (--minprob); unset = PSM validator default 0.05 |
 | `min_pep_len` | `int` | `—` | ≥ 1 | Minimum peptide length not rejected (--minpeplen); unset = 7 |
 | `mass_width` | `float` | `—` | ≥ 0 | Mass model width (--masswidth); unset = 5 |
 | `clevel` | `int` | `—` | — | Conservative level in neg_stdev from neg_mean (--clevel); higher = more conservative |
@@ -265,7 +265,7 @@
 | `no_nmc_model` | `bool` | `False` | — | Disable the missed-cleavage model (--nonmc) |
 | `no_ntt_model` | `bool` | `False` | — | Disable the enzymatic-termini model (--nontt) |
 
-## `ptmprophet`
+## `ptm-localize`
 
 版本：`6.3.2`
 
@@ -273,10 +273,10 @@
 
 | 参数 | 类型 | 默认值 | 约束 | 说明 |
 |---|---|---|---|---|
-| `mods` | `str` | `STY:79.966331,M:15.9949,n:42.0106` | — | Modification sites + masses (PTMProphet positional arg). Format: `<residues>:<mass>` items joined by commas, e.g. `STY:79.966331,M:15.9949,n:42.0106` (n = peptide N-term). |
-| `minprob` | `float` | `0.5` | ≥ 0; ≤ 1 | Minimum PeptideProphet probability for a PSM to be evaluated (MINPROB=) |
+| `mods` | `str` | `STY:79.966331,M:15.9949,n:42.0106` | — | Modification sites + masses (site localizer positional arg). Format: `<residues>:<mass>` items joined by commas, e.g. `STY:79.966331,M:15.9949,n:42.0106` (n = peptide N-term). |
+| `minprob` | `float` | `0.5` | ≥ 0; ≤ 1 | Minimum PSM validator probability for a PSM to be evaluated (MINPROB=) |
 | `em` | `int` | `1` | 枚举: 0, 1, 2, 3 | EM model: 0 none, 1 intensity, 2 intensity+matched-peaks (default), 3 matched-peaks |
-| `keepold` | `bool` | `True` | — | Retain prior PTMProphet results in the pepXML (KEEPOLD) |
+| `keepold` | `bool` | `True` | — | Retain prior site localizer results in the pepXML (KEEPOLD) |
 | `static` | `bool` | `True` | — | Use a single fragppmtol for all PSMs (STATIC) instead of per-PSM estimation |
 | `fragppmtol` | `float` | `10.0` | ≥ 0 | MS2 fragment ppm tolerance (FRAGPPMTOL=) |
 | `nions` | `str` | `b` | — | Comma-separated N-term ion types (NIONS=); defaults to b for CID |
@@ -298,9 +298,9 @@
 | `ifrags` | `bool` | `False` | — | Use internal fragments for localization (IFRAGS) |
 | `no_update` | `bool` | `False` | — | Don't rewrite modification_info tags in the pepXML (NOUPDATE) |
 | `verbose` | `bool` | `False` | — | Emit troubleshooting warnings (VERBOSE) |
-| `extra_cmdline` | `str` | `` | — | Escape hatch: extra flags appended verbatim (e.g. OSCOREMODE, QUANTMODE, MINO=2). NOTE: PTMProphet is order-sensitive — flags that must precede the mods string (NOSTACK-style) have first-class params above; use this for the trailing long tail. |
+| `extra_cmdline` | `str` | `` | — | Escape hatch: extra flags appended verbatim (e.g. OSCOREMODE, QUANTMODE, MINO=2). NOTE: site localizer is order-sensitive — flags that must precede the mods string (NOSTACK-style) have first-class params above; use this for the trailing long tail. |
 
-## `philosopher-report`
+## `report`
 
 版本：`5.1.0`
 
@@ -308,14 +308,14 @@
 
 | 参数 | 类型 | 默认值 | 约束 | 说明 |
 |---|---|---|---|---|
-| `decoy_prefix` | `str` | `rev_` | — | Decoy sequence tag (--tag); must match upstream MSFragger / philosopher-database setting |
+| `decoy_prefix` | `str` | `rev_` | — | Decoy sequence tag (--tag); must match upstream search engine / database setting |
 | `psm_fdr` | `float` | `0.01` | ≥ 0; ≤ 1 | PSM-level FDR threshold (--psm) |
 | `peptide_fdr` | `float` | `0.01` | ≥ 0; ≤ 1 | Peptide-level FDR threshold (--pep) |
 | `ion_fdr` | `float` | `0.01` | ≥ 0; ≤ 1 | Peptide-ion FDR threshold (--ion) |
 | `protein_fdr` | `float` | `0.01` | ≥ 0; ≤ 1 | Protein-level FDR threshold (--prot) |
-| `inference` | `bool` | `True` | — | Run protein-level inference via ProteinProphet (produces combined.prot.xml, passed to filter as --protxml; mirrors FragPipe). Disable for PSM/peptide-only reports — that also drops filter's --prot / --sequential / --razor, the way FragPipe does when no protXML exists. |
-| `inference_min_prob` | `float` | `—` | ≥ 0; ≤ 1 | Minimum peptide probability ProteinProphet admits (--minprob); unset = Philosopher's 0.05. 29 official workflows ask for 0.5. |
-| `inference_max_ppm_diff` | `int` | `2000000` | — | ProteinProphet's peptide mass window for protein grouping (--maxppmdiff). FragPipe's baseline 2000000 effectively disables it. |
+| `inference` | `bool` | `True` | — | Run protein-level inference via protein inference (produces combined.prot.xml, passed to filter as --protxml; mirrors workflow suite). Disable for PSM/peptide-only reports — that also drops filter's --prot / --sequential / --razor, the way workflow suite does when no protXML exists. |
+| `inference_min_prob` | `float` | `—` | ≥ 0; ≤ 1 | Minimum peptide probability protein inference admits (--minprob); unset = toolkit's 0.05. 29 official workflows ask for 0.5. |
+| `inference_max_ppm_diff` | `int` | `2000000` | — | protein inference's peptide mass window for protein grouping (--maxppmdiff). workflow suite's baseline 2000000 effectively disables it. |
 | `razor` | `bool` | `True` | — | Use razor-peptide algorithm for protein scoring |
 | `picked` | `bool` | `False` | — | Apply picked-FDR before protein scoring |
 | `sequential` | `bool` | `False` | — | Sequential FDR (PSM-then-protein) instead of 2D |
@@ -329,14 +329,14 @@
 | `two_dimensional` | `bool` | `False` | — | Two-dimensional FDR filtering (--2d) |
 | `group_filter` | `bool` | `False` | — | Use the group label when filtering (--group) |
 | `map_mods` | `bool` | `False` | — | Map modifications onto the filtered results (--mapmods) |
-| `filter_mods` | `str` | `` | — | Modifications to stratify the FDR filter by (--mods), e.g. `M:15.9949,n:42.0106`. Empty = one pooled population, Philosopher's default. |
+| `filter_mods` | `str` | `` | — | Modifications to stratify the FDR filter by (--mods), e.g. `M:15.9949,n:42.0106`. Empty = one pooled population, toolkit's default. |
 | `delta_mass_stratify` | `bool` | `False` | — | Stratify PSMs by delta-mass profile before FDR filtering (--delta); open / labile searches |
 | `print_models` | `bool` | `False` | — | Print the model distributions (--models) |
 | `report_mzid` | `bool` | `False` | — | Also emit an mzIdentML file (--mzid) |
 | `report_ionmobility` | `bool` | `False` | — | Force the ion-mobility column into the reports (--ionmobility). timsTOF data |
 | `report_prefix` | `bool` | `False` | — | Prefix report filenames with the project/folder name (--prefix) |
 
-## `freequant`
+## `quant-lfq`
 
 版本：`5.1.0`
 
@@ -348,9 +348,9 @@
 | `tol` | `float` | `10.0` | ≥ 0 | m/z tolerance in ppm (--tol) |
 | `faims` | `bool` | `False` | — | Use FAIMS compensation-voltage information (--faims) |
 | `read_raw` | `bool` | `False` | — | Read vendor raw files instead of converted mzML/mzXML (--raw) |
-| `extra_cmdline` | `str` | `` | — | Escape hatch: extra `philosopher freequant` argv appended verbatim (shell-quoted) |
+| `extra_cmdline` | `str` | `` | — | Escape hatch: extra `toolkit quant-lfq` argv appended verbatim (shell-quoted) |
 
-## `labelquant`
+## `quant-reporter`
 
 版本：`5.1.0`
 
@@ -358,8 +358,8 @@
 
 | 参数 | 类型 | 默认值 | 约束 | 说明 |
 |---|---|---|---|---|
-| `brand` | `str` | `` | — | Isobaric labeling brand (--brand): tmt, itraq or sCLIP. Required for a real run; philosopher declares no default |
-| `plex` | `str` | `` | — | Number of reporter-ion channels (--plex), e.g. 10/11/16. Required for a real run; philosopher declares no default |
+| `brand` | `str` | `` | — | Isobaric labeling brand (--brand): tmt, itraq or sCLIP. Required for a real run; toolkit declares no default |
+| `plex` | `str` | `` | — | Number of reporter-ion channels (--plex), e.g. 10/11/16. Required for a real run; toolkit declares no default |
 | `annotation_file` | `str` | `` | — | Annotation file mapping channels to sample names (--annot) |
 | `level` | `int` | `2` | ≥ 1 | MS level the reporter ions are read from (--level) |
 | `minprob` | `float` | `0.7` | ≥ 0; ≤ 1 | Only use PSMs above this probability (--minprob) |
@@ -369,9 +369,9 @@
 | `uniqueonly` | `bool` | `False` | — | Quantify from unique peptides only (--uniqueonly) |
 | `bestpsm` | `bool` | `False` | — | Keep only the best PSM per peptide for protein quantification (--bestpsm) |
 | `read_raw` | `bool` | `False` | — | Read vendor raw files instead of converted mzML/mzXML (--raw) |
-| `extra_cmdline` | `str` | `` | — | Escape hatch: extra `philosopher labelquant` argv appended verbatim (shell-quoted) |
+| `extra_cmdline` | `str` | `` | — | Escape hatch: extra `toolkit quant-reporter` argv appended verbatim (shell-quoted) |
 
-## `abacus`
+## `aggregate-reports`
 
 版本：`5.1.0`
 
@@ -379,21 +379,21 @@
 
 | 参数 | 类型 | 默认值 | 约束 | 说明 |
 |---|---|---|---|---|
-| `protein` | `bool` | `True` | — | Emit the global protein report combined_protein.tsv (--protein); needs combined.prot.xml from proteinprophet |
-| `peptide` | `bool` | `False` | — | Emit the global peptide report combined_peptide.tsv (--peptide); needs combined.pep.xml from iprophet |
+| `protein` | `bool` | `True` | — | Emit the global protein report combined_protein.tsv (--protein); needs combined.prot.xml from protein-infer |
+| `peptide` | `bool` | `False` | — | Emit the global peptide report combined_peptide.tsv (--peptide); needs combined.pep.xml from psm-integrate |
 | `decoy_prefix` | `str` | `rev_` | — | Decoy sequence tag (--tag); must match the upstream filter/database setting |
 | `pep_prob` | `float` | `0.5` | ≥ 0; ≤ 1 | Minimum peptide probability (--pepProb) |
 | `prot_prob` | `float` | `0.9` | ≥ 0; ≤ 1 | Minimum protein probability (--prtProb) |
-| `razor` | `bool` | `False` | — | Use razor peptides for protein FDR scoring (--razor); match the upstream philosopher-report setting |
+| `razor` | `bool` | `False` | — | Use razor peptides for protein FDR scoring (--razor); match the upstream report setting |
 | `picked` | `bool` | `False` | — | Apply the picked-FDR algorithm before protein scoring (--picked) |
 | `labels` | `bool` | `False` | — | The datasets carry isobaric labels — combine channel abundances too (--labels) |
 | `plex` | `str` | `10` | — | Number of isobaric channels (--plex); only meaningful with labels=True |
 | `uniqueonly` | `bool` | `False` | — | Combine isobaric quantification from unique peptides only (--uniqueonly) |
 | `full` | `bool` | `False` | — | Generate combined tables with extra columns (--full) |
 | `reprint` | `bool` | `False` | — | Also write Reprint-format tables reprint.spc.tsv / reprint.int.tsv (--reprint) |
-| `extra_cmdline` | `str` | `` | — | Escape hatch: extra `philosopher abacus` argv appended verbatim (shell-quoted) |
+| `extra_cmdline` | `str` | `` | — | Escape hatch: extra `toolkit aggregate-reports` argv appended verbatim (shell-quoted) |
 
-## `ionquant`
+## `quant`
 
 版本：`1.11.20`
 
@@ -401,7 +401,7 @@
 
 | 参数 | 类型 | 默认值 | 约束 | 说明 |
 |---|---|---|---|---|
-| `binary_path` | `str` | `/opt/fragpipe-tools/ionquant/IonQuant-1.11.20.jar` | — | Path to the IonQuant JAR |
+| `binary_path` | `str` | `镜像内置（无需填写）` | — | Path to the quantifier JAR |
 | `ram_gb` | `int` | `8` | ≥ 2 | JVM heap size (-Xmx) in GB |
 | `threads` | `int` | `0` | ≥ 0 | Worker threads (0 = all logical cores) |
 | `mztol_ppm` | `float` | `10.0` | ≥ 0 | MS1 mass tolerance (ppm) for feature extraction |
@@ -417,10 +417,10 @@
 | `mbr` | `bool` | `False` | — | Match-between-runs (cross-sample alignment) |
 | `normalization` | `bool` | `True` | — | Normalize intensities across runs |
 | `msstats` | `bool` | `False` | — | Emit MSstats-compatible input |
-| `isotol_ppm` | `float` | `—` | ≥ 0 | MS2 reporter-ion tolerance in ppm (--isotol); unset = IonQuant default 10 |
+| `isotol_ppm` | `float` | `—` | ≥ 0 | MS2 reporter-ion tolerance in ppm (--isotol); unset = quantifier default 10 |
 | `site_reports` | `bool` | `True` | — | Generate PTM site reports (needs localization columns in psm.tsv) |
 | `ionmobility` | `bool` | `False` | — | Data carries ion mobility (--ionmobility). Required for timsTOF LC-MS |
-| `imtol` | `float` | `—` | ≥ 0 | 1/K0 tolerance (--imtol); unset = IonQuant default 0.05 |
+| `imtol` | `float` | `—` | ≥ 0 | 1/K0 tolerance (--imtol); unset = quantifier default 0.05 |
 | `mbrrttol` | `float` | `—` | ≥ 0 | MBR retention-time tolerance in minutes (--mbrrttol); unset = 1.0 |
 | `mbrimtol` | `float` | `—` | ≥ 0 | MBR 1/K0 tolerance (--mbrimtol); unset = 0.05 |
 | `mbrtoprun` | `int` | `—` | ≥ 1 | Maximum donor runs per acceptor run (--mbrtoprun); unset = 10 |
@@ -442,10 +442,10 @@
 | `medium_labels` | `str` | `` | — | Medium channel labels (--medium) |
 | `heavy_labels` | `str` | `` | — | Heavy channel labels (--heavy), e.g. `K8.014199;R10.008269` |
 | `label_formula` | `str` | `` | — | Chemical formulas of the labelling mods (--formula), e.g. `C(2)H(2)O;2H(4)C(2)`. Required for isotope-labelling quantification |
-| `requantify` | `bool` | `—` | — | Re-quantify ions the search did not identify (--requantify). Unset = IonQuant's default, except with light/medium/heavy labels where it defaults to on |
-| `extra_cmdline` | `str` | `` | — | Escape hatch: extra IonQuant flags appended verbatim (e.g. `--filelist /path/flags.txt`) |
+| `requantify` | `bool` | `—` | — | Re-quantify ions the search did not identify (--requantify). Unset = quantifier's default, except with light/medium/heavy labels where it defaults to on |
+| `extra_cmdline` | `str` | `` | — | Escape hatch: extra quantifier flags appended verbatim (e.g. `--filelist /path/flags.txt`) |
 
-## `ptmshepherd`
+## `ptm-profile`
 
 版本：`3.0.11`
 
@@ -455,19 +455,19 @@
 |---|---|---|---|---|
 | `ram_gb` | `int` | `16` | ≥ 1 | JVM heap (-Xmx<N>G) |
 | `threads` | `int` | `0` | — | 0 = all available |
-| `glyco_mode` | `bool` | `False` | — | Enable glycan-PTM analysis path (emitted as PTM-Shepherd's `run_glyco_mode`) |
+| `glyco_mode` | `bool` | `False` | — | Enable glycan-PTM analysis path (emitted as PTM profiler's `run_glyco_mode`) |
 | `n_glyco` | `bool` | `True` | — | N-glycan branch (vs O-glycan) when glyco_mode is on |
 | `histo_bindivs` | `int` | `5000` | ≥ 1 | Histogram bins per Dalton used in peakpicking |
 | `histo_smoothbins` | `int` | `2` | ≥ 0 | Peakpicking smoothing factor (weight spread to N adjacent bins) |
 | `histo_normalizeTo` | `enum` | `psms` | 枚举: psms, scans | Normalize dataset size to PSM count or MS2 scan count |
-| `peakpicking_mass_units` | `int` | `0` | 枚举: 0, 1 | Peakpicking mass units: 0 = Da, 1 = ppm. Pairs with `peakpicking_width`; FragPipe's open-search config uses 0 (0.002 Da) and its offset-search config uses 1 (3 ppm) |
+| `peakpicking_mass_units` | `int` | `0` | 枚举: 0, 1 | Peakpicking mass units: 0 = Da, 1 = ppm. Pairs with `peakpicking_width`; workflow suite's open-search config uses 0 (0.002 Da) and its offset-search config uses 1 (3 ppm) |
 | `spectra_condPeaks` | `int` | `150` | ≥ 1 | Maximum peaks kept per spectrum |
 | `spectra_condRatio` | `float` | `0.0001` | ≥ 0 | Minimum peak intensity as a fraction of the base peak |
 | `spectra_maxPrecursorCharge` | `int` | `4` | ≥ 1 | Maximum precursor charge considered |
 | `localization_background` | `int` | `4` | 枚举: 1, 2, 3, 4 | Localization enrichment background: 1=bin peptides, 2=bin PSMs, 3=all peptides, 4=all PSMs |
 | `localization_allowed_res` | `str` | `` | — | Residues allowed to carry the shift (e.g. `STY`, `N`); empty = no restriction |
-| `localize_delta_mass` | `bool` | `True` | — | MSFragger already localized delta-mass fragment ions (pair with the search node's localize_delta_mass) |
-| `use_msfragger_localization` | `bool` | `False` | — | Reuse MSFragger's localization columns instead of re-localizing. Requires a psm.tsv that still carries them (no Percolator / Crystal-C in between) |
+| `localize_delta_mass` | `bool` | `True` | — | search engine already localized delta-mass fragment ions (pair with the search node's localize_delta_mass) |
+| `use_msfragger_localization` | `bool` | `False` | — | Reuse search engine's localization columns instead of re-localizing. Requires a psm.tsv that still carries them (no rescorer / precursor refiner in between) |
 | `msfragger_massdiff_to_varmod` | `bool` | `False` | — | Re-synthesise variable mods from Delta Mass. Only for a psm.tsv whose `Modified Peptide` column is empty |
 | `annotate_assigned_mods` | `bool` | `False` | — | Annotate shifts using the PSM table's assigned modifications |
 | `annotation_file` | `str` | `` | — | `glyco`, `unimod`, `common`, or path to custom annotation table; empty = unimod |
@@ -491,8 +491,8 @@
 | `iontype_z` | `bool` | `False` | — | Use z-ions |
 | `compare_betweenRuns` | `bool` | `False` | — | Allow spectral similarity / RT calculation across runs |
 | `output_extended` | `bool` | `False` | — | Retain intermediate + spectrum-level outputs |
-| `prep_for_ionquant` | `bool` | `False` | — | Prepare PSM table for downstream IonQuant |
-| `glycodatabase` | `str` | `` | — | Glycan database: comma-separated compositions (e.g. `HexNAc(2)Hex(3)`) or a path to a .glyc file; empty = PTM-Shepherd default |
+| `prep_for_ionquant` | `bool` | `False` | — | Prepare PSM table for downstream quantifier |
+| `glycodatabase` | `str` | `` | — | Glycan database: comma-separated compositions (e.g. `HexNAc(2)Hex(3)`) or a path to a .glyc file; empty = PTM profiler default |
 | `glyco_fdr` | `float` | `0.01` | ≥ 0; ≤ 1 | Glycan assignment FDR |
 | `glyco_ppm_tol` | `float` | `30.0` | ≥ 0 | Precursor ppm tolerance for glycan mass matching |
 | `glyco_isotope_min` | `int` | `-1` | — | Minimum isotope error for glycan matching |
@@ -506,7 +506,7 @@
 | `remainder_masses` | `str` | `203.07937` | — | Comma-separated remainder masses localized onto the peptide |
 | `remainder_mass_allowed_res` | `str` | `all` | — | Residues that may carry a remainder mass (`all` or a residue list) |
 | `remove_glycan_delta_mass` | `bool` | `True` | — | Strip the glycan delta mass from the reported peptide mass |
-| `put_glycans_to_assigned_mods` | `bool` | `True` | — | Write assigned glycans into the psm.tsv `Assigned Modifications` column (needed by downstream IonQuant/TMT-Integrator) |
+| `put_glycans_to_assigned_mods` | `bool` | `True` | — | Write assigned glycans into the psm.tsv `Assigned Modifications` column (needed by downstream quantifier/isobaric quantifier) |
 | `print_full_glyco_params` | `bool` | `False` | — | Echo the full resolved glyco parameter set into the log |
 | `print_decoys` | `bool` | `False` | — | Include decoy glycan assignments in the reports |
 | `run_diagextract_mode` | `bool` | `False` | — | Extract intensities for the configured diagnostic ions |
@@ -520,9 +520,9 @@
 | `diagmine_fragMinPropensity` | `float` | `12.5` | ≥ 0 | Minimum propensity for a fragment remainder ion |
 | `diagmine_pepMinFoldChange` | `float` | `3.0` | ≥ 0 | Minimum fold change for a peptide remainder mass |
 | `diagmine_pepMinSpecDiff` | `float` | `25.0` | ≥ 0 | Minimum spectral percentage difference for a peptide remainder mass |
-| `extra_params` | `str` | `` | — | Escape hatch: extra `key = value` lines appended to ptmshepherd_config.txt (newline or ';' separated). Overrides a key we already write. |
+| `extra_params` | `str` | `` | — | Escape hatch: extra `key = value` lines appended to ptm-profile_config.txt (newline or ';' separated). Overrides a key we already write. |
 
-## `tmtintegrator`
+## `quant-isobaric`
 
 版本：`6.2.1`
 
@@ -544,10 +544,10 @@
 | `outlier_removal` | `bool` | `True` | — | Drop intensity outliers before aggregation |
 | `psm_norm` | `bool` | `False` | — | Additional RT-based PSM-level normalization |
 | `ms1_int` | `bool` | `True` | — | Use MS1 precursor intensity (else MS2 reference) for ref sample abundance |
-| `min_pep_prob` | `float` | `0.9` | ≥ 0; ≤ 1 | Minimum PSM probability (in addition to Philosopher FDR) |
+| `min_pep_prob` | `float` | `0.9` | ≥ 0; ≤ 1 | Minimum PSM probability (in addition to toolkit FDR) |
 | `min_purity` | `float` | `0.5` | ≥ 0; ≤ 1 | Precursor purity threshold |
 | `min_percent` | `float` | `0.05` | ≥ 0; ≤ 1 | Drop PSMs whose summed-TMT intensity is in the lowest fraction |
-| `min_site_prob` | `float` | `-1.0` | — | Site-localization confidence (-1 global, 0 search engine, >0 PTMProphet) |
+| `min_site_prob` | `float` | `-1.0` | — | Site-localization confidence (-1 global, 0 search engine, >0 site localizer) |
 | `min_snr` | `float` | `0.0` | — | Minimum reporter-ion SNR |
 | `unique_pep` | `bool` | `False` | — | Use unique peptides only (else unique+razor) |
 | `unique_gene` | `int` | `0` | 枚举: 0, 1, 2 | Gene-uniqueness filter: 0 keep all, 1 drop multi-gene-evidence, 2 drop all multi-gene-in-fasta |
@@ -563,11 +563,11 @@
 | `medium_subplex` | `str` | `` | — | Hyperplex medium sub-plex definition `<channelCount>:<refTag>` (e.g. `18:pool`) |
 | `heavy_subplex` | `str` | `` | — | Hyperplex heavy sub-plex definition `<channelCount>:<refTag>` |
 | `combined_protein` | `str` | `` | — | Path to combined_protein.tsv used for gene/protein annotation of the reports |
-| `abn_type` | `int` | `—` | 枚举: 0, 1 | Abundance type reported (0 = ratio-derived, 1 = intensity); unset = TMT-Integrator default |
+| `abn_type` | `int` | `—` | 枚举: 0, 1 | Abundance type reported (0 = ratio-derived, 1 = intensity); unset = isobaric quantifier default |
 | `min_resolution` | `int` | `—` | ≥ 0 | Minimum MS2 resolution required to resolve the reporter ions; unset = tool default |
 | `extra_params` | `str` | `` | — | Escape hatch: extra `key = value` entries merged into tmt-i_config.yml (newline or ';' separated). Overrides a key we already write. |
 
-## `diann`
+## `dia-search`
 
 版本：`1.8.2-beta8`
 
@@ -575,24 +575,24 @@
 
 | 参数 | 类型 | 默认值 | 约束 | 说明 |
 |---|---|---|---|---|
-| `library_path` | `str` | `` | — | Path to spectral library (.tsv/.speclib). DIA-NN's --lib argument. Optional if upstream easypqp supplies library*.tsv via inputs (hybrid topology). |
+| `library_path` | `str` | `` | — | Path to spectral library (.tsv/.speclib). DIA engine's --lib argument. Optional if upstream speclib-build supplies library*.tsv via inputs (hybrid topology). |
 | `fasta_path` | `str` | `` | — | Optional fasta for protein inference (--fasta). Empty disables protein-level reports. |
 | `num_threads` | `int` | `8` | ≥ 1 | Worker threads (--threads) |
 | `precursor_qvalue` | `float` | `0.01` | ≥ 0; ≤ 1 | Run-specific precursor q-value cutoff (--qvalue) |
 | `protein_qvalue` | `float` | `0.01` | ≥ 0; ≤ 1 | Run-specific protein q-value cutoff (--matrix-qvalue) |
-| `matrix_spec_qvalue` | `float` | `—` | ≥ 0; ≤ 1 | Run-specific protein spec-q for matrix reporting (--matrix-spec-q); unset = DIA-NN's default (no filter), which is what FragPipe runs with |
+| `matrix_spec_qvalue` | `float` | `—` | ≥ 0; ≤ 1 | Run-specific protein spec-q for matrix reporting (--matrix-spec-q); unset = DIA engine's default (no filter), which is what workflow suite runs with |
 | `mbr` | `bool` | `False` | — | Match-between-runs / re-analysis pass (--reanalyse) |
 | `matrices` | `bool` | `True` | — | Emit pr_matrix / pg_matrix abundance tables (--matrices) |
 | `relaxed_protein_inference` | `bool` | `False` | — | Use relaxed protein inference (--relaxed-prot-inf) |
 | `no_protein_inference` | `bool` | `False` | — | Skip protein inference entirely (--no-prot-inf) |
-| `skip_quant` | `bool` | `False` | — | DEPRECATED / no-op: DIA-NN has no '--no-quant' option (it warns 'unrecognised option' and quantifies anyway). Kept so existing graphs still validate. Use `no_quant_files` or `quant_only` instead. |
+| `skip_quant` | `bool` | `False` | — | DEPRECATED / no-op: DIA engine has no '--no-quant' option (it warns 'unrecognised option' and quantifies anyway). Kept so existing graphs still validate. Use `no_quant_files` or `quant_only` instead. |
 | `no_quant_files` | `bool` | `False` | — | Don't write intermediate .quant files to disk (--no-quant-files) |
 | `quant_only` | `bool` | `False` | — | Only run quantification using existing .quant files (--quant-only) |
 | `fasta_search` | `bool` | `False` | — | Library-free mode: digest the FASTA in silico (--fasta-search). Requires fasta_path (or a .fasta input); library_path becomes optional. |
 | `gen_spec_lib` | `bool` | `False` | — | Generate a spectral library from this run (--gen-spec-lib) |
 | `predictor` | `bool` | `False` | — | Deep-learning prediction of spectra/RT/IM for the in-silico library (--predictor) |
 | `out_lib` | `str` | `` | — | Output spectral library path (--out-lib); empty = <output_dir>/report-lib.tsv when gen_spec_lib is on |
-| `cut` | `str` | `` | — | In-silico digest rule (--cut), e.g. `K*,R*` for trypsin, `--cut` empty = DIA-NN default |
+| `cut` | `str` | `` | — | In-silico digest rule (--cut), e.g. `K*,R*` for trypsin, `--cut` empty = DIA engine default |
 | `missed_cleavages` | `int` | `—` | ≥ 0 | Maximum missed cleavages for the in-silico digest (--missed-cleavages) |
 | `min_pep_len` | `int` | `—` | ≥ 1 | Minimum peptide length (--min-pep-len) |
 | `max_pep_len` | `int` | `—` | ≥ 1 | Maximum peptide length (--max-pep-len) |
@@ -607,15 +607,15 @@
 | `unimod35` | `bool` | `False` | — | Variable Met oxidation (--unimod35) |
 | `max_var_mods` | `int` | `—` | ≥ 0 | Maximum variable modifications per peptide (--var-mods) |
 | `var_mods` | `str` | `` | — | Extra variable mods, semicolon-separated `<name>,<mass>,<sites>` (each becomes a --var-mod argument), e.g. `UniMod:21,79.966331,STY` |
-| `mass_acc` | `float` | `—` | ≥ 0 | MS2 mass accuracy in ppm (--mass-acc); unset = DIA-NN auto-determines |
+| `mass_acc` | `float` | `—` | ≥ 0 | MS2 mass accuracy in ppm (--mass-acc); unset = DIA engine auto-determines |
 | `mass_acc_ms1` | `float` | `—` | ≥ 0 | MS1 mass accuracy in ppm (--mass-acc-ms1); unset = auto |
 | `scan_window` | `int` | `—` | ≥ 0 | Scan window radius (--window); unset = auto |
 | `smart_profiling` | `bool` | `False` | — | Adaptive library profiling (--smart-profiling) |
 | `peak_center` | `bool` | `False` | — | Robust (peak-centred) quantification (--peak-center) |
 | `no_ifs_removal` | `bool` | `False` | — | Disable interference removal (--no-ifs-removal) |
 | `report_lib_info` | `bool` | `False` | — | Add the library's own columns to report.tsv (--report-lib-info) |
-| `individual_mass_acc` | `bool` | `False` | — | Determine mass accuracy per run instead of once for the batch (--individual-mass-acc); FragPipe sets it for unrelated runs |
-| `individual_windows` | `bool` | `False` | — | Determine the scan window per run (--individual-windows); FragPipe sets it for unrelated runs |
+| `individual_mass_acc` | `bool` | `False` | — | Determine mass accuracy per run instead of once for the batch (--individual-mass-acc); workflow suite sets it for unrelated runs |
+| `individual_windows` | `bool` | `False` | — | Determine the scan window per run (--individual-windows); workflow suite sets it for unrelated runs |
 | `no_maxlfq` | `bool` | `False` | — | Disable MaxLFQ protein quantification (--no-maxlfq) |
 | `no_normalization` | `bool` | `False` | — | Disable cross-run normalization (--no-norm) |
 | `pg_level` | `int` | `—` | 枚举: 0, 1, 2 | Protein inference level (--pg-level): 0=isoform, 1=protein, 2=gene |
@@ -624,7 +624,7 @@
 | `temp_dir` | `str` | `` | — | Directory for intermediate .quant files (--temp) |
 | `extra_cmdline` | `str` | `` | — | Escape hatch: free-form extra args appended verbatim (e.g. `--no-cut-after-mod --individual-mass-acc`) |
 
-## `diaumpire`
+## `dia-pseudo`
 
 版本：`2.3.4`
 
@@ -633,7 +633,7 @@
 | 参数 | 类型 | 默认值 | 约束 | 说明 |
 |---|---|---|---|---|
 | `ram_gb` | `int` | `12` | ≥ 1 | JVM heap (-Xmx<N>G) |
-| `threads` | `int` | `7` | ≥ 1 | DIA-Umpire worker threads |
+| `threads` | `int` | `7` | ≥ 1 | DIA pseudo-spectra worker threads |
 | `RPmax` | `int` | `25` | ≥ 1 | Max precursor-fragment ratio |
 | `RFmax` | `int` | `500` | ≥ 1 | Max fragment-fragment ratio |
 | `CorrThreshold` | `float` | `0.0` | ≥ 0 | Precursor-fragment correlation cutoff |
@@ -675,9 +675,9 @@
 | `MinMZ` | `float` | `200.0` | ≥ 0 | Minimum m/z considered (SE.MinMZ) |
 | `MinPrecursorMass` | `float` | `600.0` | ≥ 0 | Minimum precursor mass (SE.MinPrecursorMass) |
 | `MaxPrecursorMass` | `float` | `5000.0` | ≥ 0 | Maximum precursor mass (SE.MaxPrecursorMass) |
-| `extra_params` | `str` | `` | — | Escape hatch: extra `key = value` lines appended to diaumpire_se.params (newline or ';' separated). Also how a V_SWATH variable-window table is supplied. |
+| `extra_params` | `str` | `` | — | Escape hatch: extra `key = value` lines appended to dia-pseudo_se.params (newline or ';' separated). Also how a V_SWATH variable-window table is supplied. |
 
-## `diatracer`
+## `dia-features`
 
 版本：`2.2.1`
 
@@ -694,9 +694,9 @@
 | `massDefectOffset` | `float` | `0.1` | ≥ 0 | Mass-defect offset (--massDefectOffset) |
 | `RFMax` | `int` | `500` | ≥ 1 | Top-N peaks per spectrum (--RFMax) |
 | `writeInter` | `bool` | `False` | — | Write intermediate files (--writeInter) |
-| `bruker_lib_dir` | `str` | `/opt/fragpipe-tools/diatracer/ext/bruker` | — | Path to ext/bruker dir containing libtimsdata-*.so (JVM -Dlibs.bruker.dir) |
+| `bruker_lib_dir` | `str` | `镜像内置（无需填写）` | — | Path to ext/bruker dir containing libtimsdata-*.so (JVM -Dlibs.bruker.dir) |
 
-## `easypqp`
+## `speclib-build`
 
 版本：`0.1.59`
 
@@ -706,7 +706,7 @@
 |---|---|---|---|---|
 | `max_delta_unimod` | `float` | `0.02` | ≥ 0 | Maximum Δ mass (Da) for UniMod annotation |
 | `max_delta_ppm` | `float` | `15.0` | ≥ 0 | Maximum Δ mass (ppm) for UniMod annotation |
-| `max_psm_pep` | `float` | `—` | ≥ 0; ≤ 1 | Maximum PSM posterior-error probability for inclusion. Unset = easypqp's own default, which differs per subcommand (0.5 for `convert`, 1 for `convertpsm`) — FragPipe passes neither, so a single value here silently over-filtered the glyco-DIA libraries |
+| `max_psm_pep` | `float` | `—` | ≥ 0; ≤ 1 | Maximum PSM posterior-error probability for inclusion. Unset = speclib-build's own default, which differs per subcommand (0.5 for `convert`, 1 for `convertpsm`) — workflow suite passes neither, so a single value here silently over-filtered the glyco-DIA libraries |
 | `fragment_types` | `str_list` | `["b", "y"]` | — | Allowed fragment ion types (a,b,c,x,y,z) |
 | `fragment_charges` | `str_list` | `["1", "2", "3", "4"]` | — | Allowed fragment ion charges |
 | `enable_specific_losses` | `bool` | `False` | — | Enable specific (residue-tied) fragment ion losses |
@@ -719,13 +719,13 @@
 | `perform_rt_calibration` | `bool` | `True` | — | Perform RT alignment across runs |
 | `perform_im_calibration` | `bool` | `True` | — | Perform IM alignment (timsTOF runs) |
 | `nofdr` | `bool` | `False` | — | Skip FDR reassessment (assume custom upstream FDR filtering) |
-| `diannpqp` | `bool` | `False` | — | Emit DIA-NN2-compatible PQP library alongside the TSV |
-| `unimod_xml` | `str` | `` | — | UniMod XML used for modification annotation (--unimod); empty = EasyPQP's bundled copy |
+| `diannpqp` | `bool` | `False` | — | Emit DIA engine2-compatible PQP library alongside the TSV |
+| `unimod_xml` | `str` | `` | — | UniMod XML used for modification annotation (--unimod); empty = spectral library builder's bundled copy |
 | `exclude_range` | `str` | `-1.5,3.5` | — | Mass-difference range NOT mapped to UniMod (--exclude-range), e.g. `-1.5,3.5` |
 | `enable_unannotated` | `bool` | `True` | — | Keep delta masses that have no UniMod match (--enable_unannotated) |
 | `enable_massdiff` | `bool` | `False` | — | Map mass differences reported by legacy search engines (--enable_massdiff) |
 | `precision_digits` | `int` | `—` | ≥ 0 | Digits of product m/z precision in the library (--precision_digits); unset = 6 |
-| `convert_from_psm` | `bool` | `False` | — | Build the library from psm.tsv via `easypqp convertpsm` instead of pepXML via `easypqp convert` |
+| `convert_from_psm` | `bool` | `False` | — | Build the library from psm.tsv via `speclib-build convertpsm` instead of pepXML via `speclib-build convert` |
 | `decoy_prefix` | `str` | `rev_` | — | Database decoy prefix used to flag decoy PSMs (--decoy_prefix, convertpsm only) |
 | `labile_mods` | `str` | `` | — | Adjust fragment masses of labile (glyco) modifications — one of oglyc / nglyc / nglyc+ (--labile_mods, convertpsm only); empty = regular, non-glyco |
 | `max_glycan_q` | `float` | `1.0` | ≥ 0; ≤ 1 | Maximum glycan q-value for a PSM to enter the library (--max_glycan_q, convertpsm only) |
@@ -739,10 +739,10 @@
 | `pi0_lambda` | `str` | `` | — | Non-parametric p-value estimation `<START> <END> <STEPS>` (--pi0_lambda), e.g. `0.1 0.5 0.05`, or `0.4 0 0` for a fixed value |
 | `proteotypic` | `bool` | `True` | — | Keep only proteotypic (unique, non-shared) peptides |
 | `consensus` | `bool` | `True` | — | Build consensus spectra instead of picking the best replicate |
-| `extra_convert_cmdline` | `str` | `` | — | Escape hatch: extra flags for each `easypqp convert` call |
-| `extra_library_cmdline` | `str` | `` | — | Escape hatch: extra flags for the `easypqp library` call |
+| `extra_convert_cmdline` | `str` | `` | — | Escape hatch: extra flags for each `speclib-build convert` call |
+| `extra_library_cmdline` | `str` | `` | — | Escape hatch: extra flags for the `speclib-build library` call |
 
-## `opair`
+## `glyco-localize`
 
 版本：`1.0.0`
 
@@ -752,7 +752,7 @@
 |---|---|---|---|---|
 | `ms1_tol` | `float` | `20.0` | ≥ 0 | Precursor mass tolerance (ppm) — CMD -c |
 | `ms2_tol` | `float` | `20.0` | ≥ 0 | Product-ion mass tolerance (ppm) — CMD -b |
-| `glyco_db` | `str` | `HexNAc(1),HexNAc(1)Hex(1),HexNAc(1)NeuAc(1),HexNAc(2)Hex(1),HexNAc(1)Hex(1)NeuAc(1),HexNAc(2)Hex(2),HexNAc(2)Hex(1)NeuAc(1),HexNAc(1)Hex(1)NeuAc(2),HexNAc(2)Hex(2)NeuAc(1),HexNAc(2)Hex(2)Fuc(1)NeuAc(1),HexNAc(2)Hex(2)NeuAc(2),HexNAc(2)Hex(2)Fuc(1)NeuAc(2)` | — | O-glycan composition list (comma-separated, FragPipe Byonic syntax) — CMD -g |
+| `glyco_db` | `str` | `HexNAc(1),HexNAc(1)Hex(1),HexNAc(1)NeuAc(1),HexNAc(2)Hex(1),HexNAc(1)Hex(1)NeuAc(1),HexNAc(2)Hex(2),HexNAc(2)Hex(1)NeuAc(1),HexNAc(1)Hex(1)NeuAc(2),HexNAc(2)Hex(2)NeuAc(1),HexNAc(2)Hex(2)Fuc(1)NeuAc(1),HexNAc(2)Hex(2)NeuAc(2),HexNAc(2)Hex(2)Fuc(1)NeuAc(2)` | — | O-glycan composition list (comma-separated, workflow suite Byonic syntax) — CMD -g |
 | `max_glycans` | `int` | `4` | ≥ 1 | Maximum glycans per PSM — CMD -n |
 | `min_isotope_error` | `int` | `0` | — | Min isotope-error offset — CMD -i |
 | `max_isotope_error` | `int` | `2` | — | Max isotope-error offset — CMD -j |
@@ -760,15 +760,15 @@
 | `oxonium_filter_file` | `str` | `` | — | Custom oxonium rules file path (empty = use CMD's default list) |
 | `oxonium_min_intensity` | `float` | `0.05` | ≥ 0; ≤ 1 | Minimum relative oxonium intensity for filtering (0-1) — CMD -m |
 | `threads` | `int` | `0` | ≥ 0 | Worker threads (0 = auto) — CMD -t |
-| `glycan_residues_file` | `str` | `/opt/fragpipe-tools/glycan-databases/glycan_residues.txt` | — | Glycan residue definitions (FragPipe Glycan_Databases) — CMD -x |
-| `glycan_mods_file` | `str` | `/opt/fragpipe-tools/glycan-databases/glycan_mods.txt` | — | Glycan modification definitions (FragPipe Glycan_Databases) — CMD -y |
-| `dotnet_bin` | `str` | `/opt/dotnet/dotnet` | — | .NET 6 runtime executable |
+| `glycan_residues_file` | `str` | `镜像内置（无需填写）` | — | Glycan residue definitions (workflow suite Glycan_Databases) — CMD -x |
+| `glycan_mods_file` | `str` | `镜像内置（无需填写）` | — | Glycan modification definitions (workflow suite Glycan_Databases) — CMD -y |
+| `dotnet_bin` | `str` | `镜像内置（无需填写）` | — | .NET 6 runtime executable |
 | `activation1` | `str` | `HCD` | — | Primary scan activation for PairScans (glycan/oxonium scan) |
 | `activation2` | `str` | `ETD` | — | Paired scan activation for PairScans (peptide-backbone scan) |
 | `verbosity` | `enum` | `normal` | 枚举: none, minimal, normal | How much CMD writes to the log — CMD -v |
-| `extra_cmdline` | `str` | `` | — | Escape hatch: extra O-Pair CMD flags appended verbatim |
+| `extra_cmdline` | `str` | `` | — | Escape hatch: extra glyco localizer CMD flags appended verbatim |
 
-## `msbooster`
+## `predict-rescore`
 
 版本：`1.4.14`
 
@@ -778,30 +778,30 @@
 |---|---|---|---|---|
 | `ram_gb` | `int` | `16` | — | Java heap (-XmxN G) |
 | `num_threads` | `int` | `8` | — | Worker threads (numThreads) |
-| `diann_path` | `str` | `/opt/fragpipe-tools/fragpipe-24.0/tools/diann/1.8.2_beta_8/linux/diann-1.8.1.8` | — | Path to local DIA-NN binary |
+| `diann_path` | `str` | `镜像内置（无需填写）` | — | Path to local DIA engine binary |
 | `use_rt` | `bool` | `True` | — | Predict RT (useRT) |
 | `use_spectra` | `bool` | `True` | — | Predict spectra (useSpectra) |
 | `use_im` | `bool` | `False` | — | Predict ion mobility (useIM) |
-| `rt_model` | `str` | `DIA-NN` | — | RT prediction model (rtModel) |
-| `spectra_model` | `str` | `DIA-NN` | — | Spectra prediction model (spectraModel) |
-| `unimod_obo` | `str` | `/opt/fragpipe-tools/fragpipe-24.0/tools/unimod.obo` | — | Path to unimod.obo for modification lookup |
-| `msbooster_jar` | `str` | `/opt/fragpipe-tools/fragpipe-24.0/tools/MSBooster-1.4.14.jar` | — | Path to MSBooster jar |
-| `batmass_io_jar` | `str` | `/opt/fragpipe-tools/fragpipe-24.0/tools/batmass-io-1.36.5.jar` | — | Path to batmass-io jar (required for mzML reading) |
-| `im_model` | `str` | `DIA-NN` | — | Ion-mobility prediction model (imModel) |
-| `use_koina` | `bool` | `False` | — | Use a remote Koina server for predictions instead of the local DIA-NN (useKoina). Requires koina_url and network access from the sandbox |
+| `rt_model` | `str` | `DIA engine` | — | RT prediction model (rtModel) |
+| `spectra_model` | `str` | `DIA engine` | — | Spectra prediction model (spectraModel) |
+| `unimod_obo` | `str` | `镜像内置（无需填写）` | — | Path to unimod.obo for modification lookup |
+| `msbooster_jar` | `str` | `镜像内置（无需填写）` | — | Path to rescoring predictor jar |
+| `batmass_io_jar` | `str` | `镜像内置（无需填写）` | — | Path to spectrum IO jar (required for mzML reading) |
+| `im_model` | `str` | `DIA engine` | — | Ion-mobility prediction model (imModel) |
+| `use_koina` | `bool` | `False` | — | Use a remote Koina server for predictions instead of the local DIA engine (useKoina). Requires koina_url and network access from the sandbox |
 | `koina_url` | `str` | `` | — | Koina server URL (KoinaURL); only used when use_koina is on |
 | `find_best_rt_model` | `bool` | `False` | — | Benchmark the available RT models and keep the best (findBestRtModel) |
 | `find_best_spectra_model` | `bool` | `False` | — | Benchmark the available spectra models and keep the best (findBestSpectraModel) |
 | `find_best_im_model` | `bool` | `False` | — | Benchmark the available IM models and keep the best (findBestImModel) |
 | `fragmentation_type` | `str` | `auto` | — | Fragmentation type passed to the predictor (FragmentationType): auto, HCD, CID, ETD, ETHCD, … |
 | `instrument` | `str` | `` | — | Instrument type hint for the predictor (instrument), e.g. `QE`, `LUMOS`, `TIMSTOF` |
-| `ppm_tolerance` | `float` | `—` | ≥ 0 | Fragment matching tolerance in ppm (ppmTolerance); unset = MSBooster default 20 |
+| `ppm_tolerance` | `float` | `—` | ≥ 0 | Fragment matching tolerance in ppm (ppmTolerance); unset = rescoring predictor default 20 |
 | `use_detect` | `bool` | `False` | — | Add detectability features (useDetect) |
-| `features` | `str` | `` | — | Explicit feature list written into the pin (features), comma-separated. Empty = MSBooster's default feature set |
+| `features` | `str` | `` | — | Explicit feature list written into the pin (features), comma-separated. Empty = rescoring predictor's default feature set |
 | `delete_predictions` | `bool` | `False` | — | Delete prediction files after the run (deletePreds) |
-| `extra_params` | `str` | `` | — | Escape hatch: extra `key = value` lines appended to msbooster_params.txt (newline or ';' separated). Covers the remaining ~100 MSBooster keys |
+| `extra_params` | `str` | `` | — | Escape hatch: extra `key = value` lines appended to predict-rescore_params.txt (newline or ';' separated). Covers the remaining ~100 rescoring predictor keys |
 
-## `iprophet`
+## `psm-integrate`
 
 版本：`5.1.0`
 
@@ -823,7 +823,7 @@
 | `no_nsp` | `bool` | `False` | — | Disable NSP model (--nonsp) |
 | `no_nss` | `bool` | `False` | — | Disable NSS model (--nonss) |
 
-## `proteinprophet`
+## `protein-infer`
 
 版本：`5.1.0`
 
@@ -831,10 +831,10 @@
 
 | 参数 | 类型 | 默认值 | 约束 | 说明 |
 |---|---|---|---|---|
-| `max_ppm_diff` | `int` | `2000000` | — | Max peptide mass difference (ppm) for protein grouping (--maxppmdiff). FragPipe baseline uses 2000000 (effectively disabled — group only on sequence). |
+| `max_ppm_diff` | `int` | `2000000` | — | Max peptide mass difference (ppm) for protein grouping (--maxppmdiff). workflow suite baseline uses 2000000 (effectively disabled — group only on sequence). |
 | `min_prob` | `float` | `0.05` | — | Minimum peptide probability to include (--minprob) |
-| `output_prefix` | `str` | `combined` | — | Output filename prefix (--output); produces <prefix>.prot.xml. FragPipe baseline uses 'combined'. |
-| `iprophet` | `bool` | `False` | — | Tell proteinprophet input is from iProphet (--iprophet) |
+| `output_prefix` | `str` | `combined` | — | Output filename prefix (--output); produces <prefix>.prot.xml. workflow suite baseline uses 'combined'. |
+| `iprophet` | `bool` | `False` | — | Tell protein-infer input is from PSM integrator (--psm-integrate) |
 | `no_nsp` | `bool` | `False` | — | Disable NSP model (--nonsp) |
 | `subgroups` | `bool` | `False` | — | Enable subgroups (--subgroups; baseline omits → no groups) |
 | `unmapped` | `bool` | `False` | — | Report UNMAPPED proteins (--unmapped) |

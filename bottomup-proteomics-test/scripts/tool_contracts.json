@@ -22,7 +22,7 @@
     ],
     "multi_parent": "single"
   },
-  "msfragger-closed": {
+  "search-closed": {
     "version": "4.4",
     "supported_input_extensions": [
       ".mzML",
@@ -34,7 +34,7 @@
     ],
     "multi_parent": "single"
   },
-  "crystalc": {
+  "precursor-refine": {
     "version": "1.5.10",
     "supported_input_extensions": [
       ".pepXML",
@@ -46,7 +46,7 @@
     ],
     "multi_parent": "single"
   },
-  "percolator": {
+  "rescore": {
     "version": "3.08",
     "supported_input_extensions": [
       ".pin",
@@ -58,8 +58,8 @@
     ],
     "multi_parent": "single"
   },
-  "percolator-to-pepxml": {
-    "version": "fragpipe-24.1",
+  "rescore-export": {
+    "version": "workflow suite-24.1",
     "supported_input_extensions": [
       ".pin",
       ".pepXML",
@@ -71,7 +71,7 @@
     ],
     "multi_parent": "single"
   },
-  "philosopher-database": {
+  "database": {
     "version": "5.1.0",
     "supported_input_extensions": [
       ".fasta",
@@ -82,7 +82,7 @@
     ],
     "multi_parent": "single"
   },
-  "peptideprophet": {
+  "validate-psm": {
     "version": "5.1.0",
     "supported_input_extensions": [
       ".pepXML",
@@ -94,7 +94,7 @@
     ],
     "multi_parent": "single"
   },
-  "ptmprophet": {
+  "ptm-localize": {
     "version": "6.3.2",
     "supported_input_extensions": [
       ".pepXML",
@@ -107,7 +107,7 @@
     ],
     "multi_parent": "optional"
   },
-  "philosopher-report": {
+  "report": {
     "version": "5.1.0",
     "supported_input_extensions": [
       ".pepXML",
@@ -122,7 +122,7 @@
     ],
     "multi_parent": "single"
   },
-  "freequant": {
+  "quant-lfq": {
     "version": "5.1.0",
     "supported_input_extensions": [
       ".tsv",
@@ -138,7 +138,7 @@
     ],
     "multi_parent": "optional"
   },
-  "labelquant": {
+  "quant-reporter": {
     "version": "5.1.0",
     "supported_input_extensions": [
       ".tsv",
@@ -154,7 +154,7 @@
     ],
     "multi_parent": "optional"
   },
-  "abacus": {
+  "aggregate-reports": {
     "version": "5.1.0",
     "supported_input_extensions": [
       ".tsv",
@@ -169,7 +169,7 @@
     ],
     "multi_parent": "required"
   },
-  "ionquant": {
+  "quant": {
     "version": "1.11.20",
     "supported_input_extensions": [
       ".mzML",
@@ -185,7 +185,7 @@
     ],
     "multi_parent": "optional"
   },
-  "ptmshepherd": {
+  "ptm-profile": {
     "version": "3.0.11",
     "supported_input_extensions": [
       ".tsv",
@@ -196,7 +196,7 @@
     ],
     "multi_parent": "single"
   },
-  "tmtintegrator": {
+  "quant-isobaric": {
     "version": "6.2.1",
     "supported_input_extensions": [
       ".tsv"
@@ -207,7 +207,7 @@
     ],
     "multi_parent": "required"
   },
-  "diann": {
+  "dia-search": {
     "version": "1.8.2-beta8",
     "supported_input_extensions": [
       ".mzML",
@@ -222,7 +222,7 @@
     ],
     "multi_parent": "optional"
   },
-  "diaumpire": {
+  "dia-pseudo": {
     "version": "2.3.4",
     "supported_input_extensions": [
       ".mzML",
@@ -235,17 +235,17 @@
     ],
     "multi_parent": "single"
   },
-  "diatracer": {
+  "dia-features": {
     "version": "2.2.1",
     "supported_input_extensions": [
       ".d"
     ],
     "expected_output_patterns": [
-      "*_diatracer.mzML"
+      "*_dia-features.mzML"
     ],
     "multi_parent": "single"
   },
-  "easypqp": {
+  "speclib-build": {
     "version": "0.1.59",
     "supported_input_extensions": [
       ".xml",
@@ -259,7 +259,7 @@
     ],
     "multi_parent": "optional"
   },
-  "opair": {
+  "glyco-localize": {
     "version": "1.0.0",
     "supported_input_extensions": [
       ".tsv",
@@ -271,7 +271,7 @@
     ],
     "multi_parent": "optional"
   },
-  "msbooster": {
+  "predict-rescore": {
     "version": "1.4.14",
     "supported_input_extensions": [
       ".pin",
@@ -284,7 +284,7 @@
     ],
     "multi_parent": "single"
   },
-  "iprophet": {
+  "psm-integrate": {
     "version": "5.1.0",
     "supported_input_extensions": [
       ".pepXML",
@@ -295,7 +295,7 @@
     ],
     "multi_parent": "optional"
   },
-  "proteinprophet": {
+  "protein-infer": {
     "version": "5.1.0",
     "supported_input_extensions": [
       ".pepXML",
