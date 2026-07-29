@@ -201,15 +201,33 @@ def _check_params(step: dict, errs: list) -> None:
                       f"步 {step.get('step_id')}({step.get('tool')})")
 
 
-def validate_with_fs(cfg: dict) -> dict:
-    """validate_config(纯规则) + 本地大文件硬拦(>100MB 逼 make_dataset)。
-    submit_pipeline 调用此接口;返回 {"ok": bool, "errors": list[str]}。"""
+def _check_local_input(v, base, field, errs):
+    """校验本地输入；相对路径与 submit 一样按 pipeline.json 所在目录解析。"""
+    if not isinstance(v, str) or v.startswith("/bohr/"):
+        return
+    path = v if os.path.isabs(v) else os.path.join(base or ".", v)
+    if not os.path.exists(path):
+        errs.append(
+            f"{field} 的本地文件不存在: {v}(按 pipeline.json 所在目录解析为 {path})。"
+            "用真实文件名修正；/bohr 路径只能来自 dataset 脚本返回值，不能猜。"
+        )
+        return
+    mb = os.path.getsize(path) / (1024 * 1024)
+    if field == "raw_files" and mb > _MAX_LOCAL_MB:
+        errs.append(
+            f"本地输入 {v} = {mb:.0f}MB > {_MAX_LOCAL_MB}MB,不能随作业打包上传。"
+            f"请先用 make_dataset.py 注册并使用返回的 /bohr 挂载路径。"
+        )
+
+
+def validate_with_fs(cfg: dict, base: str | None = None) -> dict:
+    """规则校验 + 本地输入存在性/体积校验；base 与 submit 的暂存基准一致。"""
     errs = validate_config(cfg)
     for p in (cfg.get("raw_files") or []):
-        if isinstance(p, str) and not p.startswith("/bohr/") and os.path.exists(p):
-            mb = os.path.getsize(p) / (1024 * 1024)
-            if mb > _MAX_LOCAL_MB:
-                errs.append(f"本地输入 {p} = {mb:.0f}MB > {_MAX_LOCAL_MB}MB,须 make_dataset 注册")
+        _check_local_input(p, base, "raw_files", errs)
+    for key in ("fasta_path", "annotation_path"):
+        if cfg.get(key):
+            _check_local_input(cfg[key], base, key, errs)
     return {"ok": not errs, "errors": errs}
 
 
@@ -219,7 +237,10 @@ def main(argv=None) -> int:
         print("usage: validate_pipeline.py pipeline.json", file=sys.stderr)
         return 2
     cfg = json.loads(open(args[0]).read())
-    vres = validate_with_fs(cfg)
+    vres = validate_with_fs(
+        cfg,
+        base=os.path.dirname(os.path.abspath(args[0])),
+    )
     for e in vres["errors"]:
         print(f"ERROR: {e}", file=sys.stderr)
     print(json.dumps(vres, ensure_ascii=False))

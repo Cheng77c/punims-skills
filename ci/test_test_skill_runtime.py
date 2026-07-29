@@ -108,5 +108,37 @@ class TestDatasetMountDerivation(unittest.TestCase):
         self.assertEqual(errors[0]["field"], "inputs.feature")
 
 
+class TestValidatorSubmitContract(unittest.TestCase):
+    def test_bottomup_validator_accepts_submit_base_and_resolves_relative_inputs(self):
+        module = load_script("bottomup", "validate_pipeline.py")
+        with tempfile.TemporaryDirectory() as directory:
+            base = Path(directory)
+            (base / "run.mzML").write_bytes(b"fixture")
+            (base / "db.fasta").write_text(">p1\nPEPTIDE\n")
+            result = module.validate_with_fs(
+                {
+                    "template_id": "basic-search",
+                    "raw_files": ["run.mzML"],
+                    "fasta_path": "db.fasta",
+                },
+                base=str(base),
+            )
+        self.assertTrue(result["ok"], result["errors"])
+
+    def test_topdown_validator_accepts_submit_base_and_resolves_relative_inputs(self):
+        module = load_script("topdown", "validate_pipeline.py")
+        with tempfile.TemporaryDirectory() as directory:
+            base = Path(directory)
+            (base / "run.raw").write_bytes(b"fixture")
+            result = module.validate_with_fs(
+                {
+                    "steps": [{"tool": "msconvert", "params": {}}],
+                    "inputs": {"spectrum": "run.raw"},
+                },
+                base=str(base),
+            )
+        self.assertTrue(result["ok"], result["errors"])
+
+
 if __name__ == "__main__":
     unittest.main()

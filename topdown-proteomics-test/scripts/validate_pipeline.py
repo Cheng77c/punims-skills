@@ -218,17 +218,20 @@ def validate(cfg: dict) -> dict:
 MAX_LOCAL_INPUT_MB = 100
 
 
-def validate_with_fs(cfg: dict) -> dict:
-    """validate + 本地输入存在性 + 体积上限(/bohr 挂载路径跳过)。"""
+def validate_with_fs(cfg: dict, base: str | None = None) -> dict:
+    """validate + 本地输入存在性/体积校验；相对路径按 pipeline 目录解析。"""
     res = validate(cfg)
     errors = res["errors"]
+    bdir = Path(base) if base else None
     for k, v in (cfg.get("inputs") or {}).items():
         if not v or str(v).startswith("/bohr/"):
             continue
         p = Path(v)
+        if not p.is_absolute() and bdir is not None:
+            p = bdir / p
         if not p.exists():
             errors.append(_err("inputs", None, k, f"本地文件不存在: {v}",
-                               fix="确认路径,或用 /bohr 挂载/dataset"))
+                               fix="确认真实路径；/bohr 路径只能来自 dataset 脚本返回值，不能猜。"))
             continue
         size_mb = p.stat().st_size / (1024 * 1024)
         if size_mb > MAX_LOCAL_INPUT_MB:
@@ -244,7 +247,7 @@ def main(argv=None) -> int:
     ap.add_argument("--pipeline", required=True)
     a = ap.parse_args(argv)
     cfg = json.loads(Path(a.pipeline).read_text())
-    res = validate_with_fs(cfg)
+    res = validate_with_fs(cfg, base=str(Path(a.pipeline).resolve().parent))
     print(json.dumps(res, ensure_ascii=False))
     return 0 if res["ok"] else 1
 

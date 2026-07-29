@@ -106,6 +106,9 @@ def check_domain(domain: str, failures: list[str]) -> None:
     )
 
     expected = {
+        "scripts/validate_pipeline.py": (
+            "def validate_with_fs(cfg: dict, base:",
+        ),
         "scripts/make_dataset.py": ("def _api_json",),
         "scripts/submit_pipeline.py": (
             "def _child_env",
