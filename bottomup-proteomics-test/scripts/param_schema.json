@@ -2157,12 +2157,12 @@
       "default": true,
       "description": "search engine already localized delta-mass fragment ions (pair with the search node's localize_delta_mass)"
     },
-    "use_msfragger_localization": {
+    "reuse_search_localization": {
       "type": "bool",
       "default": false,
       "description": "Reuse search engine's localization columns instead of re-localizing. Requires a psm.tsv that still carries them (no rescorer / precursor refiner in between)"
     },
-    "msfragger_massdiff_to_varmod": {
+    "mass_delta_to_variable_mods": {
       "type": "bool",
       "default": false,
       "description": "Re-synthesise variable mods from Delta Mass. Only for a psm.tsv whose `Modified Peptide` column is empty"
@@ -2297,7 +2297,7 @@
       "default": false,
       "description": "Retain intermediate + spectrum-level outputs"
     },
-    "prep_for_ionquant": {
+    "prepare_for_quant": {
       "type": "bool",
       "default": false,
       "description": "Prepare PSM table for downstream quantifier"

@@ -467,8 +467,8 @@
 | `localization_background` | `int` | `4` | 枚举: 1, 2, 3, 4 | Localization enrichment background: 1=bin peptides, 2=bin PSMs, 3=all peptides, 4=all PSMs |
 | `localization_allowed_res` | `str` | `` | — | Residues allowed to carry the shift (e.g. `STY`, `N`); empty = no restriction |
 | `localize_delta_mass` | `bool` | `True` | — | search engine already localized delta-mass fragment ions (pair with the search node's localize_delta_mass) |
-| `use_msfragger_localization` | `bool` | `False` | — | Reuse search engine's localization columns instead of re-localizing. Requires a psm.tsv that still carries them (no rescorer / precursor refiner in between) |
-| `msfragger_massdiff_to_varmod` | `bool` | `False` | — | Re-synthesise variable mods from Delta Mass. Only for a psm.tsv whose `Modified Peptide` column is empty |
+| `reuse_search_localization` | `bool` | `False` | — | Reuse search engine's localization columns instead of re-localizing. Requires a psm.tsv that still carries them (no rescorer / precursor refiner in between) |
+| `mass_delta_to_variable_mods` | `bool` | `False` | — | Re-synthesise variable mods from Delta Mass. Only for a psm.tsv whose `Modified Peptide` column is empty |
 | `annotate_assigned_mods` | `bool` | `False` | — | Annotate shifts using the PSM table's assigned modifications |
 | `annotation_file` | `str` | `` | — | `glyco`, `unimod`, `common`, or path to custom annotation table; empty = unimod |
 | `annotation_tol` | `float` | `0.01` | ≥ 0 | Mass tolerance (Da) for matching shifts to known modifications |
@@ -491,7 +491,7 @@
 | `iontype_z` | `bool` | `False` | — | Use z-ions |
 | `compare_betweenRuns` | `bool` | `False` | — | Allow spectral similarity / RT calculation across runs |
 | `output_extended` | `bool` | `False` | — | Retain intermediate + spectrum-level outputs |
-| `prep_for_ionquant` | `bool` | `False` | — | Prepare PSM table for downstream quantifier |
+| `prepare_for_quant` | `bool` | `False` | — | Prepare PSM table for downstream quantifier |
 | `glycodatabase` | `str` | `` | — | Glycan database: comma-separated compositions (e.g. `HexNAc(2)Hex(3)`) or a path to a .glyc file; empty = PTM profiler default |
 | `glyco_fdr` | `float` | `0.01` | ≥ 0; ≤ 1 | Glycan assignment FDR |
 | `glyco_ppm_tol` | `float` | `30.0` | ≥ 0 | Precursor ppm tolerance for glycan mass matching |
