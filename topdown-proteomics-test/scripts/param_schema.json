@@ -1,0 +1,1124 @@
+{
+  "msconvert": {
+    "output_format": {
+      "type": "enum",
+      "default": "mzML",
+      "description": "Output format",
+      "enum": [
+        "mzML",
+        "mzXML",
+        "mz5",
+        "mzMLb",
+        "mgf",
+        "text",
+        "ms1",
+        "ms2",
+        "cms1",
+        "cms2"
+      ],
+      "primary": true
+    },
+    "precision": {
+      "type": "int",
+      "default": 64,
+      "description": "Binary precision (bits)",
+      "enum": [
+        32,
+        64
+      ],
+      "primary": true
+    },
+    "zlib": {
+      "type": "bool",
+      "default": true,
+      "description": "Enable zlib compression",
+      "primary": true
+    },
+    "filters": {
+      "type": "str_list",
+      "default": [
+        "peakPicking true 1-"
+      ],
+      "description": "Spectrum list filters，每行一条；默认含质心化 filter",
+      "primary": true
+    },
+    "chromatogram_filters": {
+      "type": "str_list",
+      "default": [],
+      "description": "Repeated chromatogram filters"
+    },
+    "extension": {
+      "type": "str",
+      "default": null,
+      "description": "Output extension override"
+    },
+    "mz_precision": {
+      "type": "int",
+      "default": null,
+      "description": "m/z precision"
+    },
+    "inten_precision": {
+      "type": "int",
+      "default": null,
+      "description": "Intensity precision"
+    },
+    "mz_truncation": {
+      "type": "int",
+      "default": null,
+      "description": "m/z truncation bits"
+    },
+    "inten_truncation": {
+      "type": "int",
+      "default": null,
+      "description": "Intensity truncation bits"
+    },
+    "mz_delta": {
+      "type": "bool",
+      "default": false,
+      "description": "Enable m/z delta prediction"
+    },
+    "inten_delta": {
+      "type": "bool",
+      "default": false,
+      "description": "Enable intensity delta prediction"
+    },
+    "mz_linear": {
+      "type": "bool",
+      "default": false,
+      "description": "Enable m/z linear prediction"
+    },
+    "inten_linear": {
+      "type": "bool",
+      "default": false,
+      "description": "Enable intensity linear prediction"
+    },
+    "noindex": {
+      "type": "bool",
+      "default": false,
+      "description": "Disable index generation"
+    },
+    "numpress_linear": {
+      "type": "bool",
+      "default": false,
+      "description": "Enable numpress linear prediction compression for m/z and RT"
+    },
+    "numpress_linear_abs_tol": {
+      "type": "float",
+      "default": null,
+      "description": "Numpress linear absolute tolerance"
+    },
+    "numpress_pic": {
+      "type": "bool",
+      "default": false,
+      "description": "Enable numpress pic"
+    },
+    "numpress_slof": {
+      "type": "bool",
+      "default": false,
+      "description": "Enable numpress slof"
+    },
+    "numpress_all": {
+      "type": "bool",
+      "default": false,
+      "description": "Enable all numpress codecs"
+    },
+    "outfile": {
+      "type": "str",
+      "default": null,
+      "description": "Output file name"
+    },
+    "contact_info": {
+      "type": "str",
+      "default": null,
+      "description": "Contact info file"
+    },
+    "filelist": {
+      "type": "str",
+      "default": null,
+      "description": "Input file list"
+    },
+    "config_file": {
+      "type": "str",
+      "default": null,
+      "description": "msconvert config file"
+    },
+    "verbose": {
+      "type": "bool",
+      "default": true,
+      "description": "Verbose logging"
+    },
+    "single_threaded": {
+      "type": "bool",
+      "default": false,
+      "description": "Single-threaded conversion"
+    },
+    "continue_on_error": {
+      "type": "bool",
+      "default": false,
+      "description": "Continue on error"
+    },
+    "merge": {
+      "type": "bool",
+      "default": false,
+      "description": "Merge multiple inputs"
+    },
+    "combine_ion_mobility_spectra": {
+      "type": "bool",
+      "default": false,
+      "description": "Combine ion mobility spectra"
+    },
+    "dda_processing": {
+      "type": "bool",
+      "default": false,
+      "description": "Enable DDA processing"
+    },
+    "gzip": {
+      "type": "bool",
+      "default": false,
+      "description": "Gzip output"
+    },
+    "sim_as_spectra": {
+      "type": "bool",
+      "default": false,
+      "description": "Write SIM as spectra"
+    },
+    "srm_as_spectra": {
+      "type": "bool",
+      "default": false,
+      "description": "Write SRM as spectra"
+    },
+    "ignore_calibration_scans": {
+      "type": "bool",
+      "default": false,
+      "description": "Ignore calibration scans"
+    },
+    "accept_zero_length_spectra": {
+      "type": "bool",
+      "default": false,
+      "description": "Accept zero-length spectra"
+    },
+    "ignore_missing_zero_samples": {
+      "type": "bool",
+      "default": false,
+      "description": "Ignore missing zero samples"
+    },
+    "ignore_unknown_instrument_error": {
+      "type": "bool",
+      "default": false,
+      "description": "Ignore unknown instrument errors"
+    },
+    "strip_location_from_source_files": {
+      "type": "bool",
+      "default": false,
+      "description": "Strip source file location"
+    },
+    "strip_version_from_software": {
+      "type": "bool",
+      "default": false,
+      "description": "Strip software version"
+    },
+    "mzmlb_chunk_size": {
+      "type": "int",
+      "default": null,
+      "description": "mzMLb chunk size"
+    },
+    "mzmlb_compression_level": {
+      "type": "int",
+      "default": null,
+      "description": "mzMLb compression level"
+    },
+    "run_index_set": {
+      "type": "str",
+      "default": null,
+      "description": "Run index set"
+    }
+  },
+  "topfd": {
+    "activation": {
+      "type": "enum",
+      "default": "FILE",
+      "description": "MS/MS activation",
+      "enum": [
+        "FILE",
+        "CID",
+        "ETD",
+        "HCD",
+        "MPD",
+        "UVPD"
+      ],
+      "primary": true
+    },
+    "max_charge": {
+      "type": "int",
+      "default": 30,
+      "description": "Maximum charge",
+      "primary": true
+    },
+    "max_mass": {
+      "type": "float",
+      "default": 70000.0,
+      "description": "Maximum mass",
+      "primary": true
+    },
+    "mz_error": {
+      "type": "float",
+      "default": 0.02,
+      "description": "m/z tolerance (Da)",
+      "primary": true
+    },
+    "ms_one_sn_ratio": {
+      "type": "float",
+      "default": 3.0,
+      "description": "MS1 S/N ratio",
+      "primary": true
+    },
+    "ms_two_sn_ratio": {
+      "type": "float",
+      "default": 1.0,
+      "description": "MS2 S/N ratio",
+      "primary": true
+    },
+    "precursor_window": {
+      "type": "float",
+      "default": 3.0,
+      "description": "Precursor window (m/z)"
+    },
+    "thread_number": {
+      "type": "int",
+      "default": 4,
+      "description": "Thread count",
+      "min": 1,
+      "primary": true
+    },
+    "use_msdeconv": {
+      "type": "bool",
+      "default": false,
+      "description": "Use MS-Deconv score instead of the default EnvCNN scorer"
+    },
+    "env_cnn_cutoff": {
+      "type": "float",
+      "default": 0.0,
+      "description": "EnvCNN score cutoff for MS/MS envelopes [0,1]",
+      "min": 0.0,
+      "max": 1.0
+    },
+    "ecscore_cutoff": {
+      "type": "float",
+      "default": 0.1,
+      "description": "ECScore cutoff for proteoform features [0,1]",
+      "min": 0.0,
+      "max": 1.0,
+      "primary": true
+    },
+    "min_scan_number": {
+      "type": "int",
+      "default": 1,
+      "description": "Minimum MS1 scans for a proteoform feature (1|2|3)",
+      "enum": [
+        1,
+        2,
+        3
+      ]
+    },
+    "split_intensity_ratio": {
+      "type": "float",
+      "default": 2.5,
+      "description": "Intensity ratio required to split a feature",
+      "min": 0.0,
+      "xmin": true
+    },
+    "missing_level_one": {
+      "type": "bool",
+      "default": false,
+      "description": "Missing MS1 spectra"
+    },
+    "single_scan_noise": {
+      "type": "bool",
+      "default": false,
+      "description": "Use per-MS1-scan noise instead of LC-MS-wide noise"
+    },
+    "disable_additional_feature_search": {
+      "type": "bool",
+      "default": false,
+      "description": "Disable the additional proteoform feature search"
+    },
+    "disable_frag_num_filtering": {
+      "type": "bool",
+      "default": false,
+      "description": "Skip MS/MS fragment-number-based envelope filtering"
+    },
+    "skip_html_folder": {
+      "type": "bool",
+      "default": false,
+      "description": "Skip HTML folder"
+    },
+    "extra_cmdline": {
+      "type": "str",
+      "default": "",
+      "description": "Escape hatch: extra topfd arguments inserted before the spectrum file (shell-quoted)"
+    }
+  },
+  "toppic": {
+    "activation": {
+      "type": "enum",
+      "default": "FILE",
+      "description": "Activation type",
+      "enum": [
+        "FILE",
+        "CID",
+        "ETD",
+        "HCD",
+        "MPD",
+        "UVPD"
+      ],
+      "primary": true
+    },
+    "fixed_mod": {
+      "type": "str",
+      "default": null,
+      "description": "Fixed modification (C57|C58|<file>)",
+      "primary": true
+    },
+    "n_terminal_form": {
+      "type": "str",
+      "default": null,
+      "description": "Allowed N-terminal forms (comma list of NONE/NME/NME_ACETYLATION/M_ACETYLATION)"
+    },
+    "proteoform_type": {
+      "type": "str",
+      "default": null,
+      "description": "Allowed proteoform types (comma list of COMPLETE/PREFIX/SUFFIX/INTERNAL)"
+    },
+    "thread_number": {
+      "type": "int",
+      "default": 4,
+      "description": "Thread count",
+      "min": 1,
+      "primary": true
+    },
+    "mass_error_tolerance": {
+      "type": "float",
+      "default": null,
+      "description": "Mass error tolerance (ppm); when lookup_table=true must be 5, 10, or 15",
+      "primary": true
+    },
+    "num_shift": {
+      "type": "int",
+      "default": null,
+      "description": "Maximum unexpected modifications per PrSM (0|1|2)",
+      "enum": [
+        0,
+        1,
+        2
+      ],
+      "primary": true
+    },
+    "min_shift": {
+      "type": "int",
+      "default": null,
+      "description": "Min shift (Da)"
+    },
+    "max_shift": {
+      "type": "int",
+      "default": null,
+      "description": "Max shift (Da)"
+    },
+    "variable_ptm_num": {
+      "type": "int",
+      "default": null,
+      "description": "Maximum variable modifications per PrSM"
+    },
+    "variable_ptm_file_name": {
+      "type": "str",
+      "default": null,
+      "description": "Variable modification file"
+    },
+    "proteoform_error_tolerance": {
+      "type": "float",
+      "default": null,
+      "description": "Proteoform cluster error tolerance (Da)"
+    },
+    "spectrum_cutoff_type": {
+      "type": "enum",
+      "default": null,
+      "description": "Spectrum cutoff type",
+      "enum": [
+        "EVALUE",
+        "FDR"
+      ],
+      "primary": true
+    },
+    "spectrum_cutoff_value": {
+      "type": "float",
+      "default": null,
+      "description": "Spectrum cutoff value",
+      "primary": true
+    },
+    "proteoform_cutoff_type": {
+      "type": "enum",
+      "default": null,
+      "description": "Proteoform cutoff type",
+      "enum": [
+        "EVALUE",
+        "FDR"
+      ],
+      "primary": true
+    },
+    "proteoform_cutoff_value": {
+      "type": "float",
+      "default": null,
+      "description": "Proteoform cutoff value",
+      "primary": true
+    },
+    "num_combined_spectra": {
+      "type": "int",
+      "default": null,
+      "description": "Number of combined spectra (alternating fragmentation)"
+    },
+    "mod_file_name": {
+      "type": "str",
+      "default": null,
+      "description": "Local PTM (common modification) file for unexpected-shift characterization"
+    },
+    "miscore_threshold": {
+      "type": "float",
+      "default": null,
+      "description": "Modification identification score threshold [0,1]",
+      "min": 0.0,
+      "max": 1.0
+    },
+    "decoy": {
+      "type": "bool",
+      "default": false,
+      "description": "Use decoy search",
+      "primary": true
+    },
+    "approximate_spectra": {
+      "type": "bool",
+      "default": false,
+      "description": "Use approximate spectra for protein filtering (faster, may reduce sensitivity)"
+    },
+    "lookup_table": {
+      "type": "bool",
+      "default": false,
+      "description": "Use lookup table for p/E-values; requires mass_error_tolerance ∈ {5, 10, 15} ppm"
+    },
+    "no_topfd_feature": {
+      "type": "bool",
+      "default": false,
+      "description": "No TopFD feature handoff"
+    },
+    "skip_html_folder": {
+      "type": "bool",
+      "default": false,
+      "description": "Skip HTML folder"
+    },
+    "keep_temp_files": {
+      "type": "bool",
+      "default": false,
+      "description": "Keep temp files"
+    },
+    "keep_decoy_ids": {
+      "type": "bool",
+      "default": false,
+      "description": "Keep decoy IDs"
+    },
+    "combined_file_name": {
+      "type": "str",
+      "default": null,
+      "description": "Combined output name"
+    },
+    "msalign_preflight_blocks": {
+      "type": "int",
+      "default": 10,
+      "description": "Msalign preflight sample blocks"
+    },
+    "extra_cmdline": {
+      "type": "str",
+      "default": "",
+      "description": "Escape hatch: extra toppic arguments inserted before the fasta/msalign positional arguments (shell-quoted)"
+    }
+  },
+  "flashdeconv": {
+    "write_msalign1": {
+      "type": "bool",
+      "default": true,
+      "description": "Emit MS1 msalign (TopFD/TopPIC compatible)",
+      "primary": true
+    },
+    "write_msalign2": {
+      "type": "bool",
+      "default": true,
+      "description": "Emit MS2 msalign (TopFD/TopPIC compatible)",
+      "primary": true
+    },
+    "write_feature1": {
+      "type": "bool",
+      "default": true,
+      "description": "Emit MS1 feature file (TopFD compatible)",
+      "primary": true
+    },
+    "write_feature2": {
+      "type": "bool",
+      "default": true,
+      "description": "Emit MS2 feature file (TopFD compatible)",
+      "primary": true
+    },
+    "write_spec1": {
+      "type": "bool",
+      "default": false,
+      "description": "Emit MS1 deconvolved spectrum TSV"
+    },
+    "write_spec2": {
+      "type": "bool",
+      "default": false,
+      "description": "Emit MS2 deconvolved spectrum TSV"
+    },
+    "write_spec3": {
+      "type": "bool",
+      "default": false,
+      "description": "Emit MS3 deconvolved spectrum TSV"
+    },
+    "write_spec4": {
+      "type": "bool",
+      "default": false,
+      "description": "Emit MS4 deconvolved spectrum TSV"
+    },
+    "write_deconv_mzml": {
+      "type": "bool",
+      "default": false,
+      "description": "Emit deconvolved mzML (all MS levels)"
+    },
+    "write_annotated_mzml": {
+      "type": "bool",
+      "default": false,
+      "description": "Emit annotated mzML retaining original peaks"
+    },
+    "write_quant_tsv": {
+      "type": "bool",
+      "default": false,
+      "description": "Emit isobaric quantification TSV"
+    },
+    "keep_empty_out": {
+      "type": "bool",
+      "default": false,
+      "description": "Retain empty TSV outputs"
+    },
+    "write_detail": {
+      "type": "bool",
+      "default": false,
+      "description": "Include detailed peak info in spectrum TSVs"
+    },
+    "mzml_mass_charge": {
+      "type": "int",
+      "default": null,
+      "description": "Charge state for masses in deconv mzML output",
+      "enum": [
+        -1,
+        0,
+        1
+      ]
+    },
+    "min_mz": {
+      "type": "float",
+      "default": null,
+      "description": "Minimum peak m/z"
+    },
+    "max_mz": {
+      "type": "float",
+      "default": null,
+      "description": "Maximum peak m/z"
+    },
+    "min_rt": {
+      "type": "float",
+      "default": null,
+      "description": "Minimum retention time (min)"
+    },
+    "max_rt": {
+      "type": "float",
+      "default": null,
+      "description": "Maximum retention time (min)"
+    },
+    "max_ms_level": {
+      "type": "int",
+      "default": null,
+      "description": "Maximum MS level (inclusive)"
+    },
+    "threads": {
+      "type": "int",
+      "default": 4,
+      "description": "Thread count",
+      "min": 1,
+      "primary": true
+    },
+    "debug": {
+      "type": "int",
+      "default": null,
+      "description": "Debug log level"
+    },
+    "log_file": {
+      "type": "str",
+      "default": null,
+      "description": "Optional log file path"
+    },
+    "ini_file": {
+      "type": "str",
+      "default": null,
+      "description": "Optional TOPP INI file path"
+    },
+    "no_progress": {
+      "type": "bool",
+      "default": false,
+      "description": "Disable progress logging"
+    },
+    "force": {
+      "type": "bool",
+      "default": false,
+      "description": "Override tool-specific checks"
+    },
+    "fd_ida_log": {
+      "type": "str",
+      "default": null,
+      "description": "Path to FLASHIda log for acquisition coupling"
+    },
+    "fd_report_fdr": {
+      "type": "bool",
+      "default": false,
+      "description": "Report q-values via decoy FDR (Beta)"
+    },
+    "fd_allowed_isotope_error": {
+      "type": "int",
+      "default": null,
+      "description": "Allowed isotope index error in FDR calculation"
+    },
+    "fd_use_rna_averagine": {
+      "type": "bool",
+      "default": false,
+      "description": "Use RNA averagine model"
+    },
+    "fd_precursor_ms1_window": {
+      "type": "int",
+      "default": null,
+      "description": "MS1 spectra window around each MS2 for precursor search",
+      "min": 1
+    },
+    "fd_isolation_window": {
+      "type": "float",
+      "default": null,
+      "description": "Fallback precursor isolation window width"
+    },
+    "fd_merging_method": {
+      "type": "int",
+      "default": null,
+      "description": "Spectrum merging method (0=none, 1=Gaussian, 2=block)",
+      "enum": [
+        0,
+        1,
+        2
+      ]
+    },
+    "fd_merging_min_ms_level": {
+      "type": "int",
+      "default": null,
+      "description": "Minimum MS level participating in merge",
+      "min": 1
+    },
+    "fd_merging_max_ms_level": {
+      "type": "int",
+      "default": null,
+      "description": "Maximum MS level participating in merge",
+      "min": 1
+    },
+    "sd_tol": {
+      "type": "str_list",
+      "default": [],
+      "description": "PPM tolerance per MS level (e.g. ['10.0','5.0']); negative = auto",
+      "primary": true
+    },
+    "sd_min_mass": {
+      "type": "float",
+      "default": null,
+      "description": "Minimum mass (Da)",
+      "primary": true
+    },
+    "sd_max_mass": {
+      "type": "float",
+      "default": null,
+      "description": "Maximum mass (Da)",
+      "primary": true
+    },
+    "sd_min_charge": {
+      "type": "int",
+      "default": null,
+      "description": "Minimum MS1 charge state"
+    },
+    "sd_max_charge": {
+      "type": "int",
+      "default": null,
+      "description": "Maximum charge state (all MS levels)",
+      "primary": true
+    },
+    "sd_precursor_charge": {
+      "type": "int",
+      "default": null,
+      "description": "Target precursor charge state"
+    },
+    "sd_precursor_mz": {
+      "type": "float",
+      "default": null,
+      "description": "Target precursor m/z (requires sd_precursor_charge)"
+    },
+    "sd_min_cos": {
+      "type": "str_list",
+      "default": [],
+      "description": "Cosine similarity threshold per MS level (e.g. ['0.85','0.85'])"
+    },
+    "sd_min_snr": {
+      "type": "str_list",
+      "default": [],
+      "description": "Charge SNR threshold per MS level (e.g. ['0.25','0.25'])",
+      "primary": true
+    },
+    "ft_mass_error_ppm": {
+      "type": "float",
+      "default": null,
+      "description": "Mass error tolerance (ppm); negative reuses SD:tol[0]"
+    },
+    "ft_ion_mobility_tolerance": {
+      "type": "float",
+      "default": null,
+      "description": "Ion mobility tolerance (1/k0)"
+    },
+    "ft_quant_method": {
+      "type": "enum",
+      "default": null,
+      "description": "Quantification method",
+      "enum": [
+        "area",
+        "median",
+        "max_height"
+      ]
+    },
+    "ft_min_sample_rate": {
+      "type": "float",
+      "default": null,
+      "description": "Min fraction of scans containing a peak"
+    },
+    "ft_min_trace_length": {
+      "type": "float",
+      "default": null,
+      "description": "Min mass trace length (s)"
+    },
+    "ft_max_trace_length": {
+      "type": "float",
+      "default": null,
+      "description": "Max mass trace length (s); negative disables"
+    },
+    "ft_min_cos": {
+      "type": "float",
+      "default": null,
+      "description": "Cosine similarity threshold; negative reuses SD:min_cos[0]"
+    },
+    "iq_type": {
+      "type": "enum",
+      "default": null,
+      "description": "Isobaric quantification scheme",
+      "enum": [
+        "none",
+        "itraq4plex",
+        "itraq8plex",
+        "tmt6plex",
+        "tmt10plex",
+        "tmt11plex",
+        "tmt16plex",
+        "tmt18plex"
+      ]
+    },
+    "iq_isotope_correction": {
+      "type": "enum",
+      "default": null,
+      "description": "Enable isotope correction",
+      "enum": [
+        "true",
+        "false"
+      ]
+    },
+    "iq_reporter_mz_tol": {
+      "type": "float",
+      "default": null,
+      "description": "Reporter ion m/z tolerance (Th)"
+    },
+    "iq_only_fully_quantified": {
+      "type": "bool",
+      "default": false,
+      "description": "Only spectra with all channels quantified"
+    },
+    "extra_cmdline": {
+      "type": "str",
+      "default": "",
+      "description": "Escape hatch: extra FLASHDeconv arguments appended verbatim (shell-quoted), e.g. '-instance 2'"
+    }
+  },
+  "pbfgen": {
+    "start_scan": {
+      "type": "int",
+      "default": null,
+      "description": "Start scan number (negative or omitted = no limit)",
+      "primary": true
+    },
+    "end_scan": {
+      "type": "int",
+      "default": null,
+      "description": "End scan number (negative or omitted = no limit)",
+      "primary": true
+    },
+    "param_file": {
+      "type": "str",
+      "default": null,
+      "description": "Optional PRISM-style INI parameter file"
+    },
+    "extra_cmdline": {
+      "type": "str",
+      "default": "",
+      "description": "Escape hatch: extra PbfGen arguments appended verbatim (shell-quoted). Use the 'key=value' form for any absolute path — PRISM parses a leading '/' as a flag."
+    }
+  },
+  "promex": {
+    "min_charge": {
+      "type": "int",
+      "default": null,
+      "description": "Minimum precursor charge",
+      "min": 1,
+      "max": 60,
+      "primary": true
+    },
+    "max_charge": {
+      "type": "int",
+      "default": null,
+      "description": "Maximum precursor charge",
+      "min": 1,
+      "max": 60,
+      "primary": true
+    },
+    "min_mass": {
+      "type": "float",
+      "default": null,
+      "description": "Minimum mass (Da)",
+      "min": 600,
+      "max": 100000,
+      "primary": true
+    },
+    "max_mass": {
+      "type": "float",
+      "default": null,
+      "description": "Maximum mass (Da)",
+      "min": 600,
+      "max": 100000,
+      "primary": true
+    },
+    "max_threads": {
+      "type": "int",
+      "default": 4,
+      "description": "Max threads (0 = auto)",
+      "min": 0,
+      "primary": true
+    },
+    "bin_res_ppm": {
+      "type": "int",
+      "default": null,
+      "description": "Binning resolution (ppm)",
+      "enum": [
+        1,
+        2,
+        4,
+        8,
+        16,
+        32,
+        64,
+        128
+      ]
+    },
+    "score_threshold": {
+      "type": "float",
+      "default": null,
+      "description": "Likelihood score threshold (default -10)"
+    },
+    "feature_map": {
+      "type": "bool",
+      "default": false,
+      "description": "Output PNG heatmap; default OFF because OxyPlot crashes under wine and the PNG is unviewable on headless Linux anyway. Set true only if running on a desktop with X11."
+    },
+    "score_extended": {
+      "type": "bool",
+      "default": null,
+      "description": "Output extended scoring info"
+    },
+    "write_csv": {
+      "type": "bool",
+      "default": null,
+      "description": "Also write features to CSV"
+    },
+    "param_file": {
+      "type": "str",
+      "default": null,
+      "description": "Optional PRISM INI parameter file"
+    },
+    "extra_cmdline": {
+      "type": "str",
+      "default": "",
+      "description": "Escape hatch: extra ProMex arguments appended verbatim (shell-quoted), e.g. '-ms1ft=.' to only render the feature heatmap. Use the 'key=value' form for any absolute path — PRISM parses a leading '/' as a flag."
+    }
+  },
+  "mspathfindert": {
+    "ic_mode": {
+      "type": "enum",
+      "default": null,
+      "description": "Internal cleavage mode",
+      "enum": [
+        "NoInternalCleavage",
+        "SingleInternalCleavage",
+        "MultipleInternalCleavages"
+      ],
+      "primary": true
+    },
+    "tda": {
+      "type": "int",
+      "default": 1,
+      "description": "Decoy mode: 0=target only, 1=target+shuffled decoy",
+      "min": -1,
+      "max": 1,
+      "primary": true
+    },
+    "pm_tolerance": {
+      "type": "float",
+      "default": 10.0,
+      "description": "Precursor tolerance (ppm)",
+      "primary": true
+    },
+    "frag_tolerance": {
+      "type": "float",
+      "default": 10.0,
+      "description": "Fragment tolerance (ppm)",
+      "primary": true
+    },
+    "min_length": {
+      "type": "int",
+      "default": 21,
+      "description": "Min sequence length",
+      "min": 0,
+      "primary": true
+    },
+    "max_length": {
+      "type": "int",
+      "default": 500,
+      "description": "Max sequence length",
+      "min": 0
+    },
+    "min_mass": {
+      "type": "float",
+      "default": 3000.0,
+      "description": "Min sequence mass (Da)",
+      "primary": true
+    },
+    "max_mass": {
+      "type": "float",
+      "default": 50000.0,
+      "description": "Max sequence mass (Da)"
+    },
+    "min_charge": {
+      "type": "int",
+      "default": 2,
+      "description": "Min precursor charge",
+      "min": 1
+    },
+    "max_charge": {
+      "type": "int",
+      "default": 50,
+      "description": "Max precursor charge",
+      "min": 1
+    },
+    "min_frag_charge": {
+      "type": "int",
+      "default": 1,
+      "description": "Min fragment ion charge",
+      "min": 1
+    },
+    "max_frag_charge": {
+      "type": "int",
+      "default": 20,
+      "description": "Max fragment ion charge",
+      "min": 1
+    },
+    "activation": {
+      "type": "enum",
+      "default": null,
+      "description": "Activation method (Unknown if absent)",
+      "enum": [
+        "CID",
+        "ETD",
+        "HCD",
+        "ECD",
+        "PQD",
+        "UVPD",
+        "Unknown"
+      ]
+    },
+    "tag_search": {
+      "type": "bool",
+      "default": null,
+      "description": "Enable tag-based search (default true)"
+    },
+    "include_decoys": {
+      "type": "bool",
+      "default": null,
+      "description": "Include decoy rows in _IcTda.tsv"
+    },
+    "num_matches": {
+      "type": "int",
+      "default": null,
+      "description": "Matches per spectrum"
+    },
+    "mem_matches": {
+      "type": "int",
+      "default": null,
+      "description": "Matches kept in memory for E-value calc"
+    },
+    "mod_file": {
+      "type": "str",
+      "default": null,
+      "description": "Path to PNNL modification definition file"
+    },
+    "scans_file": {
+      "type": "str",
+      "default": null,
+      "description": "Optional file restricting MS2 scans to process"
+    },
+    "overwrite": {
+      "type": "bool",
+      "default": null,
+      "description": "Overwrite existing _IcTarget/_IcDecoy.tsv"
+    },
+    "flip_scoring": {
+      "type": "bool",
+      "default": null,
+      "description": "Use FLIP scoring (UVPD support)"
+    },
+    "threads": {
+      "type": "int",
+      "default": 4,
+      "description": "Thread count (0 = auto)",
+      "min": 0,
+      "primary": true
+    },
+    "param_file": {
+      "type": "str",
+      "default": null,
+      "description": "Optional PRISM INI parameter file. NOTE: any value we send on the command line overrides the same key in this file, and the defaults above are always sent — so the file only takes effect for keys we do not emit."
+    },
+    "extra_cmdline": {
+      "type": "str",
+      "default": "",
+      "description": "Escape hatch: extra MSPathFinderT arguments appended verbatim (shell-quoted). Use the 'key=value' form for any absolute path — PRISM parses a leading '/' as a flag."
+    }
+  }
+}

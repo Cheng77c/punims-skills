@@ -1,0 +1,3930 @@
+{
+  "msconvert": {
+    "output_format": {
+      "type": "enum",
+      "default": "mzML",
+      "description": "Output format",
+      "enum": [
+        "mzML",
+        "mzXML",
+        "mz5",
+        "mzMLb",
+        "mgf",
+        "text",
+        "ms1",
+        "ms2",
+        "cms1",
+        "cms2"
+      ],
+      "primary": true
+    },
+    "precision": {
+      "type": "int",
+      "default": 64,
+      "description": "Binary precision (bits)",
+      "enum": [
+        32,
+        64
+      ],
+      "primary": true
+    },
+    "zlib": {
+      "type": "bool",
+      "default": true,
+      "description": "Enable zlib compression",
+      "primary": true
+    },
+    "filters": {
+      "type": "str_list",
+      "default": [
+        "peakPicking true 1-"
+      ],
+      "description": "Spectrum list filters，每行一条；默认含质心化 filter",
+      "primary": true
+    },
+    "chromatogram_filters": {
+      "type": "str_list",
+      "default": [],
+      "description": "Repeated chromatogram filters"
+    },
+    "extension": {
+      "type": "str",
+      "default": null,
+      "description": "Output extension override"
+    },
+    "mz_precision": {
+      "type": "int",
+      "default": null,
+      "description": "m/z precision"
+    },
+    "inten_precision": {
+      "type": "int",
+      "default": null,
+      "description": "Intensity precision"
+    },
+    "mz_truncation": {
+      "type": "int",
+      "default": null,
+      "description": "m/z truncation bits"
+    },
+    "inten_truncation": {
+      "type": "int",
+      "default": null,
+      "description": "Intensity truncation bits"
+    },
+    "mz_delta": {
+      "type": "bool",
+      "default": false,
+      "description": "Enable m/z delta prediction"
+    },
+    "inten_delta": {
+      "type": "bool",
+      "default": false,
+      "description": "Enable intensity delta prediction"
+    },
+    "mz_linear": {
+      "type": "bool",
+      "default": false,
+      "description": "Enable m/z linear prediction"
+    },
+    "inten_linear": {
+      "type": "bool",
+      "default": false,
+      "description": "Enable intensity linear prediction"
+    },
+    "noindex": {
+      "type": "bool",
+      "default": false,
+      "description": "Disable index generation"
+    },
+    "numpress_linear": {
+      "type": "bool",
+      "default": false,
+      "description": "Enable numpress linear prediction compression for m/z and RT"
+    },
+    "numpress_linear_abs_tol": {
+      "type": "float",
+      "default": null,
+      "description": "Numpress linear absolute tolerance"
+    },
+    "numpress_pic": {
+      "type": "bool",
+      "default": false,
+      "description": "Enable numpress pic"
+    },
+    "numpress_slof": {
+      "type": "bool",
+      "default": false,
+      "description": "Enable numpress slof"
+    },
+    "numpress_all": {
+      "type": "bool",
+      "default": false,
+      "description": "Enable all numpress codecs"
+    },
+    "outfile": {
+      "type": "str",
+      "default": null,
+      "description": "Output file name"
+    },
+    "contact_info": {
+      "type": "str",
+      "default": null,
+      "description": "Contact info file"
+    },
+    "filelist": {
+      "type": "str",
+      "default": null,
+      "description": "Input file list"
+    },
+    "config_file": {
+      "type": "str",
+      "default": null,
+      "description": "msconvert config file"
+    },
+    "verbose": {
+      "type": "bool",
+      "default": true,
+      "description": "Verbose logging"
+    },
+    "single_threaded": {
+      "type": "bool",
+      "default": false,
+      "description": "Single-threaded conversion"
+    },
+    "continue_on_error": {
+      "type": "bool",
+      "default": false,
+      "description": "Continue on error"
+    },
+    "merge": {
+      "type": "bool",
+      "default": false,
+      "description": "Merge multiple inputs"
+    },
+    "combine_ion_mobility_spectra": {
+      "type": "bool",
+      "default": false,
+      "description": "Combine ion mobility spectra"
+    },
+    "dda_processing": {
+      "type": "bool",
+      "default": false,
+      "description": "Enable DDA processing"
+    },
+    "gzip": {
+      "type": "bool",
+      "default": false,
+      "description": "Gzip output"
+    },
+    "sim_as_spectra": {
+      "type": "bool",
+      "default": false,
+      "description": "Write SIM as spectra"
+    },
+    "srm_as_spectra": {
+      "type": "bool",
+      "default": false,
+      "description": "Write SRM as spectra"
+    },
+    "ignore_calibration_scans": {
+      "type": "bool",
+      "default": false,
+      "description": "Ignore calibration scans"
+    },
+    "accept_zero_length_spectra": {
+      "type": "bool",
+      "default": false,
+      "description": "Accept zero-length spectra"
+    },
+    "ignore_missing_zero_samples": {
+      "type": "bool",
+      "default": false,
+      "description": "Ignore missing zero samples"
+    },
+    "ignore_unknown_instrument_error": {
+      "type": "bool",
+      "default": false,
+      "description": "Ignore unknown instrument errors"
+    },
+    "strip_location_from_source_files": {
+      "type": "bool",
+      "default": false,
+      "description": "Strip source file location"
+    },
+    "strip_version_from_software": {
+      "type": "bool",
+      "default": false,
+      "description": "Strip software version"
+    },
+    "mzmlb_chunk_size": {
+      "type": "int",
+      "default": null,
+      "description": "mzMLb chunk size"
+    },
+    "mzmlb_compression_level": {
+      "type": "int",
+      "default": null,
+      "description": "mzMLb compression level"
+    },
+    "run_index_set": {
+      "type": "str",
+      "default": null,
+      "description": "Run index set"
+    }
+  },
+  "msfragger-closed": {
+    "database_path": {
+      "type": "str",
+      "default": null,
+      "description": "Path to target+decoy FASTA (Philosopher database --custom output)",
+      "required": true,
+      "primary": true
+    },
+    "num_threads": {
+      "type": "int",
+      "default": 8,
+      "description": "Worker threads",
+      "min": 1,
+      "primary": true
+    },
+    "ram_gb": {
+      "type": "int",
+      "default": 16,
+      "description": "JVM heap size (-Xmx) in GB. Default 16: full-proteome DBs (human-uniprot) + variable PTM mods (acetyl/ubiq/glyco) build multi-million-peptide indexes that OOM an 8 GB heap.",
+      "min": 2,
+      "primary": true
+    },
+    "precursor_tolerance_ppm": {
+      "type": "float",
+      "default": 20.0,
+      "description": "Precursor mass window (±ppm) for closed search",
+      "min": 0,
+      "primary": true
+    },
+    "precursor_mass_lower_da": {
+      "type": "float",
+      "default": null,
+      "description": "Open-search asymmetric lower bound (Da). When set with _upper_da, overrides ppm window."
+    },
+    "precursor_mass_upper_da": {
+      "type": "float",
+      "default": null,
+      "description": "Open-search asymmetric upper bound (Da). When set with _lower_da, overrides ppm window."
+    },
+    "fragment_tolerance_ppm": {
+      "type": "float",
+      "default": 20.0,
+      "description": "Fragment mass tolerance (ppm)",
+      "min": 0,
+      "primary": true
+    },
+    "isotope_error": {
+      "type": "str",
+      "default": "0/1/2",
+      "description": "Allowed precursor monoisotopic peak offsets, slash-separated",
+      "primary": true
+    },
+    "calibrate_mass": {
+      "type": "int",
+      "default": 2,
+      "description": "0=off, 1=mass calibration, 2=mass+parameter optimisation",
+      "enum": [
+        0,
+        1,
+        2
+      ],
+      "primary": true
+    },
+    "mass_diff_to_variable_mod": {
+      "type": "int",
+      "default": 0,
+      "description": "Delta mass → variable mod. 0=no; 1=yes+remove; 2=yes+keep. Open/mass-offset searches need 1.",
+      "enum": [
+        0,
+        1,
+        2
+      ],
+      "primary": true
+    },
+    "localize_delta_mass": {
+      "type": "int",
+      "default": 0,
+      "description": "Mass-shifted fragment ion localization. 0=off, 1=on. Pair with mass_diff_to_variable_mod=1 for open search.",
+      "enum": [
+        0,
+        1
+      ],
+      "primary": true
+    },
+    "mass_offsets": {
+      "type": "str",
+      "default": "0",
+      "description": "Slash-separated mass offsets for offset search; '0' = none",
+      "primary": true
+    },
+    "mass_offsets_detailed": {
+      "type": "str",
+      "default": "",
+      "description": "Detailed mass offset list (FragPipe format e.g. `541.0611(aa=DK);203.0794(aa=N)`); overrides mass_offsets when set"
+    },
+    "labile_search_mode": {
+      "type": "str",
+      "default": "off",
+      "description": "Labile-mod search (glyco/labile PTM): 'nglycan' for N-glyco, 'labile' for O-glyco/labile PTMs, 'off' for standard. Pairs with mass_offsets.",
+      "enum": [
+        "off",
+        "labile",
+        "nglycan"
+      ],
+      "primary": true
+    },
+    "labile_fragment_ion_series": {
+      "type": "str",
+      "default": "b,y",
+      "description": "Fragment ion series retained in labile search (e.g. 'b,y')"
+    },
+    "enzyme_name": {
+      "type": "str",
+      "default": "stricttrypsin",
+      "description": "MSFragger enzyme name (e.g. stricttrypsin, trypsin, chymotrypsin)",
+      "primary": true
+    },
+    "enzyme_cut": {
+      "type": "str",
+      "default": "KR",
+      "description": "Residues to cleave after"
+    },
+    "enzyme_nocut": {
+      "type": "str",
+      "default": "",
+      "description": "Residues that block cleavage (e.g. 'P' for trypsin)"
+    },
+    "num_enzyme_termini": {
+      "type": "int",
+      "default": 2,
+      "description": "0=non-specific, 1=semi-tryptic, 2=fully tryptic",
+      "enum": [
+        0,
+        1,
+        2
+      ],
+      "primary": true
+    },
+    "allowed_missed_cleavage": {
+      "type": "int",
+      "default": 2,
+      "description": "Maximum missed cleavages",
+      "min": 0,
+      "max": 5,
+      "primary": true
+    },
+    "enzyme_sense": {
+      "type": "enum",
+      "default": "C",
+      "description": "Cutting terminus of the first enzyme (C- or N-terminal)",
+      "enum": [
+        "C",
+        "N"
+      ]
+    },
+    "enzyme_name_2": {
+      "type": "str",
+      "default": "",
+      "description": "Second enzyme name; empty = single-enzyme digest"
+    },
+    "enzyme_cut_2": {
+      "type": "str",
+      "default": "",
+      "description": "Second enzyme's cutting residues"
+    },
+    "enzyme_nocut_2": {
+      "type": "str",
+      "default": "",
+      "description": "Second enzyme's blocking residues"
+    },
+    "enzyme_sense_2": {
+      "type": "enum",
+      "default": "C",
+      "description": "Second enzyme's cutting terminus",
+      "enum": [
+        "C",
+        "N"
+      ]
+    },
+    "allowed_missed_cleavage_2": {
+      "type": "int",
+      "default": 2,
+      "description": "Second enzyme's maximum missed cleavages",
+      "min": 0,
+      "max": 5
+    },
+    "digest_min_length": {
+      "type": "int",
+      "default": 7,
+      "description": "Min peptide length",
+      "min": 1,
+      "primary": true
+    },
+    "digest_max_length": {
+      "type": "int",
+      "default": 50,
+      "description": "Max peptide length",
+      "min": 1,
+      "primary": true
+    },
+    "digest_min_mass": {
+      "type": "float",
+      "default": 500.0,
+      "description": "Min peptide mass (Da)"
+    },
+    "digest_max_mass": {
+      "type": "float",
+      "default": 5000.0,
+      "description": "Max peptide mass (Da)"
+    },
+    "var_mod_oxidation_M": {
+      "type": "bool",
+      "default": true,
+      "description": "Variable mod: Met oxidation (+15.9949)"
+    },
+    "var_mod_acetyl_nterm": {
+      "type": "bool",
+      "default": true,
+      "description": "Variable mod: protein N-term acetylation (+42.0106)"
+    },
+    "variable_mods": {
+      "type": "str",
+      "default": "",
+      "description": "Extra variable mods beyond the oxidation/acetyl toggles, in FragPipe params format `<mass> <residues> <max>`, semicolon-separated. e.g. `79.966331 STY 3` (phospho), `114.04293 K 2` (GG/ubiquitin), `42.0106 K 2` (acetyl-K).",
+      "primary": true
+    },
+    "fixed_mod_C_carbamidomethyl": {
+      "type": "bool",
+      "default": true,
+      "description": "Fixed mod: Cys carbamidomethyl (+57.02146)",
+      "primary": true
+    },
+    "fixed_mods": {
+      "type": "str",
+      "default": "",
+      "description": "Additional fixed modifications as MSFragger `add_*` entries, semicolon- or newline-separated `key = mass`. e.g. `add_S_serine = 79.96633; add_Nterm_protein = 42.0106`. Covers every residue/terminus beyond the C/K/N-term toggles."
+    },
+    "allow_multiple_variable_mods_on_residue": {
+      "type": "bool",
+      "default": false,
+      "description": "Allow more than one variable mod on the same residue"
+    },
+    "max_variable_mods_combinations": {
+      "type": "int",
+      "default": 5000,
+      "description": "Maximum modified forms per peptide",
+      "min": 1,
+      "max": 65534
+    },
+    "tmt_label_mass": {
+      "type": "float",
+      "default": null,
+      "description": "If set, add as fixed mod on K and peptide N-term (e.g. 229.16293 for TMT-6/10/11plex). None = LFQ.",
+      "primary": true
+    },
+    "tmt_kside_variable": {
+      "type": "bool",
+      "default": false,
+      "description": "When True, TMT is fixed only on the peptide N-term (not K). Use for acetyl/ubiquitin workflows where K carries a variable label — supply `229.16293 K 2` + the PTM via variable_mods."
+    },
+    "max_variable_mods_per_peptide": {
+      "type": "int",
+      "default": 3,
+      "description": "Max variable mods per peptide",
+      "min": 0,
+      "max": 10,
+      "primary": true
+    },
+    "data_type": {
+      "type": "int",
+      "default": 0,
+      "description": "0 = DDA, 1 = DIA, 2 = gas-phase-fractionation DIA, 3 = DDA+",
+      "enum": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "primary": true
+    },
+    "activation_types": {
+      "type": "str",
+      "default": "all",
+      "description": "Only search scans of these activation types, '/'-separated (all, HCD, CID, ETD, ECD). ETD/EThcD workflows set this together with fragment_ion_series=c,z"
+    },
+    "analyzer_types": {
+      "type": "str",
+      "default": "all",
+      "description": "Only search scans from these analyzers, '/'-separated (all, FTMS, ITMS). mzML/raw only"
+    },
+    "fragment_ion_series": {
+      "type": "str",
+      "default": "b,y",
+      "description": "Ion series used in search: any of a,b,c,x,y,z,Y,b-18,y-18 (comma-separated). ETD/ECD data needs `c,z`; glyco labile searches add `Y`",
+      "primary": true
+    },
+    "ion_series_definitions": {
+      "type": "str",
+      "default": "",
+      "description": "Custom ion series, e.g. `b* N -17.026548;b0 N -18.010565`"
+    },
+    "use_topN_peaks": {
+      "type": "int",
+      "default": 150,
+      "description": "Pre-process each spectrum down to its top N peaks",
+      "min": 1
+    },
+    "minimum_peaks": {
+      "type": "int",
+      "default": 15,
+      "description": "Minimum peaks in an experimental spectrum for matching",
+      "min": 1
+    },
+    "minimum_ratio": {
+      "type": "float",
+      "default": 0.01,
+      "description": "Drop peaks below this fraction of the base peak",
+      "min": 0
+    },
+    "clear_mz_range": {
+      "type": "str",
+      "default": "0.0 0.0",
+      "description": "Remove peaks in this m/z range before matching, `<lo> <hi>` (0.0 0.0 = off). Used to clear the TMT reporter region"
+    },
+    "deisotope": {
+      "type": "int",
+      "default": 1,
+      "description": "0 = off, 1 = on (singletons single-charged), 2 = on (singletons single or double)",
+      "enum": [
+        0,
+        1,
+        2
+      ]
+    },
+    "deneutralloss": {
+      "type": "int",
+      "default": 1,
+      "description": "Remove neutral-loss peaks",
+      "enum": [
+        0,
+        1
+      ]
+    },
+    "remove_precursor_peak": {
+      "type": "int",
+      "default": 1,
+      "description": "0 = keep, 1 = remove precursor charge peak, 2 = remove all charge states (DDA only)",
+      "enum": [
+        0,
+        1,
+        2
+      ]
+    },
+    "remove_precursor_range": {
+      "type": "str",
+      "default": "-1.5,1.5",
+      "description": "m/z window (Th) used when removing precursor peaks"
+    },
+    "intensity_transform": {
+      "type": "int",
+      "default": 0,
+      "description": "0 = raw intensities, 1 = sqrt transform",
+      "enum": [
+        0,
+        1
+      ]
+    },
+    "require_precursor": {
+      "type": "int",
+      "default": 1,
+      "description": "Discard PSMs without a precursor peak (DIA only)",
+      "enum": [
+        0,
+        1
+      ]
+    },
+    "reuse_dia_fragment_peaks": {
+      "type": "int",
+      "default": 0,
+      "description": "Allow one peak to match several peptides (DIA only)",
+      "enum": [
+        0,
+        1
+      ]
+    },
+    "precursor_charge": {
+      "type": "str",
+      "default": "1 4",
+      "description": "Assumed precursor charge range `<lo> <hi>`; only used when override_charge = 1"
+    },
+    "override_charge": {
+      "type": "int",
+      "default": 0,
+      "description": "Ignore the precursor charge in the file and use precursor_charge instead",
+      "enum": [
+        0,
+        1
+      ]
+    },
+    "max_fragment_charge": {
+      "type": "int",
+      "default": 2,
+      "description": "Maximum theoretical fragment charge to match",
+      "min": 1,
+      "max": 4
+    },
+    "clip_nTerm_M": {
+      "type": "int",
+      "default": 1,
+      "description": "Treat protein N-terminal Met removal as a variable modification",
+      "enum": [
+        0,
+        1
+      ]
+    },
+    "check_spectral_files": {
+      "type": "int",
+      "default": 1,
+      "description": "Validate spectral files before searching",
+      "enum": [
+        0,
+        1
+      ]
+    },
+    "Y_type_masses": {
+      "type": "str",
+      "default": "",
+      "description": "[nglycan/labile only] Labile-mod fragments retained on intact peptides (glycan Y ions). Requires `Y` in fragment_ion_series"
+    },
+    "diagnostic_fragments": {
+      "type": "str",
+      "default": "",
+      "description": "[nglycan/labile only] Diagnostic (oxonium) fragment masses. Requires diagnostic_intensity_filter > 0"
+    },
+    "diagnostic_intensity_filter": {
+      "type": "float",
+      "default": 0.0,
+      "description": "[nglycan/labile only] Minimum summed oxonium-ion intensity (relative to base peak) for a spectrum to count as diagnostic-positive",
+      "min": 0
+    },
+    "remainder_fragment_masses": {
+      "type": "str",
+      "default": "",
+      "description": "[labile only] Partial modification masses left on b/y ions after fragmentation"
+    },
+    "restrict_deltamass_to": {
+      "type": "str",
+      "default": "all",
+      "description": "Residues that may carry a delta mass / mass offset (capitalized single letters, '-' for termini, or 'all')"
+    },
+    "min_matched_fragments": {
+      "type": "int",
+      "default": 4,
+      "description": "Minimum matched peaks for a PSM to be reported",
+      "min": 1
+    },
+    "min_sequence_matches": {
+      "type": "int",
+      "default": 2,
+      "description": "[nglycan/labile only] Minimum sequence-specific (non-Y) ions for a match",
+      "min": 0
+    },
+    "min_fragments_modelling": {
+      "type": "int",
+      "default": 2,
+      "description": "Minimum matched peaks for a PSM to enter statistical modelling",
+      "min": 1
+    },
+    "delta_mass_exclude_ranges": {
+      "type": "str",
+      "default": "",
+      "description": "Fragment mass ranges excluded from delta-mass localization, e.g. `(-1.5,3.5)`. Empty = derived from localize_delta_mass"
+    },
+    "precursor_mass_mode": {
+      "type": "enum",
+      "default": "corrected",
+      "description": "Which precursor mass MSFragger uses (FragPipe uses 'corrected')",
+      "enum": [
+        "isolated",
+        "selected",
+        "corrected"
+      ]
+    },
+    "group_variable": {
+      "type": "int",
+      "default": 0,
+      "description": "Group-FDR variable: 0 = no group FDR, 1 = num_enzyme_termini, 2 = PE from the protein header",
+      "enum": [
+        0,
+        1,
+        2
+      ]
+    },
+    "use_all_mods_in_first_search": {
+      "type": "int",
+      "default": 0,
+      "description": "Use all variable modifications in the first search pass",
+      "enum": [
+        0,
+        1
+      ]
+    },
+    "track_zero_topN": {
+      "type": "int",
+      "default": 0,
+      "description": "Track top N unmodified hits separately (open-search boosting)",
+      "min": 0
+    },
+    "zero_bin_accept_expect": {
+      "type": "float",
+      "default": 0.0,
+      "description": "Rank a zero-bin hit first when its expect value is below this",
+      "min": 0
+    },
+    "zero_bin_mult_expect": {
+      "type": "float",
+      "default": 1.0,
+      "description": "Multiplier applied to zero-bin expect values (<1 boosts them)",
+      "min": 0
+    },
+    "decoy_prefix": {
+      "type": "str",
+      "default": "rev_",
+      "description": "Decoy sequence prefix (must match Philosopher database)",
+      "primary": true
+    },
+    "output_format": {
+      "type": "str",
+      "default": "pepXML_pin",
+      "description": "Output format selector",
+      "enum": [
+        "pepXML",
+        "pepXML_pin",
+        "tsv",
+        "tsv_pin"
+      ]
+    },
+    "output_report_topN": {
+      "type": "int",
+      "default": 1,
+      "description": "Report top N PSMs per spectrum",
+      "min": 1
+    },
+    "output_max_expect": {
+      "type": "float",
+      "default": 50.0,
+      "description": "Suppress a PSM whose top hit has an expect value above this",
+      "min": 0
+    },
+    "report_alternative_proteins": {
+      "type": "int",
+      "default": 1,
+      "description": "Report alternative proteins for shared peptides",
+      "enum": [
+        0,
+        1
+      ]
+    },
+    "write_calibrated_mzml": {
+      "type": "int",
+      "default": 0,
+      "description": "Write calibrated MS2 scans to mzML (downstream MSBooster/IonQuant can consume them)",
+      "enum": [
+        0,
+        1
+      ]
+    },
+    "write_uncalibrated_mzml": {
+      "type": "int",
+      "default": 1,
+      "description": "Write uncalibrated MS2 scans to MGF (.raw/.d inputs only)",
+      "enum": [
+        0,
+        1
+      ]
+    },
+    "write_mzbin_all": {
+      "type": "int",
+      "default": 0,
+      "description": "Write all spectra to mzBIN",
+      "enum": [
+        0,
+        1
+      ]
+    },
+    "extra_params": {
+      "type": "str",
+      "default": "",
+      "description": "Escape hatch: extra `key = value` lines appended to fragger.params (newline or ';' separated). Overrides a key we already write."
+    }
+  },
+  "crystalc": {
+    "ram_gb": {
+      "type": "int",
+      "default": 8,
+      "description": "JVM heap size (-Xmx<N>G)",
+      "min": 1,
+      "primary": true
+    },
+    "num_threads": {
+      "type": "int",
+      "default": -1,
+      "description": "Worker threads (-1 = cores-1)",
+      "primary": true
+    },
+    "precursor_charge_min": {
+      "type": "int",
+      "default": 1,
+      "description": "Lower precursor charge bound for chimeric detection",
+      "min": 1
+    },
+    "precursor_charge_max": {
+      "type": "int",
+      "default": 6,
+      "description": "Upper precursor charge bound",
+      "min": 1
+    },
+    "isotope_number": {
+      "type": "int",
+      "default": 3,
+      "description": "Number of theoretical isotope peaks to consider",
+      "min": 1,
+      "primary": true
+    },
+    "precursor_mass_ppm": {
+      "type": "float",
+      "default": 20.0,
+      "description": "Precursor mass tolerance in ppm",
+      "min": 0,
+      "primary": true
+    },
+    "precursor_isolation_window": {
+      "type": "float",
+      "default": 0.7,
+      "description": "Precursor isolation window (m/z)",
+      "min": 0,
+      "primary": true
+    },
+    "correct_isotope_error": {
+      "type": "bool",
+      "default": false,
+      "description": "Update precursor neutral mass with monoisotopic mass when isotope error detected",
+      "primary": true
+    },
+    "raw_file_extension": {
+      "type": "str",
+      "default": "mzML",
+      "description": "Spectra file extension (mzML / mzXML)"
+    },
+    "grppr_jar_path": {
+      "type": "str",
+      "default": "/opt/fragpipe-tools/crystal-c/grppr-0.3.23.jar",
+      "description": "Path to grppr jar (CrystalC's required classpath sibling)"
+    }
+  },
+  "percolator": {
+    "test_fdr": {
+      "type": "float",
+      "default": 0.01,
+      "description": "FDR threshold used to evaluate end results (--testFDR)",
+      "min": 0,
+      "max": 1,
+      "primary": true
+    },
+    "train_fdr": {
+      "type": "float",
+      "default": 0.01,
+      "description": "FDR threshold for training positives (--trainFDR)",
+      "min": 0,
+      "max": 1,
+      "primary": true
+    },
+    "max_iter": {
+      "type": "int",
+      "default": 10,
+      "description": "Maximum SVM iterations (--maxiter)",
+      "min": 1
+    },
+    "num_threads": {
+      "type": "int",
+      "default": 8,
+      "description": "Worker threads",
+      "min": 1,
+      "primary": true
+    },
+    "seed": {
+      "type": "int",
+      "default": 1,
+      "description": "RNG seed for reproducible runs",
+      "min": 0,
+      "primary": true
+    },
+    "subset_max_train": {
+      "type": "int",
+      "default": 0,
+      "description": "Train on a subset of N PSMs (0 = use all). Recommended >0 for >1M PSMs.",
+      "min": 0,
+      "primary": true
+    },
+    "only_psms": {
+      "type": "bool",
+      "default": false,
+      "description": "Skip peptide-level aggregation (--only-psms)",
+      "primary": true
+    },
+    "post_processing_tdc": {
+      "type": "bool",
+      "default": false,
+      "description": "Use target-decoy competition instead of mix-max (--post-processing-tdc)",
+      "primary": true
+    },
+    "decoy_prefix": {
+      "type": "str",
+      "default": "rev_",
+      "description": "Decoy protein-id prefix; only used when picked_protein_fasta is set",
+      "primary": true
+    },
+    "picked_protein_fasta": {
+      "type": "str",
+      "default": null,
+      "description": "If set, enable picked-protein FDR using this FASTA (--picked-protein). Leave empty for PSM/peptide-only output."
+    },
+    "post_processing_mix_max": {
+      "type": "bool",
+      "default": false,
+      "description": "Explicitly use the mix-max method (--post-processing-mix-max); mutually exclusive with post_processing_tdc"
+    },
+    "quick_validation": {
+      "type": "bool",
+      "default": false,
+      "description": "Faster run with reduced internal cross-validation (--quick-validation)"
+    },
+    "nested_xval_bins": {
+      "type": "int",
+      "default": null,
+      "description": "Number of nested cross-validation bins (--nested-xval-bins)",
+      "min": 1
+    },
+    "train_fdr_initial": {
+      "type": "float",
+      "default": null,
+      "description": "FDR threshold for the first SVM iteration (--train-fdr-initial)",
+      "min": 0,
+      "max": 1
+    },
+    "train_best_positive": {
+      "type": "bool",
+      "default": false,
+      "description": "At most one PSM per spectrum may be a training positive (--train-best-positive)"
+    },
+    "default_direction": {
+      "type": "str",
+      "default": "",
+      "description": "Feature used as the initial search direction (--default-direction), e.g. `hyperscore`"
+    },
+    "init_weights": {
+      "type": "str",
+      "default": "",
+      "description": "Path to a weights file used to seed the SVM (--init-weights)"
+    },
+    "static_weights": {
+      "type": "bool",
+      "default": false,
+      "description": "Use init_weights as a fixed scoring vector, no training (--static). Requires init_weights"
+    },
+    "unit_norm": {
+      "type": "bool",
+      "default": false,
+      "description": "Unit [0-1] feature normalization instead of standard deviation (--unitnorm)"
+    },
+    "test_each_iteration": {
+      "type": "bool",
+      "default": false,
+      "description": "Report test-set performance every iteration (--test-each-iteration)"
+    },
+    "pep_algorithm": {
+      "type": "enum",
+      "default": "default",
+      "description": "Posterior-error-probability estimator: default, cubic-spline (--irls-pep), isotonic PAVA (--pava-pep) or score-based (--ip-pep)",
+      "enum": [
+        "default",
+        "irls",
+        "pava",
+        "ip"
+      ]
+    },
+    "output_retention_time": {
+      "type": "bool",
+      "default": false,
+      "description": "Add a retention-time column to the outputs (--output-retention-time)"
+    },
+    "pepxml_output": {
+      "type": "str",
+      "default": "",
+      "description": "Also write a rudimentary pepXML to this path (--pepxml-output)"
+    },
+    "protein_enzyme": {
+      "type": "str",
+      "default": "",
+      "description": "Enzyme used for in-silico protein digestion in picked-protein mode (--protein-enzyme)"
+    },
+    "protein_report_fragments": {
+      "type": "bool",
+      "default": false,
+      "description": "Report protein fragments separately (--protein-report-fragments)"
+    },
+    "protein_report_duplicates": {
+      "type": "bool",
+      "default": false,
+      "description": "Report duplicate protein groups (--protein-report-duplicates)"
+    },
+    "spectral_counting_fdr": {
+      "type": "float",
+      "default": null,
+      "description": "Enable protein spectral counting at this FDR (--spectral-counting-fdr)",
+      "min": 0,
+      "max": 1
+    },
+    "no_terminate": {
+      "type": "bool",
+      "default": false,
+      "description": "Keep going on recoverable input errors (--no-terminate)"
+    },
+    "verbose": {
+      "type": "int",
+      "default": null,
+      "description": "Output verbosity (--verbose); unset = Percolator default 2",
+      "enum": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+      ]
+    },
+    "extra_cmdline": {
+      "type": "str",
+      "default": "",
+      "description": "Escape hatch: extra Percolator flags appended verbatim (e.g. `--search-input concatenated`)"
+    }
+  },
+  "percolator-to-pepxml": {
+    "jar_path": {
+      "type": "str",
+      "default": "/opt/fragpipe-tools/fragpipe/fragpipe.jar",
+      "description": "Path to fragpipe.jar (the shadow jar that contains PercolatorOutputToPepXML)"
+    },
+    "data_type": {
+      "type": "enum",
+      "default": "DDA",
+      "description": "Acquisition mode — DDA reads <basename>.pepXML, DIA reads <basename>_rank<N>.pepXML",
+      "enum": [
+        "DDA",
+        "DIA"
+      ],
+      "primary": true
+    },
+    "min_prob": {
+      "type": "float",
+      "default": 0.0,
+      "description": "Minimum Percolator probability to emit (mirrors FragPipe's --min-prob)",
+      "min": 0,
+      "max": 1,
+      "primary": true
+    },
+    "updated_fasta_path": {
+      "type": "str",
+      "default": "",
+      "description": "Optional FASTA path rewritten into the output pepXML's <search_database local_path=...> field. Empty leaves it as-is."
+    }
+  },
+  "philosopher-database": {
+    "decoy_prefix": {
+      "type": "str",
+      "default": "rev_",
+      "description": "Decoy sequence prefix; must match MSFragger's decoy_prefix",
+      "primary": true
+    },
+    "add_contam": {
+      "type": "bool",
+      "default": true,
+      "description": "Append the common-contaminants set (cRAP-style) to the target FASTA",
+      "primary": true
+    },
+    "contam_prefix": {
+      "type": "bool",
+      "default": false,
+      "description": "Mark contaminant sequences with a prefix tag"
+    },
+    "enzyme": {
+      "type": "str",
+      "default": "trypsin",
+      "description": "Enzyme for in-silico digestion (affects sequence classification only)",
+      "enum": [
+        "trypsin",
+        "lys_c",
+        "lys_n",
+        "glu_c",
+        "chymotrypsin"
+      ],
+      "primary": true
+    },
+    "isoform": {
+      "type": "bool",
+      "default": false,
+      "description": "Include isoform sequences from UniProt"
+    },
+    "reviewed": {
+      "type": "bool",
+      "default": false,
+      "description": "Use only reviewed Swiss-Prot entries (ignored when --custom is the source)"
+    },
+    "add_sequences": {
+      "type": "str",
+      "default": "",
+      "description": "Path to an extra UniProt-format FASTA whose sequences are appended (--add), e.g. spike-ins or a mutant panel"
+    },
+    "proteome_id": {
+      "type": "str",
+      "default": "",
+      "description": "UniProt proteome ID to download instead of using a local FASTA (--id), e.g. `UP000005640`. Requires network access from the sandbox"
+    }
+  },
+  "peptideprophet": {
+    "decoy_prefix": {
+      "type": "str",
+      "default": "rev_",
+      "description": "Decoy sequence tag (--decoy); must match upstream MSFragger / database setting",
+      "primary": true
+    },
+    "output_prefix": {
+      "type": "str",
+      "default": "interact-PXD",
+      "description": "Prefix for the interact-*.pep.xml output filename (--output)"
+    },
+    "ppm": {
+      "type": "bool",
+      "default": true,
+      "description": "Mass model in ppm units (--ppm)"
+    },
+    "accmass": {
+      "type": "bool",
+      "default": true,
+      "description": "Use accurate-mass binning (--accmass)"
+    },
+    "nonparam": {
+      "type": "bool",
+      "default": true,
+      "description": "Semiparametric mixture model (--nonparam)",
+      "primary": true
+    },
+    "decoyprobs": {
+      "type": "bool",
+      "default": true,
+      "description": "Compute probabilities for decoy hits too (--decoyprobs)"
+    },
+    "combine": {
+      "type": "bool",
+      "default": true,
+      "description": "Combine all input pepXMLs into one model (--combine)",
+      "primary": true
+    },
+    "min_prob": {
+      "type": "float",
+      "default": null,
+      "description": "Report only PSMs above this probability (--minprob); unset = PeptideProphet default 0.05",
+      "min": 0,
+      "max": 1,
+      "primary": true
+    },
+    "min_pep_len": {
+      "type": "int",
+      "default": null,
+      "description": "Minimum peptide length not rejected (--minpeplen); unset = 7",
+      "min": 1
+    },
+    "mass_width": {
+      "type": "float",
+      "default": null,
+      "description": "Mass model width (--masswidth); unset = 5",
+      "min": 0
+    },
+    "clevel": {
+      "type": "int",
+      "default": null,
+      "description": "Conservative level in neg_stdev from neg_mean (--clevel); higher = more conservative"
+    },
+    "enzyme": {
+      "type": "str",
+      "default": "",
+      "description": "Enzyme used in the sample (--enzyme); empty = inferred from the pepXML"
+    },
+    "ignore_charges": {
+      "type": "str",
+      "default": "",
+      "description": "Comma-separated charge states excluded from modelling (--ignorechg), e.g. `1,5`"
+    },
+    "phospho": {
+      "type": "bool",
+      "default": false,
+      "description": "Enable the phospho motif model (--phospho)",
+      "primary": true
+    },
+    "glyc": {
+      "type": "bool",
+      "default": false,
+      "description": "Enable the glyco motif model (--glyc)",
+      "primary": true
+    },
+    "expectscore": {
+      "type": "bool",
+      "default": true,
+      "description": "Use the expectation value as the only f-value contributor (--expectscore)"
+    },
+    "no_mass_model": {
+      "type": "bool",
+      "default": false,
+      "description": "Disable the mass model (--nomass)"
+    },
+    "no_nmc_model": {
+      "type": "bool",
+      "default": false,
+      "description": "Disable the missed-cleavage model (--nonmc)"
+    },
+    "no_ntt_model": {
+      "type": "bool",
+      "default": false,
+      "description": "Disable the enzymatic-termini model (--nontt)"
+    }
+  },
+  "ptmprophet": {
+    "mods": {
+      "type": "str",
+      "default": "STY:79.966331,M:15.9949,n:42.0106",
+      "description": "Modification sites + masses (PTMProphet positional arg). Format: `<residues>:<mass>` items joined by commas, e.g. `STY:79.966331,M:15.9949,n:42.0106` (n = peptide N-term).",
+      "primary": true
+    },
+    "minprob": {
+      "type": "float",
+      "default": 0.5,
+      "description": "Minimum PeptideProphet probability for a PSM to be evaluated (MINPROB=)",
+      "min": 0,
+      "max": 1,
+      "primary": true
+    },
+    "em": {
+      "type": "int",
+      "default": 1,
+      "description": "EM model: 0 none, 1 intensity, 2 intensity+matched-peaks (default), 3 matched-peaks",
+      "enum": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "primary": true
+    },
+    "keepold": {
+      "type": "bool",
+      "default": true,
+      "description": "Retain prior PTMProphet results in the pepXML (KEEPOLD)"
+    },
+    "static": {
+      "type": "bool",
+      "default": true,
+      "description": "Use a single fragppmtol for all PSMs (STATIC) instead of per-PSM estimation",
+      "primary": true
+    },
+    "fragppmtol": {
+      "type": "float",
+      "default": 10.0,
+      "description": "MS2 fragment ppm tolerance (FRAGPPMTOL=)",
+      "min": 0,
+      "primary": true
+    },
+    "nions": {
+      "type": "str",
+      "default": "b",
+      "description": "Comma-separated N-term ion types (NIONS=); defaults to b for CID",
+      "primary": true
+    },
+    "nostack": {
+      "type": "bool",
+      "default": false,
+      "description": "Disallow stacking multiple PTMs at the same residue (NOSTACK)",
+      "primary": true
+    },
+    "maxthreads": {
+      "type": "int",
+      "default": 1,
+      "description": "Worker threads (MAXTHREADS=). Was pinned to 1 because the key wasn't declared — large datasets should raise this",
+      "min": 1,
+      "primary": true
+    },
+    "cions": {
+      "type": "str",
+      "default": "",
+      "description": "Comma-separated C-term ion types (CIONS=); empty = y for CID, z for ETD"
+    },
+    "ppmtol": {
+      "type": "float",
+      "default": null,
+      "description": "MS1 precursor ppm tolerance (PPMTOL=); unset = 1 ppm",
+      "min": 0
+    },
+    "daltontol": {
+      "type": "float",
+      "default": null,
+      "description": "MS2 fragment tolerance in Da (DALTONTOL=); overrides fragppmtol when set",
+      "min": 0
+    },
+    "maxfragz": {
+      "type": "int",
+      "default": null,
+      "description": "Maximum fragment charge (MAXFRAGZ=); negative values subtract from the precursor charge"
+    },
+    "modprec": {
+      "type": "int",
+      "default": null,
+      "description": "Decimal digits used when writing PTM masses (MODPREC=)",
+      "min": 0
+    },
+    "massoffset": {
+      "type": "float",
+      "default": null,
+      "description": "Adjust the massdiff by this offset (MASSOFFSET=)"
+    },
+    "massdiffmode": {
+      "type": "bool",
+      "default": false,
+      "description": "Treat the measured−theoretical mass difference as the modification and localize it (MASSDIFFMODE)"
+    },
+    "exclude_massdiff_min": {
+      "type": "float",
+      "default": null,
+      "description": "Lower bound of the mass-difference range excluded in MASSDIFFMODE (EXCLUDEMASSDIFFMIN=)"
+    },
+    "exclude_massdiff_max": {
+      "type": "float",
+      "default": null,
+      "description": "Upper bound of the mass-difference range excluded in MASSDIFFMODE (EXCLUDEMASSDIFFMAX=)"
+    },
+    "lability": {
+      "type": "bool",
+      "default": false,
+      "description": "Compute PTM lability (LABILITY) — glyco / labile PTMs",
+      "primary": true
+    },
+    "direct": {
+      "type": "bool",
+      "default": false,
+      "description": "Use only direct evidence for site probabilities (DIRECT)"
+    },
+    "autodirect": {
+      "type": "bool",
+      "default": false,
+      "description": "Use direct evidence when lability is high (AUTODIRECT; pair with lability)"
+    },
+    "denoise": {
+      "type": "bool",
+      "default": false,
+      "description": "Remove presumed noise peaks before localization (DENOISE)"
+    },
+    "ifrags": {
+      "type": "bool",
+      "default": false,
+      "description": "Use internal fragments for localization (IFRAGS)"
+    },
+    "no_update": {
+      "type": "bool",
+      "default": false,
+      "description": "Don't rewrite modification_info tags in the pepXML (NOUPDATE)"
+    },
+    "verbose": {
+      "type": "bool",
+      "default": false,
+      "description": "Emit troubleshooting warnings (VERBOSE)"
+    },
+    "extra_cmdline": {
+      "type": "str",
+      "default": "",
+      "description": "Escape hatch: extra flags appended verbatim (e.g. OSCOREMODE, QUANTMODE, MINO=2). NOTE: PTMProphet is order-sensitive — flags that must precede the mods string (NOSTACK-style) have first-class params above; use this for the trailing long tail."
+    }
+  },
+  "philosopher-report": {
+    "decoy_prefix": {
+      "type": "str",
+      "default": "rev_",
+      "description": "Decoy sequence tag (--tag); must match upstream MSFragger / philosopher-database setting",
+      "primary": true
+    },
+    "psm_fdr": {
+      "type": "float",
+      "default": 0.01,
+      "description": "PSM-level FDR threshold (--psm)",
+      "min": 0,
+      "max": 1,
+      "primary": true
+    },
+    "peptide_fdr": {
+      "type": "float",
+      "default": 0.01,
+      "description": "Peptide-level FDR threshold (--pep)",
+      "min": 0,
+      "max": 1,
+      "primary": true
+    },
+    "ion_fdr": {
+      "type": "float",
+      "default": 0.01,
+      "description": "Peptide-ion FDR threshold (--ion)",
+      "min": 0,
+      "max": 1,
+      "primary": true
+    },
+    "protein_fdr": {
+      "type": "float",
+      "default": 0.01,
+      "description": "Protein-level FDR threshold (--prot)",
+      "min": 0,
+      "max": 1,
+      "primary": true
+    },
+    "inference": {
+      "type": "bool",
+      "default": true,
+      "description": "Run protein-level inference via ProteinProphet (produces combined.prot.xml, passed to filter as --protxml; mirrors FragPipe). Disable for PSM/peptide-only reports — that also drops filter's --prot / --sequential / --razor, the way FragPipe does when no protXML exists.",
+      "primary": true
+    },
+    "inference_min_prob": {
+      "type": "float",
+      "default": null,
+      "description": "Minimum peptide probability ProteinProphet admits (--minprob); unset = Philosopher's 0.05. 29 official workflows ask for 0.5.",
+      "min": 0,
+      "max": 1
+    },
+    "inference_max_ppm_diff": {
+      "type": "int",
+      "default": 2000000,
+      "description": "ProteinProphet's peptide mass window for protein grouping (--maxppmdiff). FragPipe's baseline 2000000 effectively disables it."
+    },
+    "razor": {
+      "type": "bool",
+      "default": true,
+      "description": "Use razor-peptide algorithm for protein scoring",
+      "primary": true
+    },
+    "picked": {
+      "type": "bool",
+      "default": false,
+      "description": "Apply picked-FDR before protein scoring",
+      "primary": true
+    },
+    "sequential": {
+      "type": "bool",
+      "default": false,
+      "description": "Sequential FDR (PSM-then-protein) instead of 2D",
+      "primary": true
+    },
+    "report_decoys": {
+      "type": "bool",
+      "default": false,
+      "description": "Include decoy hits in the report (--decoys)",
+      "primary": true
+    },
+    "report_msstats": {
+      "type": "bool",
+      "default": false,
+      "description": "Emit an MSstats-compatible CSV alongside the TSVs (--msstats)",
+      "primary": true
+    },
+    "remove_contam": {
+      "type": "bool",
+      "default": false,
+      "description": "Strip contaminants from the final report (--removecontam)"
+    },
+    "pep_prob": {
+      "type": "float",
+      "default": null,
+      "description": "Top-peptide probability threshold used in FDR filtering (--pepProb); unset = 0.7",
+      "min": 0,
+      "max": 1
+    },
+    "prot_prob": {
+      "type": "float",
+      "default": null,
+      "description": "Protein probability threshold (--protProb, ignored with razor); unset = 0.5",
+      "min": 0,
+      "max": 1
+    },
+    "min_pep_len": {
+      "type": "int",
+      "default": null,
+      "description": "Minimum peptide length for protein probability assignment (--minPepLen); unset = 7",
+      "min": 1
+    },
+    "peptide_weight": {
+      "type": "float",
+      "default": null,
+      "description": "Threshold defining peptide uniqueness (--weight); unset = 1",
+      "min": 0
+    },
+    "two_dimensional": {
+      "type": "bool",
+      "default": false,
+      "description": "Two-dimensional FDR filtering (--2d)"
+    },
+    "group_filter": {
+      "type": "bool",
+      "default": false,
+      "description": "Use the group label when filtering (--group)"
+    },
+    "map_mods": {
+      "type": "bool",
+      "default": false,
+      "description": "Map modifications onto the filtered results (--mapmods)"
+    },
+    "filter_mods": {
+      "type": "str",
+      "default": "",
+      "description": "Modifications to stratify the FDR filter by (--mods), e.g. `M:15.9949,n:42.0106`. Empty = one pooled population, Philosopher's default."
+    },
+    "delta_mass_stratify": {
+      "type": "bool",
+      "default": false,
+      "description": "Stratify PSMs by delta-mass profile before FDR filtering (--delta); open / labile searches"
+    },
+    "print_models": {
+      "type": "bool",
+      "default": false,
+      "description": "Print the model distributions (--models)"
+    },
+    "report_mzid": {
+      "type": "bool",
+      "default": false,
+      "description": "Also emit an mzIdentML file (--mzid)"
+    },
+    "report_ionmobility": {
+      "type": "bool",
+      "default": false,
+      "description": "Force the ion-mobility column into the reports (--ionmobility). timsTOF data"
+    },
+    "report_prefix": {
+      "type": "bool",
+      "default": false,
+      "description": "Prefix report filenames with the project/folder name (--prefix)"
+    }
+  },
+  "freequant": {
+    "ptw": {
+      "type": "float",
+      "default": 0.4,
+      "description": "Peak time window in minutes (--ptw)",
+      "min": 0,
+      "primary": true
+    },
+    "tol": {
+      "type": "float",
+      "default": 10.0,
+      "description": "m/z tolerance in ppm (--tol)",
+      "min": 0,
+      "primary": true
+    },
+    "faims": {
+      "type": "bool",
+      "default": false,
+      "description": "Use FAIMS compensation-voltage information (--faims)",
+      "primary": true
+    },
+    "read_raw": {
+      "type": "bool",
+      "default": false,
+      "description": "Read vendor raw files instead of converted mzML/mzXML (--raw)",
+      "primary": true
+    },
+    "extra_cmdline": {
+      "type": "str",
+      "default": "",
+      "description": "Escape hatch: extra `philosopher freequant` argv appended verbatim (shell-quoted)"
+    }
+  },
+  "labelquant": {
+    "brand": {
+      "type": "str",
+      "default": "",
+      "description": "Isobaric labeling brand (--brand): tmt, itraq or sCLIP. Required for a real run; philosopher declares no default",
+      "primary": true
+    },
+    "plex": {
+      "type": "str",
+      "default": "",
+      "description": "Number of reporter-ion channels (--plex), e.g. 10/11/16. Required for a real run; philosopher declares no default",
+      "primary": true
+    },
+    "annotation_file": {
+      "type": "str",
+      "default": "",
+      "description": "Annotation file mapping channels to sample names (--annot)",
+      "primary": true
+    },
+    "level": {
+      "type": "int",
+      "default": 2,
+      "description": "MS level the reporter ions are read from (--level)",
+      "min": 1,
+      "primary": true
+    },
+    "minprob": {
+      "type": "float",
+      "default": 0.7,
+      "description": "Only use PSMs above this probability (--minprob)",
+      "min": 0,
+      "max": 1,
+      "primary": true
+    },
+    "purity": {
+      "type": "float",
+      "default": 0.5,
+      "description": "Ion purity threshold (--purity)",
+      "min": 0,
+      "max": 1,
+      "primary": true
+    },
+    "tol": {
+      "type": "float",
+      "default": 20.0,
+      "description": "m/z tolerance in ppm (--tol)",
+      "min": 0,
+      "primary": true
+    },
+    "removelow": {
+      "type": "float",
+      "default": 0.0,
+      "description": "Ignore the lower fraction of PSMs by summed abundance (--removelow); 0 = keep all",
+      "min": 0,
+      "max": 1
+    },
+    "uniqueonly": {
+      "type": "bool",
+      "default": false,
+      "description": "Quantify from unique peptides only (--uniqueonly)",
+      "primary": true
+    },
+    "bestpsm": {
+      "type": "bool",
+      "default": false,
+      "description": "Keep only the best PSM per peptide for protein quantification (--bestpsm)",
+      "primary": true
+    },
+    "read_raw": {
+      "type": "bool",
+      "default": false,
+      "description": "Read vendor raw files instead of converted mzML/mzXML (--raw)"
+    },
+    "extra_cmdline": {
+      "type": "str",
+      "default": "",
+      "description": "Escape hatch: extra `philosopher labelquant` argv appended verbatim (shell-quoted)"
+    }
+  },
+  "abacus": {
+    "protein": {
+      "type": "bool",
+      "default": true,
+      "description": "Emit the global protein report combined_protein.tsv (--protein); needs combined.prot.xml from proteinprophet",
+      "primary": true
+    },
+    "peptide": {
+      "type": "bool",
+      "default": false,
+      "description": "Emit the global peptide report combined_peptide.tsv (--peptide); needs combined.pep.xml from iprophet",
+      "primary": true
+    },
+    "decoy_prefix": {
+      "type": "str",
+      "default": "rev_",
+      "description": "Decoy sequence tag (--tag); must match the upstream filter/database setting",
+      "primary": true
+    },
+    "pep_prob": {
+      "type": "float",
+      "default": 0.5,
+      "description": "Minimum peptide probability (--pepProb)",
+      "min": 0,
+      "max": 1,
+      "primary": true
+    },
+    "prot_prob": {
+      "type": "float",
+      "default": 0.9,
+      "description": "Minimum protein probability (--prtProb)",
+      "min": 0,
+      "max": 1,
+      "primary": true
+    },
+    "razor": {
+      "type": "bool",
+      "default": false,
+      "description": "Use razor peptides for protein FDR scoring (--razor); match the upstream philosopher-report setting",
+      "primary": true
+    },
+    "picked": {
+      "type": "bool",
+      "default": false,
+      "description": "Apply the picked-FDR algorithm before protein scoring (--picked)",
+      "primary": true
+    },
+    "labels": {
+      "type": "bool",
+      "default": false,
+      "description": "The datasets carry isobaric labels — combine channel abundances too (--labels)",
+      "primary": true
+    },
+    "plex": {
+      "type": "str",
+      "default": "10",
+      "description": "Number of isobaric channels (--plex); only meaningful with labels=True",
+      "primary": true
+    },
+    "uniqueonly": {
+      "type": "bool",
+      "default": false,
+      "description": "Combine isobaric quantification from unique peptides only (--uniqueonly)"
+    },
+    "full": {
+      "type": "bool",
+      "default": false,
+      "description": "Generate combined tables with extra columns (--full)"
+    },
+    "reprint": {
+      "type": "bool",
+      "default": false,
+      "description": "Also write Reprint-format tables reprint.spc.tsv / reprint.int.tsv (--reprint)",
+      "primary": true
+    },
+    "extra_cmdline": {
+      "type": "str",
+      "default": "",
+      "description": "Escape hatch: extra `philosopher abacus` argv appended verbatim (shell-quoted)"
+    }
+  },
+  "ionquant": {
+    "binary_path": {
+      "type": "str",
+      "default": "/opt/fragpipe-tools/ionquant/IonQuant-1.11.20.jar",
+      "description": "Path to the IonQuant JAR"
+    },
+    "ram_gb": {
+      "type": "int",
+      "default": 8,
+      "description": "JVM heap size (-Xmx) in GB",
+      "min": 2,
+      "primary": true
+    },
+    "threads": {
+      "type": "int",
+      "default": 0,
+      "description": "Worker threads (0 = all logical cores)",
+      "min": 0,
+      "primary": true
+    },
+    "mztol_ppm": {
+      "type": "float",
+      "default": 10.0,
+      "description": "MS1 mass tolerance (ppm) for feature extraction",
+      "min": 0,
+      "primary": true
+    },
+    "rttol_min": {
+      "type": "float",
+      "default": 0.4,
+      "description": "Retention time tolerance (min)",
+      "min": 0,
+      "primary": true
+    },
+    "minisotopes": {
+      "type": "int",
+      "default": 2,
+      "description": "Minimum isotopes required in feature extraction",
+      "enum": [
+        1,
+        2,
+        3
+      ],
+      "primary": true
+    },
+    "minscans": {
+      "type": "int",
+      "default": 3,
+      "description": "Minimum MS1 scans required in feature extraction",
+      "min": 1,
+      "primary": true
+    },
+    "perform_ms1quant": {
+      "type": "bool",
+      "default": true,
+      "description": "Run MS1 quant (LFQ); turn off for TMT-only experiments",
+      "primary": true
+    },
+    "perform_isoquant": {
+      "type": "bool",
+      "default": false,
+      "description": "Run isobaric (TMT) quantification",
+      "primary": true
+    },
+    "isotype": {
+      "type": "str",
+      "default": "TMT-10",
+      "description": "Isobaric label type (only when perform_isoquant=True)",
+      "enum": [
+        "iTRAQ-4",
+        "iTRAQ-8",
+        "TMT-0",
+        "TMT-2",
+        "TMT-6",
+        "TMT-10",
+        "TMT-11",
+        "TMT-16",
+        "TMT-18",
+        "TMT-35"
+      ],
+      "primary": true
+    },
+    "isolevel": {
+      "type": "int",
+      "default": 2,
+      "description": "MS level reporter ions are read from (2=MS2, 3=MS3). Only when perform_isoquant=True.",
+      "enum": [
+        2,
+        3
+      ],
+      "primary": true
+    },
+    "annotation_file": {
+      "type": "str",
+      "default": "",
+      "description": "TMT channel→sample annotation file. Required for isoquant (passed as --annotation <psm.tsv>=<file>).",
+      "primary": true
+    },
+    "maxlfq": {
+      "type": "bool",
+      "default": true,
+      "description": "Calculate MaxLFQ intensity",
+      "primary": true
+    },
+    "mbr": {
+      "type": "bool",
+      "default": false,
+      "description": "Match-between-runs (cross-sample alignment)",
+      "primary": true
+    },
+    "normalization": {
+      "type": "bool",
+      "default": true,
+      "description": "Normalize intensities across runs",
+      "primary": true
+    },
+    "msstats": {
+      "type": "bool",
+      "default": false,
+      "description": "Emit MSstats-compatible input",
+      "primary": true
+    },
+    "isotol_ppm": {
+      "type": "float",
+      "default": null,
+      "description": "MS2 reporter-ion tolerance in ppm (--isotol); unset = IonQuant default 10",
+      "min": 0
+    },
+    "site_reports": {
+      "type": "bool",
+      "default": true,
+      "description": "Generate PTM site reports (needs localization columns in psm.tsv)"
+    },
+    "ionmobility": {
+      "type": "bool",
+      "default": false,
+      "description": "Data carries ion mobility (--ionmobility). Required for timsTOF LC-MS",
+      "primary": true
+    },
+    "imtol": {
+      "type": "float",
+      "default": null,
+      "description": "1/K0 tolerance (--imtol); unset = IonQuant default 0.05",
+      "min": 0
+    },
+    "mbrrttol": {
+      "type": "float",
+      "default": null,
+      "description": "MBR retention-time tolerance in minutes (--mbrrttol); unset = 1.0",
+      "min": 0
+    },
+    "mbrimtol": {
+      "type": "float",
+      "default": null,
+      "description": "MBR 1/K0 tolerance (--mbrimtol); unset = 0.05",
+      "min": 0
+    },
+    "mbrtoprun": {
+      "type": "int",
+      "default": null,
+      "description": "Maximum donor runs per acceptor run (--mbrtoprun); unset = 10",
+      "min": 1
+    },
+    "mbrmincorr": {
+      "type": "float",
+      "default": null,
+      "description": "Minimum donor↔acceptor correlation (--mbrmincorr); unset = 0"
+    },
+    "ionfdr": {
+      "type": "float",
+      "default": null,
+      "description": "Transferred-ion FDR threshold (--ionfdr); unset = 0.01",
+      "min": 0,
+      "max": 1
+    },
+    "peptidefdr": {
+      "type": "float",
+      "default": null,
+      "description": "Transferred-peptide FDR threshold (--peptidefdr); unset = 1",
+      "min": 0,
+      "max": 1
+    },
+    "proteinfdr": {
+      "type": "float",
+      "default": null,
+      "description": "Transferred-protein FDR threshold (--proteinfdr); unset = 1",
+      "min": 0,
+      "max": 1
+    },
+    "minions": {
+      "type": "int",
+      "default": null,
+      "description": "Minimum ions required to quantify a protein, MaxLFQ only (--minions); unset = 1",
+      "min": 1
+    },
+    "minexps": {
+      "type": "int",
+      "default": null,
+      "description": "Minimum experiments an ion must appear in (--minexps); unset = 1",
+      "min": 1
+    },
+    "minfreq": {
+      "type": "float",
+      "default": null,
+      "description": "Minimum frequency for an ion to be used in protein quant (--minfreq); unset = 0",
+      "min": 0,
+      "max": 1
+    },
+    "topn_ions": {
+      "type": "int",
+      "default": null,
+      "description": "Ions used per protein, 0 = all (--tp); unset = 0",
+      "min": 0
+    },
+    "uniqueness": {
+      "type": "int",
+      "default": null,
+      "description": "Peptide→protein uniqueness (--uniqueness): 0 = unique+razor, 1 = unique only, 2 = all",
+      "enum": [
+        0,
+        1,
+        2
+      ]
+    },
+    "intensitymode": {
+      "type": "int",
+      "default": null,
+      "description": "Ion intensity mode (--intensitymode): 0 = apex, 1 = area, 2 = auto",
+      "enum": [
+        0,
+        1,
+        2
+      ]
+    },
+    "ibaq": {
+      "type": "bool",
+      "default": false,
+      "description": "Also compute iBAQ intensities (experimental)"
+    },
+    "excludemods": {
+      "type": "str",
+      "default": "",
+      "description": "Modifications excluded from quantification, `<aa><mass>;…` (--excludemods)"
+    },
+    "locprob": {
+      "type": "float",
+      "default": null,
+      "description": "Localization probability threshold (--locprob); unset = 0",
+      "min": 0,
+      "max": 1
+    },
+    "writeindex": {
+      "type": "bool",
+      "default": false,
+      "description": "Write a reusable spectral index to disk (--writeindex)"
+    },
+    "light_labels": {
+      "type": "str",
+      "default": "",
+      "description": "Light channel labels `<residues><mass>;…` (--light), e.g. `K0.0;R0.0`"
+    },
+    "medium_labels": {
+      "type": "str",
+      "default": "",
+      "description": "Medium channel labels (--medium)"
+    },
+    "heavy_labels": {
+      "type": "str",
+      "default": "",
+      "description": "Heavy channel labels (--heavy), e.g. `K8.014199;R10.008269`"
+    },
+    "label_formula": {
+      "type": "str",
+      "default": "",
+      "description": "Chemical formulas of the labelling mods (--formula), e.g. `C(2)H(2)O;2H(4)C(2)`. Required for isotope-labelling quantification"
+    },
+    "requantify": {
+      "type": "bool",
+      "default": null,
+      "description": "Re-quantify ions the search did not identify (--requantify). Unset = IonQuant's default, except with light/medium/heavy labels where it defaults to on"
+    },
+    "extra_cmdline": {
+      "type": "str",
+      "default": "",
+      "description": "Escape hatch: extra IonQuant flags appended verbatim (e.g. `--filelist /path/flags.txt`)"
+    }
+  },
+  "ptmshepherd": {
+    "ram_gb": {
+      "type": "int",
+      "default": 16,
+      "description": "JVM heap (-Xmx<N>G)",
+      "min": 1,
+      "primary": true
+    },
+    "threads": {
+      "type": "int",
+      "default": 0,
+      "description": "0 = all available",
+      "primary": true
+    },
+    "glyco_mode": {
+      "type": "bool",
+      "default": false,
+      "description": "Enable glycan-PTM analysis path (emitted as PTM-Shepherd's `run_glyco_mode`)",
+      "primary": true
+    },
+    "n_glyco": {
+      "type": "bool",
+      "default": true,
+      "description": "N-glycan branch (vs O-glycan) when glyco_mode is on",
+      "primary": true
+    },
+    "histo_bindivs": {
+      "type": "int",
+      "default": 5000,
+      "description": "Histogram bins per Dalton used in peakpicking",
+      "min": 1
+    },
+    "histo_smoothbins": {
+      "type": "int",
+      "default": 2,
+      "description": "Peakpicking smoothing factor (weight spread to N adjacent bins)",
+      "min": 0
+    },
+    "histo_normalizeTo": {
+      "type": "enum",
+      "default": "psms",
+      "description": "Normalize dataset size to PSM count or MS2 scan count",
+      "enum": [
+        "psms",
+        "scans"
+      ]
+    },
+    "peakpicking_mass_units": {
+      "type": "int",
+      "default": 0,
+      "description": "Peakpicking mass units: 0 = Da, 1 = ppm. Pairs with `peakpicking_width`; FragPipe's open-search config uses 0 (0.002 Da) and its offset-search config uses 1 (3 ppm)",
+      "enum": [
+        0,
+        1
+      ]
+    },
+    "spectra_condPeaks": {
+      "type": "int",
+      "default": 150,
+      "description": "Maximum peaks kept per spectrum",
+      "min": 1
+    },
+    "spectra_condRatio": {
+      "type": "float",
+      "default": 0.0001,
+      "description": "Minimum peak intensity as a fraction of the base peak",
+      "min": 0
+    },
+    "spectra_maxPrecursorCharge": {
+      "type": "int",
+      "default": 4,
+      "description": "Maximum precursor charge considered",
+      "min": 1
+    },
+    "localization_background": {
+      "type": "int",
+      "default": 4,
+      "description": "Localization enrichment background: 1=bin peptides, 2=bin PSMs, 3=all peptides, 4=all PSMs",
+      "enum": [
+        1,
+        2,
+        3,
+        4
+      ]
+    },
+    "localization_allowed_res": {
+      "type": "str",
+      "default": "",
+      "description": "Residues allowed to carry the shift (e.g. `STY`, `N`); empty = no restriction"
+    },
+    "localize_delta_mass": {
+      "type": "bool",
+      "default": true,
+      "description": "MSFragger already localized delta-mass fragment ions (pair with the search node's localize_delta_mass)"
+    },
+    "use_msfragger_localization": {
+      "type": "bool",
+      "default": false,
+      "description": "Reuse MSFragger's localization columns instead of re-localizing. Requires a psm.tsv that still carries them (no Percolator / Crystal-C in between)"
+    },
+    "msfragger_massdiff_to_varmod": {
+      "type": "bool",
+      "default": false,
+      "description": "Re-synthesise variable mods from Delta Mass. Only for a psm.tsv whose `Modified Peptide` column is empty"
+    },
+    "annotate_assigned_mods": {
+      "type": "bool",
+      "default": false,
+      "description": "Annotate shifts using the PSM table's assigned modifications"
+    },
+    "annotation_file": {
+      "type": "str",
+      "default": "",
+      "description": "`glyco`, `unimod`, `common`, or path to custom annotation table; empty = unimod",
+      "primary": true
+    },
+    "annotation_tol": {
+      "type": "float",
+      "default": 0.01,
+      "description": "Mass tolerance (Da) for matching shifts to known modifications",
+      "min": 0,
+      "primary": true
+    },
+    "mass_offsets": {
+      "type": "str",
+      "default": "",
+      "description": "Slash-separated list to restrict peakpicking to (e.g. `0/-105.0248/-89.0299`); empty = full open search",
+      "primary": true
+    },
+    "isotope_error": {
+      "type": "str",
+      "default": "0",
+      "description": "Isotope correction list (e.g. `0/1/2`)"
+    },
+    "peakpicking_promRatio": {
+      "type": "float",
+      "default": 0.3,
+      "description": "Prominence ratio for peakpicking",
+      "min": 0,
+      "primary": true
+    },
+    "peakpicking_width": {
+      "type": "float",
+      "default": 0.002,
+      "description": "Peakpicking width (Da)",
+      "min": 0
+    },
+    "peakpicking_topN": {
+      "type": "int",
+      "default": 500,
+      "description": "Maximum peaks to report",
+      "min": 1
+    },
+    "peakpicking_minPsm": {
+      "type": "int",
+      "default": 10,
+      "description": "Minimum PSMs per peak",
+      "min": 1,
+      "primary": true
+    },
+    "precursor_tol": {
+      "type": "float",
+      "default": 0.01,
+      "description": "Peak-width tolerance (Da or ppm)",
+      "min": 0,
+      "primary": true
+    },
+    "precursor_mass_units": {
+      "type": "int",
+      "default": 0,
+      "description": "0 = Da, 1 = ppm",
+      "enum": [
+        0,
+        1
+      ]
+    },
+    "varmod_masses": {
+      "type": "str",
+      "default": "",
+      "description": "Additional prioritized mass shifts (e.g. `mod1:1234.456,mod2:456.789`)",
+      "primary": true
+    },
+    "spectra_ppmtol": {
+      "type": "float",
+      "default": 20.0,
+      "description": "MS2 ppm tolerance for localization + spectral similarity",
+      "min": 0,
+      "primary": true
+    },
+    "spectra_maxfragcharge": {
+      "type": "int",
+      "default": 2,
+      "description": "Maximum fragment charge for localization",
+      "min": 1
+    },
+    "iontype_a": {
+      "type": "bool",
+      "default": false,
+      "description": "Use a-ions"
+    },
+    "iontype_b": {
+      "type": "bool",
+      "default": true,
+      "description": "Use b-ions"
+    },
+    "iontype_c": {
+      "type": "bool",
+      "default": false,
+      "description": "Use c-ions"
+    },
+    "iontype_x": {
+      "type": "bool",
+      "default": false,
+      "description": "Use x-ions"
+    },
+    "iontype_y": {
+      "type": "bool",
+      "default": true,
+      "description": "Use y-ions"
+    },
+    "iontype_z": {
+      "type": "bool",
+      "default": false,
+      "description": "Use z-ions"
+    },
+    "compare_betweenRuns": {
+      "type": "bool",
+      "default": false,
+      "description": "Allow spectral similarity / RT calculation across runs"
+    },
+    "output_extended": {
+      "type": "bool",
+      "default": false,
+      "description": "Retain intermediate + spectrum-level outputs"
+    },
+    "prep_for_ionquant": {
+      "type": "bool",
+      "default": false,
+      "description": "Prepare PSM table for downstream IonQuant"
+    },
+    "glycodatabase": {
+      "type": "str",
+      "default": "",
+      "description": "Glycan database: comma-separated compositions (e.g. `HexNAc(2)Hex(3)`) or a path to a .glyc file; empty = PTM-Shepherd default",
+      "primary": true
+    },
+    "glyco_fdr": {
+      "type": "float",
+      "default": 0.01,
+      "description": "Glycan assignment FDR",
+      "min": 0,
+      "max": 1
+    },
+    "glyco_ppm_tol": {
+      "type": "float",
+      "default": 30.0,
+      "description": "Precursor ppm tolerance for glycan mass matching",
+      "min": 0
+    },
+    "glyco_isotope_min": {
+      "type": "int",
+      "default": -1,
+      "description": "Minimum isotope error for glycan matching"
+    },
+    "glyco_isotope_max": {
+      "type": "int",
+      "default": 3,
+      "description": "Maximum isotope error for glycan matching"
+    },
+    "glyco_lda": {
+      "type": "bool",
+      "default": false,
+      "description": "Use LDA-based glycan scoring"
+    },
+    "cap_y_ions": {
+      "type": "str",
+      "default": "0,203.07937,406.15874,568.21156,730.26438,892.3172,349.137279",
+      "description": "Y-ion (peptide + glycan remainder) masses searched in the spectrum"
+    },
+    "diag_ions": {
+      "type": "str",
+      "default": "204.086646,186.076086,168.065526,366.139466,144.0656,138.055,512.197375,292.1026925,274.0921325,657.2349,243.026426,405.079246,485.045576,308.09761",
+      "description": "Diagnostic (oxonium) ion masses, singly charged"
+    },
+    "diag_ions_normalize": {
+      "type": "int",
+      "default": 1,
+      "description": "Normalize diagnostic ion intensities: 0 = off, 1 = base peak",
+      "enum": [
+        0,
+        1
+      ]
+    },
+    "glyco_cap_y_ions_normalize": {
+      "type": "int",
+      "default": 1,
+      "description": "Normalize Y-ion intensities: 0 = off, 1 = base peak",
+      "enum": [
+        0,
+        1
+      ]
+    },
+    "max_cap_y_charge": {
+      "type": "int",
+      "default": 0,
+      "description": "Maximum Y-ion charge state (0 = tool default)",
+      "min": 0
+    },
+    "remainder_masses": {
+      "type": "str",
+      "default": "203.07937",
+      "description": "Comma-separated remainder masses localized onto the peptide"
+    },
+    "remainder_mass_allowed_res": {
+      "type": "str",
+      "default": "all",
+      "description": "Residues that may carry a remainder mass (`all` or a residue list)"
+    },
+    "remove_glycan_delta_mass": {
+      "type": "bool",
+      "default": true,
+      "description": "Strip the glycan delta mass from the reported peptide mass"
+    },
+    "put_glycans_to_assigned_mods": {
+      "type": "bool",
+      "default": true,
+      "description": "Write assigned glycans into the psm.tsv `Assigned Modifications` column (needed by downstream IonQuant/TMT-Integrator)"
+    },
+    "print_full_glyco_params": {
+      "type": "bool",
+      "default": false,
+      "description": "Echo the full resolved glyco parameter set into the log"
+    },
+    "print_decoys": {
+      "type": "bool",
+      "default": false,
+      "description": "Include decoy glycan assignments in the reports"
+    },
+    "run_diagextract_mode": {
+      "type": "bool",
+      "default": false,
+      "description": "Extract intensities for the configured diagnostic ions"
+    },
+    "run_diagmine_mode": {
+      "type": "bool",
+      "default": false,
+      "description": "Mine unknown diagnostic ions / peptide remainders (Diagnostic-ion-mining workflow)"
+    },
+    "diagmine_minPeps": {
+      "type": "int",
+      "default": 25,
+      "description": "Minimum peptides per mass shift for diagnostic mining",
+      "min": 1
+    },
+    "diagmine_minIonsPerSpec": {
+      "type": "int",
+      "default": 2,
+      "description": "Minimum ions per spectrum for diagnostic mining",
+      "min": 1
+    },
+    "diagmine_diagMinFoldChange": {
+      "type": "float",
+      "default": 3.0,
+      "description": "Minimum fold change for a diagnostic ion to be reported",
+      "min": 0
+    },
+    "diagmine_diagMinSpecDiff": {
+      "type": "float",
+      "default": 25.0,
+      "description": "Minimum spectral percentage difference for a diagnostic ion",
+      "min": 0
+    },
+    "diagmine_fragMinFoldChange": {
+      "type": "float",
+      "default": 3.0,
+      "description": "Minimum fold change for a fragment remainder ion",
+      "min": 0
+    },
+    "diagmine_fragMinSpecDiff": {
+      "type": "float",
+      "default": 25.0,
+      "description": "Minimum spectral percentage difference for a fragment remainder ion",
+      "min": 0
+    },
+    "diagmine_fragMinPropensity": {
+      "type": "float",
+      "default": 12.5,
+      "description": "Minimum propensity for a fragment remainder ion",
+      "min": 0
+    },
+    "diagmine_pepMinFoldChange": {
+      "type": "float",
+      "default": 3.0,
+      "description": "Minimum fold change for a peptide remainder mass",
+      "min": 0
+    },
+    "diagmine_pepMinSpecDiff": {
+      "type": "float",
+      "default": 25.0,
+      "description": "Minimum spectral percentage difference for a peptide remainder mass",
+      "min": 0
+    },
+    "extra_params": {
+      "type": "str",
+      "default": "",
+      "description": "Escape hatch: extra `key = value` lines appended to ptmshepherd_config.txt (newline or ';' separated). Overrides a key we already write."
+    }
+  },
+  "tmtintegrator": {
+    "annotation_file": {
+      "type": "str",
+      "default": "",
+      "description": "Path to TMT annotation file (whitespace-separated `<channel> <sample>` per line). Reference channels must use the value of `ref_tag` (default 'pool').",
+      "required": true,
+      "primary": true
+    },
+    "channel_num": {
+      "type": "int",
+      "default": 10,
+      "description": "Isobaric plex size — iTRAQ 4/8 or TMT 6/10/11/16/18/35 (label mass auto-derived: 4/8→iTRAQ 144.10, others→TMT/TMTpro)",
+      "enum": [
+        4,
+        8,
+        6,
+        10,
+        11,
+        16,
+        18,
+        35
+      ],
+      "primary": true
+    },
+    "ref_tag": {
+      "type": "str",
+      "default": "pool",
+      "description": "Reference-channel tag (matched against sample column of annotation file)",
+      "primary": true
+    },
+    "add_Ref": {
+      "type": "int",
+      "default": -1,
+      "description": "Artificial reference: -2 raw, -1 disabled, 0 sum, 1 avg, 2 median",
+      "enum": [
+        -2,
+        -1,
+        0,
+        1,
+        2
+      ],
+      "primary": true
+    },
+    "groupby": {
+      "type": "int",
+      "default": -1,
+      "description": "Aggregation level: -1 all, 0 gene, 1 protein, 2 peptide, 3 multi-site, 4 single-site, 5 multi-mass",
+      "enum": [
+        -1,
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "primary": true
+    },
+    "prot_norm": {
+      "type": "int",
+      "default": -1,
+      "description": "Normalization: -1 all, 0 none, 1 MC, 2 GN, 3 SL+IRS",
+      "enum": [
+        -1,
+        0,
+        1,
+        2,
+        3
+      ],
+      "primary": true
+    },
+    "aggregation_method": {
+      "type": "int",
+      "default": 0,
+      "description": "PSM→level aggregation: 0 median, 1 weighted-ratio",
+      "enum": [
+        0,
+        1
+      ],
+      "primary": true
+    },
+    "log2transformed": {
+      "type": "bool",
+      "default": true,
+      "description": "Report ratios/abundances on log2 scale"
+    },
+    "allow_overlabel": {
+      "type": "bool",
+      "default": true,
+      "description": "Accept PSMs with extra TMT on Ser"
+    },
+    "allow_unlabeled": {
+      "type": "bool",
+      "default": false,
+      "description": "Accept PSMs without any TMT tag",
+      "primary": true
+    },
+    "best_psm": {
+      "type": "bool",
+      "default": true,
+      "description": "Keep highest-intensity PSM per peptide per run",
+      "primary": true
+    },
+    "outlier_removal": {
+      "type": "bool",
+      "default": true,
+      "description": "Drop intensity outliers before aggregation"
+    },
+    "psm_norm": {
+      "type": "bool",
+      "default": false,
+      "description": "Additional RT-based PSM-level normalization"
+    },
+    "ms1_int": {
+      "type": "bool",
+      "default": true,
+      "description": "Use MS1 precursor intensity (else MS2 reference) for ref sample abundance"
+    },
+    "min_pep_prob": {
+      "type": "float",
+      "default": 0.9,
+      "description": "Minimum PSM probability (in addition to Philosopher FDR)",
+      "min": 0,
+      "max": 1,
+      "primary": true
+    },
+    "min_purity": {
+      "type": "float",
+      "default": 0.5,
+      "description": "Precursor purity threshold",
+      "min": 0,
+      "max": 1,
+      "primary": true
+    },
+    "min_percent": {
+      "type": "float",
+      "default": 0.05,
+      "description": "Drop PSMs whose summed-TMT intensity is in the lowest fraction",
+      "min": 0,
+      "max": 1,
+      "primary": true
+    },
+    "min_site_prob": {
+      "type": "float",
+      "default": -1.0,
+      "description": "Site-localization confidence (-1 global, 0 search engine, >0 PTMProphet)",
+      "primary": true
+    },
+    "min_snr": {
+      "type": "float",
+      "default": 0.0,
+      "description": "Minimum reporter-ion SNR",
+      "primary": true
+    },
+    "unique_pep": {
+      "type": "bool",
+      "default": false,
+      "description": "Use unique peptides only (else unique+razor)"
+    },
+    "unique_gene": {
+      "type": "int",
+      "default": 0,
+      "description": "Gene-uniqueness filter: 0 keep all, 1 drop multi-gene-evidence, 2 drop all multi-gene-in-fasta",
+      "enum": [
+        0,
+        1,
+        2
+      ]
+    },
+    "mod_tag": {
+      "type": "str",
+      "default": "none",
+      "description": "PTM specification for site-specific reports (e.g. 'S(79.9663),T(79.9663),Y(79.9663)' for phospho)",
+      "primary": true
+    },
+    "prot_exclude": {
+      "type": "str",
+      "default": "none",
+      "description": "Protein accession prefixes to drop (e.g. 'sp|,tr|'). 'none' = keep all."
+    },
+    "ram_gb": {
+      "type": "int",
+      "default": 16,
+      "description": "JVM heap (-Xmx<N>G)",
+      "min": 1,
+      "primary": true
+    },
+    "label_masses": {
+      "type": "float",
+      "default": null,
+      "description": "Isobaric label mass. Empty = derived from channel_num (iTRAQ 144.10253, TMT 229.16293, TMTpro 304.20715)"
+    },
+    "max_pep_prob_thres": {
+      "type": "float",
+      "default": 0.0,
+      "description": "Peptide probability above which a PSM is always kept (0 = off)",
+      "min": 0,
+      "max": 1
+    },
+    "min_ntt": {
+      "type": "int",
+      "default": 0,
+      "description": "Minimum number of enzymatic termini",
+      "enum": [
+        0,
+        1,
+        2
+      ]
+    },
+    "glyco_qval": {
+      "type": "float",
+      "default": -1.0,
+      "description": "Glycan q-value filter for glyco-TMT reports (-1 = off)"
+    },
+    "use_glycan_composition": {
+      "type": "bool",
+      "default": false,
+      "description": "Index site reports by glycan composition instead of mass (N-glyco only)"
+    },
+    "print_RefInt": {
+      "type": "bool",
+      "default": false,
+      "description": "Print reference-channel intensities in the reports"
+    },
+    "medium_subplex": {
+      "type": "str",
+      "default": "",
+      "description": "Hyperplex medium sub-plex definition `<channelCount>:<refTag>` (e.g. `18:pool`)"
+    },
+    "heavy_subplex": {
+      "type": "str",
+      "default": "",
+      "description": "Hyperplex heavy sub-plex definition `<channelCount>:<refTag>`"
+    },
+    "combined_protein": {
+      "type": "str",
+      "default": "",
+      "description": "Path to combined_protein.tsv used for gene/protein annotation of the reports"
+    },
+    "abn_type": {
+      "type": "int",
+      "default": null,
+      "description": "Abundance type reported (0 = ratio-derived, 1 = intensity); unset = TMT-Integrator default",
+      "enum": [
+        0,
+        1
+      ]
+    },
+    "min_resolution": {
+      "type": "int",
+      "default": null,
+      "description": "Minimum MS2 resolution required to resolve the reporter ions; unset = tool default",
+      "min": 0
+    },
+    "extra_params": {
+      "type": "str",
+      "default": "",
+      "description": "Escape hatch: extra `key = value` entries merged into tmt-i_config.yml (newline or ';' separated). Overrides a key we already write."
+    }
+  },
+  "diann": {
+    "library_path": {
+      "type": "str",
+      "default": "",
+      "description": "Path to spectral library (.tsv/.speclib). DIA-NN's --lib argument. Optional if upstream easypqp supplies library*.tsv via inputs (hybrid topology).",
+      "primary": true
+    },
+    "fasta_path": {
+      "type": "str",
+      "default": "",
+      "description": "Optional fasta for protein inference (--fasta). Empty disables protein-level reports.",
+      "primary": true
+    },
+    "num_threads": {
+      "type": "int",
+      "default": 8,
+      "description": "Worker threads (--threads)",
+      "min": 1,
+      "primary": true
+    },
+    "precursor_qvalue": {
+      "type": "float",
+      "default": 0.01,
+      "description": "Run-specific precursor q-value cutoff (--qvalue)",
+      "min": 0,
+      "max": 1,
+      "primary": true
+    },
+    "protein_qvalue": {
+      "type": "float",
+      "default": 0.01,
+      "description": "Run-specific protein q-value cutoff (--matrix-qvalue)",
+      "min": 0,
+      "max": 1,
+      "primary": true
+    },
+    "matrix_spec_qvalue": {
+      "type": "float",
+      "default": null,
+      "description": "Run-specific protein spec-q for matrix reporting (--matrix-spec-q); unset = DIA-NN's default (no filter), which is what FragPipe runs with",
+      "min": 0,
+      "max": 1,
+      "primary": true
+    },
+    "mbr": {
+      "type": "bool",
+      "default": false,
+      "description": "Match-between-runs / re-analysis pass (--reanalyse)",
+      "primary": true
+    },
+    "matrices": {
+      "type": "bool",
+      "default": true,
+      "description": "Emit pr_matrix / pg_matrix abundance tables (--matrices)",
+      "primary": true
+    },
+    "relaxed_protein_inference": {
+      "type": "bool",
+      "default": false,
+      "description": "Use relaxed protein inference (--relaxed-prot-inf)"
+    },
+    "no_protein_inference": {
+      "type": "bool",
+      "default": false,
+      "description": "Skip protein inference entirely (--no-prot-inf)"
+    },
+    "skip_quant": {
+      "type": "bool",
+      "default": false,
+      "description": "DEPRECATED / no-op: DIA-NN has no '--no-quant' option (it warns 'unrecognised option' and quantifies anyway). Kept so existing graphs still validate. Use `no_quant_files` or `quant_only` instead."
+    },
+    "no_quant_files": {
+      "type": "bool",
+      "default": false,
+      "description": "Don't write intermediate .quant files to disk (--no-quant-files)"
+    },
+    "quant_only": {
+      "type": "bool",
+      "default": false,
+      "description": "Only run quantification using existing .quant files (--quant-only)"
+    },
+    "fasta_search": {
+      "type": "bool",
+      "default": false,
+      "description": "Library-free mode: digest the FASTA in silico (--fasta-search). Requires fasta_path (or a .fasta input); library_path becomes optional.",
+      "primary": true
+    },
+    "gen_spec_lib": {
+      "type": "bool",
+      "default": false,
+      "description": "Generate a spectral library from this run (--gen-spec-lib)",
+      "primary": true
+    },
+    "predictor": {
+      "type": "bool",
+      "default": false,
+      "description": "Deep-learning prediction of spectra/RT/IM for the in-silico library (--predictor)"
+    },
+    "out_lib": {
+      "type": "str",
+      "default": "",
+      "description": "Output spectral library path (--out-lib); empty = <output_dir>/report-lib.tsv when gen_spec_lib is on"
+    },
+    "cut": {
+      "type": "str",
+      "default": "",
+      "description": "In-silico digest rule (--cut), e.g. `K*,R*` for trypsin, `--cut` empty = DIA-NN default"
+    },
+    "missed_cleavages": {
+      "type": "int",
+      "default": null,
+      "description": "Maximum missed cleavages for the in-silico digest (--missed-cleavages)",
+      "min": 0
+    },
+    "min_pep_len": {
+      "type": "int",
+      "default": null,
+      "description": "Minimum peptide length (--min-pep-len)",
+      "min": 1
+    },
+    "max_pep_len": {
+      "type": "int",
+      "default": null,
+      "description": "Maximum peptide length (--max-pep-len)",
+      "min": 1
+    },
+    "min_pr_mz": {
+      "type": "float",
+      "default": null,
+      "description": "Minimum precursor m/z (--min-pr-mz)",
+      "min": 0
+    },
+    "max_pr_mz": {
+      "type": "float",
+      "default": null,
+      "description": "Maximum precursor m/z (--max-pr-mz)",
+      "min": 0
+    },
+    "min_pr_charge": {
+      "type": "int",
+      "default": null,
+      "description": "Minimum precursor charge (--min-pr-charge)",
+      "min": 1
+    },
+    "max_pr_charge": {
+      "type": "int",
+      "default": null,
+      "description": "Maximum precursor charge (--max-pr-charge)",
+      "min": 1
+    },
+    "min_fr_mz": {
+      "type": "float",
+      "default": null,
+      "description": "Minimum fragment m/z (--min-fr-mz)",
+      "min": 0
+    },
+    "max_fr_mz": {
+      "type": "float",
+      "default": null,
+      "description": "Maximum fragment m/z (--max-fr-mz)",
+      "min": 0
+    },
+    "met_excision": {
+      "type": "bool",
+      "default": false,
+      "description": "Consider protein N-terminal methionine excision (--met-excision)"
+    },
+    "unimod4": {
+      "type": "bool",
+      "default": false,
+      "description": "Fixed Cys carbamidomethylation (--unimod4)"
+    },
+    "unimod35": {
+      "type": "bool",
+      "default": false,
+      "description": "Variable Met oxidation (--unimod35)"
+    },
+    "max_var_mods": {
+      "type": "int",
+      "default": null,
+      "description": "Maximum variable modifications per peptide (--var-mods)",
+      "min": 0
+    },
+    "var_mods": {
+      "type": "str",
+      "default": "",
+      "description": "Extra variable mods, semicolon-separated `<name>,<mass>,<sites>` (each becomes a --var-mod argument), e.g. `UniMod:21,79.966331,STY`"
+    },
+    "mass_acc": {
+      "type": "float",
+      "default": null,
+      "description": "MS2 mass accuracy in ppm (--mass-acc); unset = DIA-NN auto-determines",
+      "min": 0,
+      "primary": true
+    },
+    "mass_acc_ms1": {
+      "type": "float",
+      "default": null,
+      "description": "MS1 mass accuracy in ppm (--mass-acc-ms1); unset = auto",
+      "min": 0,
+      "primary": true
+    },
+    "scan_window": {
+      "type": "int",
+      "default": null,
+      "description": "Scan window radius (--window); unset = auto",
+      "min": 0
+    },
+    "smart_profiling": {
+      "type": "bool",
+      "default": false,
+      "description": "Adaptive library profiling (--smart-profiling)"
+    },
+    "peak_center": {
+      "type": "bool",
+      "default": false,
+      "description": "Robust (peak-centred) quantification (--peak-center)"
+    },
+    "no_ifs_removal": {
+      "type": "bool",
+      "default": false,
+      "description": "Disable interference removal (--no-ifs-removal)"
+    },
+    "report_lib_info": {
+      "type": "bool",
+      "default": false,
+      "description": "Add the library's own columns to report.tsv (--report-lib-info)"
+    },
+    "individual_mass_acc": {
+      "type": "bool",
+      "default": false,
+      "description": "Determine mass accuracy per run instead of once for the batch (--individual-mass-acc); FragPipe sets it for unrelated runs"
+    },
+    "individual_windows": {
+      "type": "bool",
+      "default": false,
+      "description": "Determine the scan window per run (--individual-windows); FragPipe sets it for unrelated runs"
+    },
+    "no_maxlfq": {
+      "type": "bool",
+      "default": false,
+      "description": "Disable MaxLFQ protein quantification (--no-maxlfq)"
+    },
+    "no_normalization": {
+      "type": "bool",
+      "default": false,
+      "description": "Disable cross-run normalization (--no-norm)"
+    },
+    "pg_level": {
+      "type": "int",
+      "default": null,
+      "description": "Protein inference level (--pg-level): 0=isoform, 1=protein, 2=gene",
+      "enum": [
+        0,
+        1,
+        2
+      ]
+    },
+    "il_eq": {
+      "type": "bool",
+      "default": false,
+      "description": "Treat isoleucine and leucine as equal (--il-eq)"
+    },
+    "reannotate": {
+      "type": "bool",
+      "default": false,
+      "description": "Re-annotate the library against the FASTA (--reannotate)"
+    },
+    "temp_dir": {
+      "type": "str",
+      "default": "",
+      "description": "Directory for intermediate .quant files (--temp)"
+    },
+    "extra_cmdline": {
+      "type": "str",
+      "default": "",
+      "description": "Escape hatch: free-form extra args appended verbatim (e.g. `--no-cut-after-mod --individual-mass-acc`)"
+    }
+  },
+  "diaumpire": {
+    "ram_gb": {
+      "type": "int",
+      "default": 12,
+      "description": "JVM heap (-Xmx<N>G)",
+      "min": 1,
+      "primary": true
+    },
+    "threads": {
+      "type": "int",
+      "default": 7,
+      "description": "DIA-Umpire worker threads",
+      "min": 1,
+      "primary": true
+    },
+    "RPmax": {
+      "type": "int",
+      "default": 25,
+      "description": "Max precursor-fragment ratio",
+      "min": 1,
+      "primary": true
+    },
+    "RFmax": {
+      "type": "int",
+      "default": 500,
+      "description": "Max fragment-fragment ratio",
+      "min": 1,
+      "primary": true
+    },
+    "CorrThreshold": {
+      "type": "float",
+      "default": 0.0,
+      "description": "Precursor-fragment correlation cutoff",
+      "min": 0,
+      "primary": true
+    },
+    "DeltaApex": {
+      "type": "float",
+      "default": 0.2,
+      "description": "Precursor-fragment apex Δ tolerance",
+      "min": 0,
+      "primary": true
+    },
+    "RTOverlap": {
+      "type": "float",
+      "default": 0.3,
+      "description": "Minimum RT overlap fraction",
+      "min": 0,
+      "max": 1
+    },
+    "AdjustFragIntensity": {
+      "type": "bool",
+      "default": true,
+      "description": "Adjust fragment intensities post-grouping"
+    },
+    "BoostComplementaryIon": {
+      "type": "bool",
+      "default": false,
+      "description": "Boost complementary ion pairs (helpful for library building)"
+    },
+    "ExportPrecursorPeak": {
+      "type": "bool",
+      "default": false,
+      "description": "Export detected MS1 feature file"
+    },
+    "MS1PPM": {
+      "type": "float",
+      "default": 10.0,
+      "description": "Signal-extraction MS1 ppm tolerance (SE.MS1PPM)",
+      "min": 0,
+      "primary": true
+    },
+    "MS2PPM": {
+      "type": "float",
+      "default": 20.0,
+      "description": "Signal-extraction MS2 ppm tolerance (SE.MS2PPM)",
+      "min": 0,
+      "primary": true
+    },
+    "MS1SN": {
+      "type": "float",
+      "default": 1.1,
+      "description": "MS1 signal-to-noise threshold (SE.SN)",
+      "min": 0,
+      "primary": true
+    },
+    "MS2SN": {
+      "type": "float",
+      "default": 1.1,
+      "description": "MS2 signal-to-noise threshold (SE.MS2SN)",
+      "min": 0,
+      "primary": true
+    },
+    "MassDefectFilter": {
+      "type": "bool",
+      "default": true,
+      "description": "Apply mass-defect-based peptide filter (SE.MassDefectFilter)"
+    },
+    "Q1": {
+      "type": "bool",
+      "default": true,
+      "description": "Emit Q1 pseudo-DDA mzML"
+    },
+    "Q2": {
+      "type": "bool",
+      "default": true,
+      "description": "Emit Q2 pseudo-DDA mzML"
+    },
+    "Q3": {
+      "type": "bool",
+      "default": true,
+      "description": "Emit Q3 pseudo-DDA mzML"
+    },
+    "WindowType": {
+      "type": "enum",
+      "default": "SWATH",
+      "description": "DIA isolation scheme. SWATH = fixed windows (uses WindowSize); V_SWATH = variable windows (needs a window list via extra_params `==window setting begin`); MSX / MSE / pSMART for those acquisitions",
+      "enum": [
+        "SWATH",
+        "V_SWATH",
+        "MSX",
+        "MSE",
+        "pSMART"
+      ],
+      "primary": true
+    },
+    "WindowSize": {
+      "type": "int",
+      "default": 10,
+      "description": "Isolation window width (Th) for WindowType = SWATH",
+      "min": 0,
+      "primary": true
+    },
+    "Resolution": {
+      "type": "int",
+      "default": 60000,
+      "description": "Instrument resolving power (SE.Resolution)",
+      "min": 1
+    },
+    "EstimateBG": {
+      "type": "bool",
+      "default": false,
+      "description": "Estimate background noise level (SE.EstimateBG)"
+    },
+    "MinMSIntensity": {
+      "type": "float",
+      "default": 1.0,
+      "description": "Minimum MS1 peak intensity (SE.MinMSIntensity)",
+      "min": 0
+    },
+    "MinMSMSIntensity": {
+      "type": "float",
+      "default": 1.0,
+      "description": "Minimum MS2 peak intensity (SE.MinMSMSIntensity)",
+      "min": 0
+    },
+    "NoMissedScan": {
+      "type": "int",
+      "default": 1,
+      "description": "Allowed missed scans within a peak curve (SE.NoMissedScan)",
+      "min": 0
+    },
+    "MaxCurveRTRange": {
+      "type": "float",
+      "default": 2.0,
+      "description": "Maximum peak-curve RT width in minutes (SE.MaxCurveRTRange)",
+      "min": 0
+    },
+    "RemoveGroupedPeaks": {
+      "type": "bool",
+      "default": true,
+      "description": "Remove fragment peaks already grouped to another precursor (SE.RemoveGroupedPeaks)"
+    },
+    "RemoveGroupedPeaksRTOverlap": {
+      "type": "float",
+      "default": 0.3,
+      "description": "RT overlap threshold for grouped-peak removal (SE.RemoveGroupedPeaksRTOverlap)",
+      "min": 0,
+      "max": 1
+    },
+    "RemoveGroupedPeaksCorr": {
+      "type": "float",
+      "default": 0.3,
+      "description": "Correlation threshold for grouped-peak removal (SE.RemoveGroupedPeaksCorr)",
+      "min": 0,
+      "max": 1
+    },
+    "MinNoPeakCluster": {
+      "type": "int",
+      "default": 2,
+      "description": "Minimum isotope peaks per cluster (SE.MinNoPeakCluster)",
+      "min": 1
+    },
+    "MaxNoPeakCluster": {
+      "type": "int",
+      "default": 4,
+      "description": "Maximum isotope peaks per cluster (SE.MaxNoPeakCluster)",
+      "min": 1
+    },
+    "IsoPattern": {
+      "type": "float",
+      "default": 0.3,
+      "description": "Isotope pattern similarity threshold (SE.IsoPattern)",
+      "min": 0
+    },
+    "MassDefectOffset": {
+      "type": "float",
+      "default": 0.1,
+      "description": "Mass-defect filter offset (SE.MassDefectOffset)",
+      "min": 0
+    },
+    "StartCharge": {
+      "type": "int",
+      "default": 1,
+      "description": "Minimum precursor charge (SE.StartCharge)",
+      "min": 1
+    },
+    "EndCharge": {
+      "type": "int",
+      "default": 5,
+      "description": "Maximum precursor charge (SE.EndCharge)",
+      "min": 1
+    },
+    "MS2StartCharge": {
+      "type": "int",
+      "default": 2,
+      "description": "Minimum fragment charge (SE.MS2StartCharge)",
+      "min": 1
+    },
+    "MS2EndCharge": {
+      "type": "int",
+      "default": 5,
+      "description": "Maximum fragment charge (SE.MS2EndCharge)",
+      "min": 1
+    },
+    "MinFrag": {
+      "type": "int",
+      "default": 10,
+      "description": "Minimum fragments per pseudo-MS/MS spectrum (SE.MinFrag)",
+      "min": 1
+    },
+    "StartRT": {
+      "type": "float",
+      "default": 0.0,
+      "description": "Start retention time in minutes (SE.StartRT)",
+      "min": 0
+    },
+    "EndRT": {
+      "type": "float",
+      "default": 9999.0,
+      "description": "End retention time in minutes (SE.EndRT)",
+      "min": 0
+    },
+    "MinMZ": {
+      "type": "float",
+      "default": 200.0,
+      "description": "Minimum m/z considered (SE.MinMZ)",
+      "min": 0
+    },
+    "MinPrecursorMass": {
+      "type": "float",
+      "default": 600.0,
+      "description": "Minimum precursor mass (SE.MinPrecursorMass)",
+      "min": 0
+    },
+    "MaxPrecursorMass": {
+      "type": "float",
+      "default": 5000.0,
+      "description": "Maximum precursor mass (SE.MaxPrecursorMass)",
+      "min": 0
+    },
+    "extra_params": {
+      "type": "str",
+      "default": "",
+      "description": "Escape hatch: extra `key = value` lines appended to diaumpire_se.params (newline or ';' separated). Also how a V_SWATH variable-window table is supplied."
+    }
+  },
+  "diatracer": {
+    "ram_gb": {
+      "type": "int",
+      "default": 16,
+      "description": "JVM heap (-Xmx<N>G)",
+      "min": 1,
+      "primary": true
+    },
+    "threads": {
+      "type": "int",
+      "default": 8,
+      "description": "Worker threads (--threadNum)",
+      "min": 1,
+      "primary": true
+    },
+    "deltaApexIM": {
+      "type": "float",
+      "default": 0.01,
+      "description": "Ion-mobility Δ for MS1/MS2 apex match (--deltaApexIM)",
+      "min": 0,
+      "primary": true
+    },
+    "deltaApexRT": {
+      "type": "int",
+      "default": 3,
+      "description": "Apex-scan Δ range for MS1/MS2 match (--deltaApexRT, integer scans)",
+      "min": 0,
+      "primary": true
+    },
+    "ms1MS2Corr": {
+      "type": "float",
+      "default": 0.3,
+      "description": "MS1/MS2 correlation threshold (--ms1MS2Corr)",
+      "min": 0,
+      "max": 1,
+      "primary": true
+    },
+    "massDefectFilter": {
+      "type": "bool",
+      "default": true,
+      "description": "Apply mass-defect filter (--massDefectFilter)",
+      "primary": true
+    },
+    "massDefectOffset": {
+      "type": "float",
+      "default": 0.1,
+      "description": "Mass-defect offset (--massDefectOffset)",
+      "min": 0
+    },
+    "RFMax": {
+      "type": "int",
+      "default": 500,
+      "description": "Top-N peaks per spectrum (--RFMax)",
+      "min": 1,
+      "primary": true
+    },
+    "writeInter": {
+      "type": "bool",
+      "default": false,
+      "description": "Write intermediate files (--writeInter)"
+    },
+    "bruker_lib_dir": {
+      "type": "str",
+      "default": "/opt/fragpipe-tools/diatracer/ext/bruker",
+      "description": "Path to ext/bruker dir containing libtimsdata-*.so (JVM -Dlibs.bruker.dir)"
+    }
+  },
+  "easypqp": {
+    "max_delta_unimod": {
+      "type": "float",
+      "default": 0.02,
+      "description": "Maximum Δ mass (Da) for UniMod annotation",
+      "min": 0,
+      "primary": true
+    },
+    "max_delta_ppm": {
+      "type": "float",
+      "default": 15.0,
+      "description": "Maximum Δ mass (ppm) for UniMod annotation",
+      "min": 0,
+      "primary": true
+    },
+    "max_psm_pep": {
+      "type": "float",
+      "default": null,
+      "description": "Maximum PSM posterior-error probability for inclusion. Unset = easypqp's own default, which differs per subcommand (0.5 for `convert`, 1 for `convertpsm`) — FragPipe passes neither, so a single value here silently over-filtered the glyco-DIA libraries",
+      "min": 0,
+      "max": 1,
+      "primary": true
+    },
+    "fragment_types": {
+      "type": "str_list",
+      "default": [
+        "b",
+        "y"
+      ],
+      "description": "Allowed fragment ion types (a,b,c,x,y,z)",
+      "primary": true
+    },
+    "fragment_charges": {
+      "type": "str_list",
+      "default": [
+        "1",
+        "2",
+        "3",
+        "4"
+      ],
+      "description": "Allowed fragment ion charges",
+      "primary": true
+    },
+    "enable_specific_losses": {
+      "type": "bool",
+      "default": false,
+      "description": "Enable specific (residue-tied) fragment ion losses"
+    },
+    "enable_unspecific_losses": {
+      "type": "bool",
+      "default": false,
+      "description": "Enable unspecific fragment ion losses"
+    },
+    "rt_lowess_fraction": {
+      "type": "float",
+      "default": 0.05,
+      "description": "LOWESS smoothing fraction for RT calibration (0 = cross-validate)",
+      "min": 0,
+      "max": 1,
+      "primary": true
+    },
+    "im_lowess_fraction": {
+      "type": "float",
+      "default": 0.05,
+      "description": "LOWESS smoothing fraction for IM calibration",
+      "min": 0,
+      "max": 1
+    },
+    "psm_fdr_threshold": {
+      "type": "float",
+      "default": 0.01,
+      "description": "PSM FDR cutoff",
+      "min": 0,
+      "max": 1,
+      "primary": true
+    },
+    "peptide_fdr_threshold": {
+      "type": "float",
+      "default": 0.01,
+      "description": "Peptide FDR cutoff",
+      "min": 0,
+      "max": 1,
+      "primary": true
+    },
+    "protein_fdr_threshold": {
+      "type": "float",
+      "default": 0.01,
+      "description": "Protein FDR cutoff",
+      "min": 0,
+      "max": 1,
+      "primary": true
+    },
+    "perform_rt_calibration": {
+      "type": "bool",
+      "default": true,
+      "description": "Perform RT alignment across runs",
+      "primary": true
+    },
+    "perform_im_calibration": {
+      "type": "bool",
+      "default": true,
+      "description": "Perform IM alignment (timsTOF runs)",
+      "primary": true
+    },
+    "nofdr": {
+      "type": "bool",
+      "default": false,
+      "description": "Skip FDR reassessment (assume custom upstream FDR filtering)"
+    },
+    "diannpqp": {
+      "type": "bool",
+      "default": false,
+      "description": "Emit DIA-NN2-compatible PQP library alongside the TSV"
+    },
+    "unimod_xml": {
+      "type": "str",
+      "default": "",
+      "description": "UniMod XML used for modification annotation (--unimod); empty = EasyPQP's bundled copy"
+    },
+    "exclude_range": {
+      "type": "str",
+      "default": "-1.5,3.5",
+      "description": "Mass-difference range NOT mapped to UniMod (--exclude-range), e.g. `-1.5,3.5`"
+    },
+    "enable_unannotated": {
+      "type": "bool",
+      "default": true,
+      "description": "Keep delta masses that have no UniMod match (--enable_unannotated)"
+    },
+    "enable_massdiff": {
+      "type": "bool",
+      "default": false,
+      "description": "Map mass differences reported by legacy search engines (--enable_massdiff)"
+    },
+    "precision_digits": {
+      "type": "int",
+      "default": null,
+      "description": "Digits of product m/z precision in the library (--precision_digits); unset = 6",
+      "min": 0
+    },
+    "convert_from_psm": {
+      "type": "bool",
+      "default": false,
+      "description": "Build the library from psm.tsv via `easypqp convertpsm` instead of pepXML via `easypqp convert`"
+    },
+    "decoy_prefix": {
+      "type": "str",
+      "default": "rev_",
+      "description": "Database decoy prefix used to flag decoy PSMs (--decoy_prefix, convertpsm only)"
+    },
+    "labile_mods": {
+      "type": "str",
+      "default": "",
+      "description": "Adjust fragment masses of labile (glyco) modifications — one of oglyc / nglyc / nglyc+ (--labile_mods, convertpsm only); empty = regular, non-glyco"
+    },
+    "max_glycan_q": {
+      "type": "float",
+      "default": 1.0,
+      "description": "Maximum glycan q-value for a PSM to enter the library (--max_glycan_q, convertpsm only)",
+      "min": 0,
+      "max": 1
+    },
+    "rt_reference": {
+      "type": "str",
+      "default": "",
+      "description": "iRT/CiRT reference file for RT alignment (--rt_reference)"
+    },
+    "rt_filter": {
+      "type": "str",
+      "default": "",
+      "description": "Tag used to pick candidate RT reference runs (--rt_filter)"
+    },
+    "rt_psm_fdr_threshold": {
+      "type": "float",
+      "default": null,
+      "description": "PSM FDR used for RT alignment (--rt_psm_fdr_threshold); unset = 0.001",
+      "min": 0,
+      "max": 1
+    },
+    "im_reference": {
+      "type": "str",
+      "default": "",
+      "description": "IM reference file for ion-mobility alignment (--im_reference)"
+    },
+    "im_filter": {
+      "type": "str",
+      "default": "",
+      "description": "Tag used to pick candidate IM reference runs (--im_filter)"
+    },
+    "im_psm_fdr_threshold": {
+      "type": "float",
+      "default": null,
+      "description": "PSM FDR used for IM alignment (--im_psm_fdr_threshold); unset = 0.001",
+      "min": 0,
+      "max": 1
+    },
+    "min_peptides": {
+      "type": "int",
+      "default": null,
+      "description": "Minimum peptides required for a successful alignment (--min_peptides); unset = 5",
+      "min": 1
+    },
+    "pi0_lambda": {
+      "type": "str",
+      "default": "",
+      "description": "Non-parametric p-value estimation `<START> <END> <STEPS>` (--pi0_lambda), e.g. `0.1 0.5 0.05`, or `0.4 0 0` for a fixed value"
+    },
+    "proteotypic": {
+      "type": "bool",
+      "default": true,
+      "description": "Keep only proteotypic (unique, non-shared) peptides"
+    },
+    "consensus": {
+      "type": "bool",
+      "default": true,
+      "description": "Build consensus spectra instead of picking the best replicate"
+    },
+    "extra_convert_cmdline": {
+      "type": "str",
+      "default": "",
+      "description": "Escape hatch: extra flags for each `easypqp convert` call"
+    },
+    "extra_library_cmdline": {
+      "type": "str",
+      "default": "",
+      "description": "Escape hatch: extra flags for the `easypqp library` call"
+    }
+  },
+  "opair": {
+    "ms1_tol": {
+      "type": "float",
+      "default": 20.0,
+      "description": "Precursor mass tolerance (ppm) — CMD -c",
+      "min": 0,
+      "primary": true
+    },
+    "ms2_tol": {
+      "type": "float",
+      "default": 20.0,
+      "description": "Product-ion mass tolerance (ppm) — CMD -b",
+      "min": 0,
+      "primary": true
+    },
+    "glyco_db": {
+      "type": "str",
+      "default": "HexNAc(1),HexNAc(1)Hex(1),HexNAc(1)NeuAc(1),HexNAc(2)Hex(1),HexNAc(1)Hex(1)NeuAc(1),HexNAc(2)Hex(2),HexNAc(2)Hex(1)NeuAc(1),HexNAc(1)Hex(1)NeuAc(2),HexNAc(2)Hex(2)NeuAc(1),HexNAc(2)Hex(2)Fuc(1)NeuAc(1),HexNAc(2)Hex(2)NeuAc(2),HexNAc(2)Hex(2)Fuc(1)NeuAc(2)",
+      "description": "O-glycan composition list (comma-separated, FragPipe Byonic syntax) — CMD -g",
+      "primary": true
+    },
+    "max_glycans": {
+      "type": "int",
+      "default": 4,
+      "description": "Maximum glycans per PSM — CMD -n",
+      "min": 1,
+      "primary": true
+    },
+    "min_isotope_error": {
+      "type": "int",
+      "default": 0,
+      "description": "Min isotope-error offset — CMD -i"
+    },
+    "max_isotope_error": {
+      "type": "int",
+      "default": 2,
+      "description": "Max isotope-error offset — CMD -j"
+    },
+    "filter_oxonium": {
+      "type": "bool",
+      "default": false,
+      "description": "Enable oxonium-ion based glycan filtering — CMD -f",
+      "primary": true
+    },
+    "oxonium_filter_file": {
+      "type": "str",
+      "default": "",
+      "description": "Custom oxonium rules file path (empty = use CMD's default list)"
+    },
+    "oxonium_min_intensity": {
+      "type": "float",
+      "default": 0.05,
+      "description": "Minimum relative oxonium intensity for filtering (0-1) — CMD -m",
+      "min": 0,
+      "max": 1,
+      "primary": true
+    },
+    "threads": {
+      "type": "int",
+      "default": 0,
+      "description": "Worker threads (0 = auto) — CMD -t",
+      "min": 0,
+      "primary": true
+    },
+    "glycan_residues_file": {
+      "type": "str",
+      "default": "/opt/fragpipe-tools/glycan-databases/glycan_residues.txt",
+      "description": "Glycan residue definitions (FragPipe Glycan_Databases) — CMD -x"
+    },
+    "glycan_mods_file": {
+      "type": "str",
+      "default": "/opt/fragpipe-tools/glycan-databases/glycan_mods.txt",
+      "description": "Glycan modification definitions (FragPipe Glycan_Databases) — CMD -y"
+    },
+    "dotnet_bin": {
+      "type": "str",
+      "default": "/opt/dotnet/dotnet",
+      "description": ".NET 6 runtime executable"
+    },
+    "activation1": {
+      "type": "str",
+      "default": "HCD",
+      "description": "Primary scan activation for PairScans (glycan/oxonium scan)",
+      "primary": true
+    },
+    "activation2": {
+      "type": "str",
+      "default": "ETD",
+      "description": "Paired scan activation for PairScans (peptide-backbone scan)",
+      "primary": true
+    },
+    "verbosity": {
+      "type": "enum",
+      "default": "normal",
+      "description": "How much CMD writes to the log — CMD -v",
+      "enum": [
+        "none",
+        "minimal",
+        "normal"
+      ]
+    },
+    "extra_cmdline": {
+      "type": "str",
+      "default": "",
+      "description": "Escape hatch: extra O-Pair CMD flags appended verbatim"
+    }
+  },
+  "msbooster": {
+    "ram_gb": {
+      "type": "int",
+      "default": 16,
+      "description": "Java heap (-XmxN G)",
+      "primary": true
+    },
+    "num_threads": {
+      "type": "int",
+      "default": 8,
+      "description": "Worker threads (numThreads)",
+      "primary": true
+    },
+    "diann_path": {
+      "type": "str",
+      "default": "/opt/fragpipe-tools/fragpipe-24.0/tools/diann/1.8.2_beta_8/linux/diann-1.8.1.8",
+      "description": "Path to local DIA-NN binary"
+    },
+    "use_rt": {
+      "type": "bool",
+      "default": true,
+      "description": "Predict RT (useRT)",
+      "primary": true
+    },
+    "use_spectra": {
+      "type": "bool",
+      "default": true,
+      "description": "Predict spectra (useSpectra)",
+      "primary": true
+    },
+    "use_im": {
+      "type": "bool",
+      "default": false,
+      "description": "Predict ion mobility (useIM)",
+      "primary": true
+    },
+    "rt_model": {
+      "type": "str",
+      "default": "DIA-NN",
+      "description": "RT prediction model (rtModel)",
+      "primary": true
+    },
+    "spectra_model": {
+      "type": "str",
+      "default": "DIA-NN",
+      "description": "Spectra prediction model (spectraModel)",
+      "primary": true
+    },
+    "unimod_obo": {
+      "type": "str",
+      "default": "/opt/fragpipe-tools/fragpipe-24.0/tools/unimod.obo",
+      "description": "Path to unimod.obo for modification lookup"
+    },
+    "msbooster_jar": {
+      "type": "str",
+      "default": "/opt/fragpipe-tools/fragpipe-24.0/tools/MSBooster-1.4.14.jar",
+      "description": "Path to MSBooster jar"
+    },
+    "batmass_io_jar": {
+      "type": "str",
+      "default": "/opt/fragpipe-tools/fragpipe-24.0/tools/batmass-io-1.36.5.jar",
+      "description": "Path to batmass-io jar (required for mzML reading)"
+    },
+    "im_model": {
+      "type": "str",
+      "default": "DIA-NN",
+      "description": "Ion-mobility prediction model (imModel)"
+    },
+    "use_koina": {
+      "type": "bool",
+      "default": false,
+      "description": "Use a remote Koina server for predictions instead of the local DIA-NN (useKoina). Requires koina_url and network access from the sandbox"
+    },
+    "koina_url": {
+      "type": "str",
+      "default": "",
+      "description": "Koina server URL (KoinaURL); only used when use_koina is on"
+    },
+    "find_best_rt_model": {
+      "type": "bool",
+      "default": false,
+      "description": "Benchmark the available RT models and keep the best (findBestRtModel)"
+    },
+    "find_best_spectra_model": {
+      "type": "bool",
+      "default": false,
+      "description": "Benchmark the available spectra models and keep the best (findBestSpectraModel)"
+    },
+    "find_best_im_model": {
+      "type": "bool",
+      "default": false,
+      "description": "Benchmark the available IM models and keep the best (findBestImModel)"
+    },
+    "fragmentation_type": {
+      "type": "str",
+      "default": "auto",
+      "description": "Fragmentation type passed to the predictor (FragmentationType): auto, HCD, CID, ETD, ETHCD, …"
+    },
+    "instrument": {
+      "type": "str",
+      "default": "",
+      "description": "Instrument type hint for the predictor (instrument), e.g. `QE`, `LUMOS`, `TIMSTOF`"
+    },
+    "ppm_tolerance": {
+      "type": "float",
+      "default": null,
+      "description": "Fragment matching tolerance in ppm (ppmTolerance); unset = MSBooster default 20",
+      "min": 0
+    },
+    "use_detect": {
+      "type": "bool",
+      "default": false,
+      "description": "Add detectability features (useDetect)"
+    },
+    "features": {
+      "type": "str",
+      "default": "",
+      "description": "Explicit feature list written into the pin (features), comma-separated. Empty = MSBooster's default feature set"
+    },
+    "delete_predictions": {
+      "type": "bool",
+      "default": false,
+      "description": "Delete prediction files after the run (deletePreds)"
+    },
+    "extra_params": {
+      "type": "str",
+      "default": "",
+      "description": "Escape hatch: extra `key = value` lines appended to msbooster_params.txt (newline or ';' separated). Covers the remaining ~100 MSBooster keys"
+    }
+  },
+  "iprophet": {
+    "decoy_prefix": {
+      "type": "str",
+      "default": "rev_",
+      "description": "Decoy sequence tag (--decoy)",
+      "primary": true
+    },
+    "min_prob": {
+      "type": "float",
+      "default": 0.0,
+      "description": "Minimum probability of results to report (--minProb)",
+      "primary": true
+    },
+    "num_threads": {
+      "type": "int",
+      "default": 4,
+      "description": "Worker threads (--threads)",
+      "primary": true
+    },
+    "output_prefix": {
+      "type": "str",
+      "default": "interact.iproph",
+      "description": "Output name prefix (--output); produces <prefix>.pep.xml"
+    },
+    "length": {
+      "type": "bool",
+      "default": false,
+      "description": "Use Peptide Length model (--length)"
+    },
+    "sharpnse": {
+      "type": "bool",
+      "default": false,
+      "description": "Use more discriminating NSE model for SWATH (--sharpnse)"
+    },
+    "no_fpkm": {
+      "type": "bool",
+      "default": false,
+      "description": "Disable FPKM model (--nofpkm)"
+    },
+    "no_nrs": {
+      "type": "bool",
+      "default": false,
+      "description": "Disable NRS model (--nonrs)"
+    },
+    "no_nse": {
+      "type": "bool",
+      "default": false,
+      "description": "Disable NSE model (--nonse)"
+    },
+    "no_nsi": {
+      "type": "bool",
+      "default": false,
+      "description": "Disable NSI model (--nonsi)"
+    },
+    "no_nsm": {
+      "type": "bool",
+      "default": false,
+      "description": "Disable NSM model (--nonsm)"
+    },
+    "no_nsp": {
+      "type": "bool",
+      "default": false,
+      "description": "Disable NSP model (--nonsp)"
+    },
+    "no_nss": {
+      "type": "bool",
+      "default": false,
+      "description": "Disable NSS model (--nonss)"
+    }
+  },
+  "proteinprophet": {
+    "max_ppm_diff": {
+      "type": "int",
+      "default": 2000000,
+      "description": "Max peptide mass difference (ppm) for protein grouping (--maxppmdiff). FragPipe baseline uses 2000000 (effectively disabled — group only on sequence)."
+    },
+    "min_prob": {
+      "type": "float",
+      "default": 0.05,
+      "description": "Minimum peptide probability to include (--minprob)",
+      "primary": true
+    },
+    "output_prefix": {
+      "type": "str",
+      "default": "combined",
+      "description": "Output filename prefix (--output); produces <prefix>.prot.xml. FragPipe baseline uses 'combined'."
+    },
+    "iprophet": {
+      "type": "bool",
+      "default": false,
+      "description": "Tell proteinprophet input is from iProphet (--iprophet)",
+      "primary": true
+    },
+    "no_nsp": {
+      "type": "bool",
+      "default": false,
+      "description": "Disable NSP model (--nonsp)"
+    },
+    "subgroups": {
+      "type": "bool",
+      "default": false,
+      "description": "Enable subgroups (--subgroups; baseline omits → no groups)"
+    },
+    "unmapped": {
+      "type": "bool",
+      "default": false,
+      "description": "Report UNMAPPED proteins (--unmapped)"
+    }
+  }
+}

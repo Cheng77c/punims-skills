@@ -1,0 +1,309 @@
+{
+  "msconvert": {
+    "version": "3.0.25323",
+    "supported_input_extensions": [
+      ".raw",
+      ".wiff",
+      ".d",
+      ".mzML",
+      ".mzXML"
+    ],
+    "expected_output_patterns": [
+      "*.mzML",
+      "*.mzXML",
+      "*.mz5",
+      "*.mzMLb",
+      "*.mgf",
+      "*.txt",
+      "*.ms1",
+      "*.ms2",
+      "*.cms1",
+      "*.cms2"
+    ],
+    "multi_parent": "single"
+  },
+  "msfragger-closed": {
+    "version": "4.4",
+    "supported_input_extensions": [
+      ".mzML",
+      ".mzXML"
+    ],
+    "expected_output_patterns": [
+      "*.pepXML",
+      "*.pin"
+    ],
+    "multi_parent": "single"
+  },
+  "crystalc": {
+    "version": "1.5.10",
+    "supported_input_extensions": [
+      ".pepXML",
+      ".fasta",
+      ".mzML"
+    ],
+    "expected_output_patterns": [
+      "*_c.pepXML"
+    ],
+    "multi_parent": "single"
+  },
+  "percolator": {
+    "version": "3.08",
+    "supported_input_extensions": [
+      ".pin",
+      ".tsv"
+    ],
+    "expected_output_patterns": [
+      "target_psms.tsv",
+      "decoy_psms.tsv"
+    ],
+    "multi_parent": "single"
+  },
+  "percolator-to-pepxml": {
+    "version": "fragpipe-24.1",
+    "supported_input_extensions": [
+      ".pin",
+      ".pepXML",
+      ".tsv",
+      ".mzML"
+    ],
+    "expected_output_patterns": [
+      "interact-*.pep.xml"
+    ],
+    "multi_parent": "single"
+  },
+  "philosopher-database": {
+    "version": "5.1.0",
+    "supported_input_extensions": [
+      ".fasta",
+      ".fa"
+    ],
+    "expected_output_patterns": [
+      "*-decoys-*.fas"
+    ],
+    "multi_parent": "single"
+  },
+  "peptideprophet": {
+    "version": "5.1.0",
+    "supported_input_extensions": [
+      ".pepXML",
+      ".fas",
+      ".fasta"
+    ],
+    "expected_output_patterns": [
+      "interact-*.pep.xml"
+    ],
+    "multi_parent": "single"
+  },
+  "ptmprophet": {
+    "version": "6.3.2",
+    "supported_input_extensions": [
+      ".pepXML",
+      ".pep.xml",
+      ".mzML",
+      ".mzXML"
+    ],
+    "expected_output_patterns": [
+      "*.mod.pep.xml"
+    ],
+    "multi_parent": "optional"
+  },
+  "philosopher-report": {
+    "version": "5.1.0",
+    "supported_input_extensions": [
+      ".pepXML",
+      ".fas",
+      ".fasta"
+    ],
+    "expected_output_patterns": [
+      "psm.tsv",
+      "peptide.tsv",
+      "protein.tsv",
+      "ion.tsv"
+    ],
+    "multi_parent": "single"
+  },
+  "freequant": {
+    "version": "5.1.0",
+    "supported_input_extensions": [
+      ".tsv",
+      ".mzML",
+      ".mzXML",
+      ".raw",
+      ".d"
+    ],
+    "expected_output_patterns": [
+      "psm.tsv",
+      "peptide.tsv",
+      "ion.tsv"
+    ],
+    "multi_parent": "optional"
+  },
+  "labelquant": {
+    "version": "5.1.0",
+    "supported_input_extensions": [
+      ".tsv",
+      ".mzML",
+      ".mzXML",
+      ".raw",
+      ".d"
+    ],
+    "expected_output_patterns": [
+      "psm.tsv",
+      "peptide.tsv",
+      "ion.tsv"
+    ],
+    "multi_parent": "optional"
+  },
+  "abacus": {
+    "version": "5.1.0",
+    "supported_input_extensions": [
+      ".tsv",
+      ".prot.xml",
+      ".pep.xml"
+    ],
+    "expected_output_patterns": [
+      "combined_protein.tsv",
+      "combined_peptide.tsv",
+      "reprint.spc.tsv",
+      "reprint.int.tsv"
+    ],
+    "multi_parent": "required"
+  },
+  "ionquant": {
+    "version": "1.11.20",
+    "supported_input_extensions": [
+      ".mzML",
+      ".mzXML",
+      ".tsv",
+      ".txt"
+    ],
+    "expected_output_patterns": [
+      "combined_ion.tsv",
+      "combined_peptide.tsv",
+      "combined_protein.tsv",
+      "combined_modified_peptide.tsv"
+    ],
+    "multi_parent": "optional"
+  },
+  "ptmshepherd": {
+    "version": "3.0.11",
+    "supported_input_extensions": [
+      ".tsv",
+      ".mzML"
+    ],
+    "expected_output_patterns": [
+      "global.*.tsv"
+    ],
+    "multi_parent": "single"
+  },
+  "tmtintegrator": {
+    "version": "6.2.1",
+    "supported_input_extensions": [
+      ".tsv"
+    ],
+    "expected_output_patterns": [
+      "abundance_*.tsv",
+      "ratio_*.tsv"
+    ],
+    "multi_parent": "required"
+  },
+  "diann": {
+    "version": "1.8.2-beta8",
+    "supported_input_extensions": [
+      ".mzML",
+      ".mzXML",
+      ".d",
+      ".raw"
+    ],
+    "expected_output_patterns": [
+      "report.tsv",
+      "report.*.tsv",
+      "report.log.txt"
+    ],
+    "multi_parent": "optional"
+  },
+  "diaumpire": {
+    "version": "2.3.4",
+    "supported_input_extensions": [
+      ".mzML",
+      ".mzXML"
+    ],
+    "expected_output_patterns": [
+      "*_Q1.mzML",
+      "*_Q2.mzML",
+      "*_Q3.mzML"
+    ],
+    "multi_parent": "single"
+  },
+  "diatracer": {
+    "version": "2.2.1",
+    "supported_input_extensions": [
+      ".d"
+    ],
+    "expected_output_patterns": [
+      "*_diatracer.mzML"
+    ],
+    "multi_parent": "single"
+  },
+  "easypqp": {
+    "version": "0.1.59",
+    "supported_input_extensions": [
+      ".xml",
+      ".pepxml",
+      ".mzML",
+      ".mzXML",
+      ".tsv"
+    ],
+    "expected_output_patterns": [
+      "library.tsv"
+    ],
+    "multi_parent": "optional"
+  },
+  "opair": {
+    "version": "1.0.0",
+    "supported_input_extensions": [
+      ".tsv",
+      ".mzML",
+      ".mzXML"
+    ],
+    "expected_output_patterns": [
+      "psm.tsv"
+    ],
+    "multi_parent": "optional"
+  },
+  "msbooster": {
+    "version": "1.4.14",
+    "supported_input_extensions": [
+      ".pin",
+      ".mzML",
+      ".mzXML",
+      ".params"
+    ],
+    "expected_output_patterns": [
+      "*_edited.pin"
+    ],
+    "multi_parent": "single"
+  },
+  "iprophet": {
+    "version": "5.1.0",
+    "supported_input_extensions": [
+      ".pepXML",
+      ".pep.xml"
+    ],
+    "expected_output_patterns": [
+      "interact.iproph.pep.xml"
+    ],
+    "multi_parent": "optional"
+  },
+  "proteinprophet": {
+    "version": "5.1.0",
+    "supported_input_extensions": [
+      ".pepXML",
+      ".pep.xml"
+    ],
+    "expected_output_patterns": [
+      "*.prot.xml"
+    ],
+    "multi_parent": "optional"
+  }
+}

@@ -1,0 +1,148 @@
+{
+  "schema_version": 1,
+  "bottom_up_tools": [
+    "msconvert",
+    "msfragger-closed",
+    "crystalc",
+    "percolator",
+    "percolator-to-pepxml",
+    "philosopher-database",
+    "peptideprophet",
+    "ptmprophet",
+    "philosopher-report",
+    "freequant",
+    "labelquant",
+    "abacus",
+    "ionquant",
+    "ptmshepherd",
+    "tmtintegrator",
+    "diann",
+    "diaumpire",
+    "diatracer",
+    "easypqp",
+    "opair",
+    "msbooster",
+    "iprophet",
+    "proteinprophet"
+  ],
+  "rules": {
+    "msconvert": [
+      "msfragger-closed",
+      "ionquant",
+      "percolator-to-pepxml",
+      "ptmshepherd",
+      "crystalc",
+      "diann",
+      "opair",
+      "ptmprophet",
+      "easypqp",
+      "freequant",
+      "labelquant",
+      "msbooster",
+      "diaumpire"
+    ],
+    "msfragger-closed": [
+      "percolator",
+      "percolator-to-pepxml",
+      "peptideprophet",
+      "crystalc",
+      "philosopher-report",
+      "msbooster"
+    ],
+    "crystalc": [
+      "peptideprophet"
+    ],
+    "percolator": [
+      "percolator-to-pepxml"
+    ],
+    "percolator-to-pepxml": [
+      "philosopher-report",
+      "ptmprophet",
+      "iprophet",
+      "proteinprophet",
+      "easypqp"
+    ],
+    "philosopher-database": [
+      "msfragger-closed",
+      "philosopher-report",
+      "peptideprophet",
+      "crystalc"
+    ],
+    "peptideprophet": [
+      "philosopher-report",
+      "ptmprophet",
+      "easypqp",
+      "iprophet",
+      "proteinprophet"
+    ],
+    "ptmprophet": [
+      "philosopher-report",
+      "easypqp"
+    ],
+    "philosopher-report": [
+      "ionquant",
+      "tmtintegrator",
+      "ptmshepherd",
+      "opair",
+      "easypqp",
+      "freequant",
+      "labelquant",
+      "abacus"
+    ],
+    "freequant": [
+      "abacus"
+    ],
+    "labelquant": [
+      "tmtintegrator",
+      "abacus"
+    ],
+    "ionquant": [
+      "tmtintegrator"
+    ],
+    "ptmshepherd": [
+      "ionquant"
+    ],
+    "diaumpire": [
+      "msfragger-closed",
+      "ionquant",
+      "percolator-to-pepxml",
+      "ptmshepherd",
+      "crystalc",
+      "diann",
+      "opair",
+      "ptmprophet",
+      "easypqp",
+      "freequant",
+      "labelquant",
+      "msbooster"
+    ],
+    "diatracer": [
+      "msfragger-closed",
+      "ionquant",
+      "percolator-to-pepxml",
+      "ptmshepherd",
+      "crystalc",
+      "diann",
+      "opair",
+      "ptmprophet",
+      "easypqp",
+      "freequant",
+      "labelquant",
+      "msbooster"
+    ],
+    "easypqp": [
+      "diann"
+    ],
+    "msbooster": [
+      "percolator"
+    ],
+    "iprophet": [
+      "proteinprophet",
+      "philosopher-report",
+      "abacus"
+    ],
+    "proteinprophet": [
+      "abacus"
+    ]
+  }
+}

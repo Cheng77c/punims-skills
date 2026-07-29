@@ -1,0 +1,120 @@
+{
+  "msconvert": {
+    "version": "3.0.25323",
+    "supported_input_extensions": [
+      ".raw",
+      ".wiff",
+      ".d",
+      ".mzML",
+      ".mzXML"
+    ],
+    "expected_output_patterns": [
+      "*.mzML",
+      "*.mzXML",
+      "*.mz5",
+      "*.mzMLb",
+      "*.mgf",
+      "*.txt",
+      "*.ms1",
+      "*.ms2",
+      "*.cms1",
+      "*.cms2"
+    ],
+    "multi_parent": "single"
+  },
+  "topfd": {
+    "version": "1.8.1",
+    "supported_input_extensions": [
+      ".mzML",
+      ".mzXML"
+    ],
+    "expected_output_patterns": [
+      "*_ms1.msalign",
+      "*_file/*_ms1.msalign",
+      "*_ms2.msalign",
+      "*_ms1.feature",
+      "*_ms2.feature",
+      "*_feature.xml",
+      "*_html"
+    ],
+    "multi_parent": "single"
+  },
+  "toppic": {
+    "version": "1.8.1",
+    "supported_input_extensions": [
+      ".fasta",
+      ".fa",
+      ".msalign"
+    ],
+    "expected_output_patterns": [
+      "*_toppic_prsm.tsv",
+      "*_toppic_proteoform.tsv",
+      "*_toppic_prsm_single.tsv",
+      "*_toppic_proteoform_single.tsv",
+      "*_toppic_prsm.xml",
+      "*_toppic_proteoform.xml"
+    ],
+    "multi_parent": "single"
+  },
+  "flashdeconv": {
+    "version": "3.5.0",
+    "supported_input_extensions": [
+      ".mzML"
+    ],
+    "expected_output_patterns": [
+      "*.tsv",
+      "*_ms1.msalign",
+      "*_ms2.msalign",
+      "*_ms1.feature",
+      "*_ms2.feature",
+      "*_spec1.tsv",
+      "*_spec2.tsv",
+      "*_spec3.tsv",
+      "*_spec4.tsv",
+      "*_deconv.mzML",
+      "*_annotated.mzML",
+      "*_quant.tsv"
+    ],
+    "multi_parent": "single"
+  },
+  "pbfgen": {
+    "version": "1.1.7867",
+    "supported_input_extensions": [
+      ".raw",
+      ".mzML"
+    ],
+    "expected_output_patterns": [
+      "*.pbf"
+    ],
+    "multi_parent": "single"
+  },
+  "promex": {
+    "version": "1.1.7867",
+    "supported_input_extensions": [
+      ".pbf",
+      ".mzML",
+      ".raw"
+    ],
+    "expected_output_patterns": [
+      "*.ms1ft",
+      "*.csv",
+      "*_ms1ft.png"
+    ],
+    "multi_parent": "single"
+  },
+  "mspathfindert": {
+    "version": "1.1.7867",
+    "supported_input_extensions": [
+      ".pbf",
+      ".mzML",
+      ".raw"
+    ],
+    "expected_output_patterns": [
+      "*_IcTarget.tsv",
+      "*_IcDecoy.tsv",
+      "*_IcTda.tsv",
+      "*.mzid"
+    ],
+    "multi_parent": "single"
+  }
+}
