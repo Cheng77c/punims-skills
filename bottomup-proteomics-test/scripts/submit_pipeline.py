@@ -7,7 +7,7 @@
 contract-v4 执行器(bu_cli/execution_plan/bu_run.sh)已烤在镜像 /opt/topdown,不随包上传。
 
 env(由 openclaw 注入,先 source /bohr-workspace/.bohr_env):
-  ACCESS_KEY、PROJECT_ID(默认 27108)、IMAGE_ADDRESS(默认本项目镜像)、MACHINE_TYPE
+  BOHR_ACCESS_KEY、PROJECT_ID(无默认,必须由当前用户/平台提供)、IMAGE_ADDRESS、MACHINE_TYPE
 输出: JSON {ok, jobId, status, pollAfterMs, nextTool}
 """
 import argparse
@@ -27,14 +27,72 @@ _IMAGE_FILE = Path(__file__).resolve().parent.parent / "image.txt"
 DEFAULT_IMAGE = _IMAGE_FILE.read_text().strip() if _IMAGE_FILE.exists() else ""
 # PROJECT_ID 无默认:项目相关,必须由 env/configField 注入(同 ACCESS_KEY),否则误投错项目。
 
+# 数据集挂载根:/bohr/<数据集名>/v<版本>。用来从 /bohr 文件路径反推挂载根。
+_BOHR_MOUNT_RE = re.compile(r"^(/bohr/[^/]+/v[0-9]+)(?:/.*)?$")
+
+
+def _derive_dataset_paths(paths, explicit: list):
+    """从 authoring 输入里的 /bohr 文件路径自动推导 dataset_path 挂载根。"""
+    mounts = list(dict.fromkeys(explicit))
+    errors = []
+    for value in paths:
+        if not value or not str(value).startswith("/bohr/"):
+            continue
+        match = _BOHR_MOUNT_RE.match(str(value))
+        if not match:
+            errors.append({
+                "field": "raw_files/fasta_path/annotation_path",
+                "value": value,
+                "problem": "这是 /bohr 路径但推不出数据集挂载根"
+                           "(应形如 /bohr/<数据集名>/v1/<文件>)",
+                "fix": "用 dataset_manager.py files --id <ID> 获取确切 mount_path,"
+                       "不要猜路径。",
+            })
+            continue
+        root = match.group(1)
+        if root not in mounts:
+            mounts.append(root)
+    return mounts, errors
+
+
+# bohr CLI 只认 ACCESS_KEY，平台只保证注入 BOHR_ACCESS_KEY。
+_AUTH_MARKERS = (
+    "cannot unmarshal object into Go struct field RespErr.error",
+    "AccessKey Invalid",
+    "Invalid AccessKey",
+    "AccessKey is required",
+    "code:2000",
+    "Unauthorized",
+)
+
+
+def _child_env() -> dict:
+    env = os.environ.copy()
+    ak = env.get("BOHR_ACCESS_KEY") or env.get("ACCESS_KEY")
+    if ak:
+        env["ACCESS_KEY"] = ak
+        env["BOHR_ACCESS_KEY"] = ak
+    return env
+
+
+def _looks_unauthenticated(text: str) -> bool:
+    return any(marker in (text or "") for marker in _AUTH_MARKERS)
+
 
 def _submit(workdir: str) -> str:
-    # bohr 直接跑(不用 script 包装;ACCESS_KEY 经 env 继承——调用前须 source .bohr_env)
+    # 显式桥接 key，不依赖调用方是否 source .bohr_env。
     p = subprocess.run(["bohr", "job", "submit", "-i", "job.json", "-p", "./"],
-                       cwd=workdir, capture_output=True, text=True)
+                       cwd=workdir, capture_output=True, text=True, env=_child_env())
     out = p.stdout + p.stderr
     m = re.search(r"JobId:\s*(\d+)", out)
     if not m:
+        if _looks_unauthenticated(out):
+            sys.exit(
+                "submit 失败:平台注入的密钥已失效(终局错误,重试没用)。"
+                "这是平台侧的密钥注入问题;如实告知用户后停止本轮。"
+                "不要向用户索取 key,不要运行 bohr auth login。\n原始输出:\n"
+                + out[-800:]
+            )
         sys.exit("submit 失败:\n" + out[-800:])
     return m.group(1)
 
@@ -53,7 +111,8 @@ def main():
 
     # 先本地校验 pipeline(错则停,不浪费 job;错误带 step/tool/field/fix 供 agent 自纠),
     # 再查提交所需 env(PROJECT_ID 无默认,须注入)。
-    vres = validate_pipeline.validate_with_fs(pipeline)
+    vres = validate_pipeline.validate_with_fs(
+        pipeline, base=str(Path(a.pipeline).resolve().parent))
     if not vres["ok"]:
         print(json.dumps({"ok": False, "stage": "validate", "errors": vres["errors"]},
                          ensure_ascii=False))
@@ -63,6 +122,11 @@ def main():
     if not project:
         sys.exit("missing env: PROJECT_ID(须经 .bohr_env/configField 注入,无默认值)")
     image = os.environ.get("IMAGE_ADDRESS", DEFAULT_IMAGE)
+    if not image:
+        sys.exit(
+            "image_address 为空:skill 根目录的 image.txt 找不到,env IMAGE_ADDRESS 也没设。"
+            "不要凭记忆编造 registry 地址或镜像 tag。"
+        )
     machine = os.environ.get("MACHINE_TYPE", "c16_m32_cpu")
 
     # 就地打包:默认用 pipeline.json 所在目录(per-task 自包含、并发安全、不散落根目录)。
@@ -76,9 +140,14 @@ def main():
     # 本地输入拷进上传包并改为包内相对名(/bohr 挂载路径保留)。
     # BU schema:执行器 bu_cli 读 raw_files(list)+ fasta_path(str)+ annotation_path(str),
     # 不是 TD 的 inputs 字典——必须 stage 这几个键,否则作业节点找不到输入。
+    pdir = Path(a.pipeline).resolve().parent
+
     def _stage(v):
         if v and not str(v).startswith("/bohr/"):
-            src = Path(v).resolve()
+            src = Path(v)
+            if not src.is_absolute():
+                src = pdir / src
+            src = src.resolve()
             dst = wd / src.name
             if src != dst.resolve():   # 就地打包时输入可能已在 wd,避免 copy 自己到自己
                 shutil.copy(src, dst)
@@ -89,6 +158,20 @@ def main():
     for key in ("fasta_path", "annotation_path"):
         if pipeline.get(key):
             pipeline[key] = _stage(pipeline[key])
+
+    scan_paths = list(pipeline.get("raw_files") or []) + [
+        pipeline.get("fasta_path"),
+        pipeline.get("annotation_path"),
+    ]
+    mounts, dataset_errors = _derive_dataset_paths(scan_paths, a.dataset_path)
+    if dataset_errors:
+        print(json.dumps({
+            "ok": False,
+            "stage": "dataset_path",
+            "errors": dataset_errors,
+        }, ensure_ascii=False))
+        return 1
+
     (wd / "pipeline.json").write_text(json.dumps(pipeline, ensure_ascii=False, indent=2))
     execution_plan = compile_execution_plan.compile_bottomup(pipeline)
     (wd / "execution_plan.json").write_text(
@@ -108,8 +191,8 @@ def main():
         "max_run_time": 120,
         "image_address": image,
     }
-    if a.dataset_path:
-        job["dataset_path"] = a.dataset_path
+    if mounts:
+        job["dataset_path"] = mounts
     (wd / "job.json").write_text(json.dumps(job, ensure_ascii=False, indent=2))
 
     jid = _submit(str(wd))

@@ -24,7 +24,7 @@ configFields:
     default: "c16_m32_cpu"
 metadata:
   openclaw:
-    primaryEnv: ACCESS_KEY
+    primaryEnv: BOHR_ACCESS_KEY
 l0: Top-down 蛋白质组学流水线(Bohrium)
 l1: >
   用户给 .raw/.mzML + FASTA;确认质量误差/PTM/FDR 等参数后,提交 Bohrium job 跑
@@ -47,9 +47,15 @@ l1: >
   你只需提供 spectrum / fasta / 参数;镜像与作业配置由脚本处理。
 - 重二进制都在镜像里跑(经 Bohrium 作业),**不要在 sandbox 里直接跑 msconvert/TopPIC**。
 
-如果 `IMAGE_ADDRESS`/`PROJECT_ID`/`ACCESS_KEY` 未配置,**不要猜或找替代镜像**——用 `AskUserInput` 让用户补配置或提示去启用 `bohrium-job` skill。
+如果 `IMAGE_ADDRESS`/`PROJECT_ID` 未配置,**不要猜或找替代值**——用 `AskUserInput` 让用户补配置或提示去启用 `bohrium-job` skill。**密钥是例外:绝不向用户索取。** 平台会把表单中的密钥脱敏成 `[REDACTED]`,Agent 拿不到真值,还可能留下覆盖有效注入的陈旧记录。密钥缺失或认证失败属于平台注入问题:如实告知用户并停止本轮。
 
-### 🚫 五条铁律(违反=必错)
+### 🚫 六条铁律(违反=必错)
+0. **开工先加载 `bohrium-dataset-manager-test` skill。** 共享盘/个人盘谱图的查重和建集只用:
+   ```bash
+   python3 /data/skills/bohrium-dataset-manager-test/dataset_manager.py create-from-disk \
+     --project-id <pid> --disk-path share/<盘内路径> --json
+   ```
+   不要手写 REST、不要根据标题猜是否已有数据集。
 1. **绝不手写 job.json / 绝不自己拼 `bohr job submit`** —— 一律 `scripts/submit_pipeline.py`。
 2. **绝不直接调工具**(msconvert/topfd/toppic…)—— 只经 `submit_pipeline.py` 提交。
 3. **谱图默认一律走 dataset(不论大小)**:共享盘/个人盘的谱图**直接转 dataset、无需下载**,工作区本地用 `make_dataset.py`;仅当用户主动要求"直接上传"且谱图 ≤100MB 才 `-p`。**唯一需要下载的是 FASTA**(需可写)。结果用 `collect_results.py` 取。
@@ -69,10 +75,10 @@ sandbox 每次 Bash 是独立 shell,环境变量不跨调用持久化。**第一
 bash scripts/setup.sh              # 装 bohr CLI + 写 /bohr-workspace/.bohr_env(只需一次)
 source /bohr-workspace/.bohr_env   # 每个新 Bash 调用开头都要,确保 ACCESS_KEY/PROJECT_ID 在
 ```
-鉴权要点:bohr CLI 认 `ACCESS_KEY` 环境变量;直接调 REST API 用 HTTP 头 `accessKey: <key>`(**不是** `Authorization: Bearer`)。脚本已按此写。
+鉴权要点:平台注入 `BOHR_ACCESS_KEY`,bohr CLI 只认 `ACCESS_KEY`;`setup.sh` 和各脚本会在子进程环境中自动桥接。**Agent 不需要读取、复制或改写密钥。**
 
 > ⛔ **只许 `bash scripts/setup.sh` 生成 .bohr_env,绝不手写/覆写它**(setup 已兜底读 `BOHR_ACCESS_KEY`)。
-> - `ACCESS_KEY` 未注入:先完成授权 + 重载 skill,再 `setup.sh`(setup 跑早于授权才会读不到)。
+> - 密钥未注入或探针认证失败:这是平台侧问题,如实告知用户后停止。**绝不向用户索取 key,不手写 curl,不反复换 header 重试。**
 > - `PROJECT_ID` 未注入:对话中用户已明确的项目 ID 可直接用(`export PROJECT_ID=<id>`);未知才 `AskUserInput` 索取,**绝不凭空编造默认值**(不同用户项目不同,乱写会误投)。
 
 ## 工作流(严格按序)
@@ -127,15 +133,16 @@ python3 scripts/validate_pipeline.py --pipeline pipeline.json
 
 > **FASTA 必须走 `-p`,不可放 dataset。** TopPIC / MSPathFinderT 在搜索时会于 **FASTA 同目录**写入索引文件(`.fasta_idx`);dataset 为只读挂载,写索引将失败(`LOG ERROR: … fasta_idx could not be created`)。FASTA 体积通常为 KB–MB 级,放入 `-p` 即可;`make_dataset.py` 也会拒绝 FASTA 文件。
 >
-> **共享盘/个人盘上的 fasta:只下载这一个文件**进任务目录再走 `-p`(**别做成 dataset**)。用已验证的下载形态——**路径作 URL 段**,`projectId`+`userId` 作 query(**不要用 `filePath=` query,后端会回 `path invalid!`**):
+> **共享盘/个人盘上的 fasta:只下载这一个文件**进任务目录再走 `-p`(**别做成 dataset**)。
+> **一律用 `fetch_file.py`,不要手写 curl**:
 > ```bash
 > source /bohr-workspace/.bohr_env
-> API=https://open.bohrium.com/openapi
-> USERID=$(curl -sS "$API/v1/ak/get" -H "Authorization: Bearer $ACCESS_KEY" | python3 -c "import json,sys;print(json.load(sys.stdin)['data']['user_id'])")
-> # 共享盘路径前缀 share/…;个人盘用 personal/…(路径原样拼进 URL 段)
-> curl -L -sS "$API/v1/file/download/share/jubao/<完整路径>/xxx.fasta?projectId=$PROJECT_ID&userId=$USERID" \
->   -H "Authorization: Bearer $ACCESS_KEY" -o /bohr-workspace/td-runs/<任务>/xxx.fasta
+> # 共享盘以 share/ 开头,个人盘以 personal/ 开头;路径原样传入。
+> python3 scripts/fetch_file.py \
+>   --remote share/<完整路径>/xxx.fasta \
+>   --out /bohr-workspace/td-runs/<任务>/xxx.fasta
 > ```
+> `fetch_file.py` 负责路径校验、用户 ID 解析和认证头,且不让密钥进入命令文本。
 
 仅**谱图**需要建 dataset:
 ```bash
@@ -233,7 +240,7 @@ python3 scripts/collect_results.py --job-id <JobId> --out /bohr-workspace/td-run
 **常见错误:**
 | 现象 | 原因 / 处理 |
 |---|---|
-| `AccessKey Invalid` | ① 确认 `ACCESS_KEY` 已 export(`echo ${ACCESS_KEY:0:6}` 非空);② 别用 `Authorization: Bearer`,REST 用 `accessKey:` 头;③ 短时间高频/并发同一 key 可能被限流,稍等重试;④ key 被重新生成会失效,让用户重取 |
+| `AccessKey Invalid` / `AccessKey is required` / `code:2000` | **终局错误,不要重试。** 先运行 `bash scripts/setup.sh`;若探针仍失败,说明平台密钥注入缺失或已失效。如实告知用户后停止,**绝不向用户索取 key**,不手写 curl,不尝试 `bohr auth login`。 |
 | `ParamError ... validation failed` | pipeline.json 写了不存在的字段;只用 `references/parameters.md` 列的键,不要臆造(如 `msconvert_only`) |
 | `no files found matching X` | 输入路径问题——脚本已把本地输入绝对化;确认文件真存在、或 dataset 路径对 |
 | job `status=-1`(失败) | `collect_results.py` 直接返回 `failed_step` + `error` + **`failed_log_tail`(工具真实报错)** + `missing_inputs`;依据真实报错修正,勿自行臆测 |
@@ -253,12 +260,12 @@ python3 scripts/collect_results.py --job-id <JobId> --out /bohr-workspace/td-run
 - 不臆造文件路径或参数;不确定就 `AskUserInput`。
 - **禁止 `cat` 执行器日志 / 大 TSV**(toppic 进度日志可达数百万字符):指标取 `collect_results.py` 的 `metrics`;需细节时 `head -40` 读 TSV 顶部统计块即可。
 - 不在 Bohrium 镜像库查找单工具镜像;一律使用配置的 `IMAGE_ADDRESS`(默认取自 `image.txt`)。
-- ACCESS_KEY 由平台注入,不写进 prompt/日志/文件。
+- `BOHR_ACCESS_KEY` 由平台注入,不写进 prompt/日志/文件,也不向用户索取。
 
 ## 配置(由平台注入)
 本 skill 需要的配置在上方 frontmatter 的 `configFields` / `metadata.openclaw` 中声明,由平台(OpenClaw)以**环境变量**注入;sandbox 内经 `setup.sh` 落到 `/bohr-workspace/.bohr_env`,后续命令 `source` 即用:
-- `ACCESS_KEY`(`primaryEnv`,**必填**;平台亦可能注入 `BOHR_ACCESS_KEY`,脚本两者都认)
+- `BOHR_ACCESS_KEY`(`primaryEnv`,**必填**;脚本自动桥接为 bohr CLI 所需的 `ACCESS_KEY`)
 - `PROJECT_ID`(**必填**,无默认——缺失时不得硬编码,向用户索取)
 - `IMAGE_ADDRESS`(可选,默认取 skill 的 `image.txt`,仅临时换版本时填)、`MACHINE_TYPE`(可选,默认 `c16_m32_cpu`)
 
-> 具体在何处填这些值,以平台的 skill 配置界面/文档为准(本 skill 不假设具体配置文件名)。
+> 具体在何处填这些值,以平台的 skill 配置界面/文档为准。密钥配置异常只能由平台侧修复,Agent 不向用户收集密钥。

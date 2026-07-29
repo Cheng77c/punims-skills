@@ -7,9 +7,39 @@ import argparse
 import json
 import os
 import sys
+import urllib.error
 import urllib.request
 
 STATUS = {0: "pending", 1: "running", 2: "completed", 3: "scheduling", -1: "failed"}
+
+
+# ── 鉴权失败的统一口径(与 fetch_file.py 同源) ───────────────────────
+# 平台 401 的 body 是**合法 JSON**;不读 body 就会把"密钥失效"误判成"作业不存在"。
+_AUTH_NEXT = ("平台注入的密钥已失效。这是**终局错误**(响应里带 retryable:false),重试没用。"
+              "**这是平台侧的密钥注入问题,不在本 skill 的处理范围** —— 如实把这一条告知用户,"
+              "然后停止本轮,不要尝试自行修复、也不要替平台猜处置步骤。")
+_AUTH_NEVER = ("不要向用户索取 key,不要手写 .bohr_env,不要 `bohr auth login`(该子命令不存在),"
+               "不要把作业当成仍在运行继续等。")
+
+
+def _biz(e):
+    try:
+        j = json.loads(e.read().decode("utf-8", "replace"))
+        return j.get("code"), j.get("message")
+    except Exception:  # noqa: BLE001
+        return None, None
+
+
+def _fail(job_id: str, what: str, next_: str, forbidden: str, status: str = "not_found"):
+    """作业查询失败一律硬失败:ok:false + 非 0 退出码。
+
+    这里曾经把"查不到"当成 status:"unknown" + ok:true + "仍在运行,稍后再查"返回,
+    退出码还是 0 —— agent 于是永远等一个不存在的作业。查不到就是错,必须说清怎么办。
+    """
+    print(json.dumps({"ok": False, "jobId": job_id, "status": status,
+                      "done": False, "error": what, "next": next_,
+                      "forbidden": forbidden}, ensure_ascii=False))
+    sys.exit(2)
 
 
 def decide(job_id: str, code) -> dict:
@@ -37,15 +67,51 @@ def main():
     if not ak:
         sys.exit("missing env: ACCESS_KEY(也没 BOHR_ACCESS_KEY;先 source .bohr_env 或完成授权)")
 
-    url = "https://openapi.dp.tech/openapi/v1/job/list?page=1&pageSize=50"
+    # 地址唯一来源:OPENAPI_HOST(setup.sh 导出)。不要自己拼别的域名。
+    api = os.environ.get("OPENAPI_HOST", "https://open.bohrium.com").rstrip("/")
+    url = f"{api}/openapi/v1/job/list?page=1&pageSize=50"
     req = urllib.request.Request(url, headers={"accessKey": ak})
-    data = json.load(urllib.request.urlopen(req, timeout=20))
+    try:
+        data = json.load(urllib.request.urlopen(req, timeout=20))
+    except urllib.error.HTTPError as e:
+        code, msg = _biz(e)
+        if code == 2000 or e.code in (401, 403):
+            # 关键:这不是"作业不存在"。以前所有失败都标 not_found,于是鉴权失败被
+            # 报成"查不到这个作业",agent 转头去核对 jobId —— 方向完全错。
+            _fail(a.job_id, f"密钥被拒:HTTP {e.code} code={code} {msg or ''}".strip(),
+                  next_=_AUTH_NEXT, forbidden=_AUTH_NEVER, status="auth_failed")
+        _fail(a.job_id, f"查询作业列表失败:HTTP {e.code} code={code}",
+              next_="非鉴权错(5xx/网关抖动),原样重跑本命令一次。",
+              forbidden="不要改用别的 API 域名或自己拼 REST 端点,不要把作业当成已完成继续往下走。")
+    except Exception as e:
+        _fail(a.job_id, f"查询作业列表失败:{e}",
+              next_="多半是网络/代理问题(代理返回 HTML 会导致 JSON 解析失败):"
+                    "`unset http_proxy https_proxy` 后原样重跑本命令。",
+              forbidden="不要换端点,不要假设作业仍在运行。")
 
+    # HTTP 200 也可能带业务错误码。不查就会拿到空 items → 误报"作业不存在"。
+    if isinstance(data, dict) and data.get("code") == 2000:
+        _fail(a.job_id, f"密钥被拒:HTTP 200 但 code=2000 {data.get('message') or ''}".strip(),
+              next_=_AUTH_NEXT, forbidden=_AUTH_NEVER, status="auth_failed")
+
+    items = (data.get("data") or {}).get("items") or []
     code = None
-    for j in data.get("data", {}).get("items", []):
+    for j in items:
         if str(j.get("id")) == str(a.job_id):
             code = j.get("status")
             break
+
+    # 查不到 = 硬错误。绝不能退化成 status:"unknown" + "仍在运行" —— 那会让 agent
+    # 永远等一个不存在的作业(jobId 抄错 / 提交时 PROJECT_ID 与当前 env 不一致 / 作业被删)。
+    if code is None:
+        _fail(a.job_id,
+              f"在最近 {len(items)} 条作业里找不到 jobId={a.job_id}",
+              next_="① 回看 submit 的输出,核对 jobId 原文有没有抄错;"
+                    "② `echo $PROJECT_ID` 确认与提交时是同一个项目;"
+                    "③ 仍找不到就说明作业没提交成功或已被删除,需要重新 submit。",
+              forbidden="不要猜别的 jobId,不要自己 curl 其它端点去找,"
+                        "更不要把状态当成 running 继续等下去 —— 这个作业并不存在。")
+
     print(json.dumps(decide(a.job_id, code), ensure_ascii=False))
 
 
